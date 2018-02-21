@@ -1,11 +1,10 @@
-from os import urandom
-import json
 from uuid import uuid4
 
+from yaml import load, dump
 import redis
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization\
     import load_pem_parameters, load_pem_public_key
@@ -25,16 +24,16 @@ class RedisClient():
 
     def post_message(self, to=None, m_code=None, data=None):
         return self.r.publish(self.channel,
-                              json.dumps({
+                              dump({
                                   "sender_id": self.ident,
                                   "to": to,
                                   "m_code": m_code,
-                                  "data": json.dumps(data)
+                                  "data": dump(data)
                               }))
 
     def decode_message(message):
-        payload = json.loads(message['data'])
-        payload['data'] = json.loads(payload['data'])
+        payload = load(message['data'])
+        payload['data'] = load(payload['data'])
         return payload
 
 
@@ -110,7 +109,7 @@ class DFEKeyExchange(GameClient):
             elif data.get('dh_step') == 'share_pub':
                 self.recv_pubkey(data)
 
-            elif data.get('type') == 'encrypted_message':
+            elif data.get('type') == 'fernet_message':
                 self.recv_encrypted_message(data)
 
             else:
@@ -146,24 +145,44 @@ class DFEKeyExchange(GameClient):
             data['pub'].encode(), backend=default_backend())
         self.dh_server.submit_public_key(peerpub)
         print(self.dh_server._shared_key)
-        hkdf = HKDF(
+        self.fernet = FernetServer(self.dh_server._shared_key)
+
+        print("Shared key = {}".format(self.fernet.key))
+
+        self.cli.post_message(
+            data={
+                'type': 'fernet_message',
+                'ciphertext': self.fernet.encrypt_message("secret message")
+            })
+
+    def recv_encrypted_message(self, data):
+        message = data.get('ciphertext')
+        print("Secret message recv: {}".format(message))
+
+        print("Decrypted message: {}".format(
+            self.fernet.decrypt_message(message)))
+
+
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+import base64
+
+class FernetServer():
+    def __init__(self, shared_key):
+        kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
-            salt=None,
-            info=b'pkr_channel',
+            salt=b'salt',
+            iterations=100000,
             backend=default_backend())
-        self.dh_server._shared_key = hkdf.derive(self.dh_server._shared_key)
-        message = self.dh_server.encrypt_message("Hello this is secret")
-        print("Secret message send = {}".format(message))
-        self.cli.post_message(data={
-            'type': 'encrypted_message',
-            'message': message
-        })
+        self.key = base64.urlsafe_b64encode(kdf.derive(shared_key))
 
-    def recv_encryted_message(self, data):
-        message = data.get('message')
-        de = self.dh_server.decrypt_message(message)
-        print("Decrypted: {}".format(de))
+        self.f = Fernet(self.key)
+
+    def encrypt_message(self, message):
+        return self.f.encrypt(message.encode())
+
+    def decrypt_message(self, cipher):
+        return self.f.decrypt(cipher).decode()
 
 
 class DHServer(object):
@@ -206,17 +225,6 @@ class DHServer(object):
         ciphertext = encryptor.update(bytes([b + 12 % 255 for b in message
                                              ])) + encryptor.finalize()
         return nonce + ciphertext
-
-    def decrypt_message(self, ciphertext):
-        if self._shared_key is not None:
-            key = self._shared_key
-
-        cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=self.backend)
-        decryptor = cipher.decryptor()
-        plaintext = b''
-        for block in self._get_blocks(ciphertext):
-            plaintext = plaintext + decryptor.update(block)
-        return plaintext + decryptor.finalize()
 
     def parse_parameters(self, params):
         # TODO: Use proper library serialisation
