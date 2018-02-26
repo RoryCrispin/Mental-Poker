@@ -2,7 +2,7 @@ from multiprocessing import Pool
 from time import sleep
 
 from Client import Client
-from Client import DFEKeyExchange
+from DFClient import DFEKeyExchange
 
 
 def start_async_rounds(process_count):
