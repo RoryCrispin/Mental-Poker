@@ -152,7 +152,7 @@ class DFEKeyExchange(GameClient):
         self.cli.post_message(
             data={
                 'type': 'fernet_message',
-                'ciphertext': self.fernet.encrypt_message("secret message")
+                'ciphertext': self.fernet.encrypt_message("Hello from client: {}".format(self.cli.ident))
             })
 
     def recv_encrypted_message(self, data):
@@ -265,4 +265,3 @@ class DHServer(object):
         self._shared_key = hkdf.derive(self._pre_master_secret)
 
 
-bob = Client(DFEKeyExchange)
