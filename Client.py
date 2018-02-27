@@ -3,6 +3,8 @@ from yaml import load, dump
 
 import redis
 
+from Logging import LogLevel, readable_ident
+
 
 class RedisClient():
     def __init__(self, channel):
@@ -33,6 +35,7 @@ class Client(RedisClient):
         super().__init__('poker_chan')
         self.game = initial_game(self)
         self.queue = []
+        self.logged_messages = []
         self.begin()
 
     def begin(self):
@@ -45,6 +48,13 @@ class Client(RedisClient):
                     self.queue.append(payload)
                     self.game, self.queue =\
                         self.game.apply_queue(self.queue)
+                    if self.game is None:
+                        self.log(LogLevel.VERBOSE, "Game Complete")
+                        return self.logged_messages
+
+    def log(self, log_level, message):
+        self.logged_messages.append((log_level, message))
+        print("{} <> {}".format(str(log_level), message))
 
 
 class GameClient():
@@ -71,9 +81,14 @@ class GreetingCli(GameClient):
                 self.send_greeting(e)
             else:
                 new_queue.append(e)
-        return (self, new_queue)
+
+        return (None, None) if self.is_game_over() else (self, new_queue)
+
+    def is_game_over(self):
+        return self.greetings_sent >= 2
 
     def send_greeting(self, data):
         self.cli.post_message(data={'Welcome: Player ': self.greetings_sent})
         self.greetings_sent += 1
-        yield "Greeting sent!"
+        self.cli.log(LogLevel.INFO, "Greetings sent {}".format(
+            self.greetings_sent))
