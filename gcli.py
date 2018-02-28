@@ -1,3 +1,3 @@
 from Client import Client, GreetingCli
 
-bob = Client(GreetingCli)
+bob = Client(GreetingCli).begin()
