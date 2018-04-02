@@ -6,3 +6,5 @@ class SRAEncryptionClient(GameClient):
         super.__init__(cli)
         self.max_players = max_players
         self.initial_message = b'SRA_WELCOME_MESSAGE'
+        
+

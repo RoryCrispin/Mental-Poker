@@ -39,9 +39,14 @@ class Client(RedisClient):
 
 
 class GameClient():
+    IDENT_REQ_KEY = 'identify_request'
+    IDENT_RESP_KEY = 'identify_response'
+
+
     def __init__(self, cli):
         self.cli = cli
-        self.queue_map = [('identify_request', self.recv_identify_request)]
+        self.queue_map = [(GameClient.IDENT_REQ_KEY, self.recv_identify_request),
+                          (GameClient.IDENT_RESP_KEY, self.recv_identify_response)]
         self.player_map = {}
 
     # Takes a Queue of messages and returns a new game class along with
@@ -75,15 +80,14 @@ class GameClient():
                  'player_map': self.player_map}]
 
     def recv_identify_request(self, _):
-        self.cli.post_message(data={'message_key': 'identify_response',
-                                    'client_id': self.cli.ident})
+        self.cli.post_message(data={'message_key': GameClient.IDENT_RESP_KEY})
 
     def recv_identify_response(self, data):
         self.cli.log(LogLevel.INFO, "Identify Response!")
-        self.player_map[data.get('client_id')] = {}
+        self.player_map[data.get('sender_id')] = {}
 
     def request_idenfity(self):
-        self.cli.post_message(data={'message_key': 'identify_request'})
+        self.cli.post_message(data={'message_key': GameClient.IDENT_REQ_KEY})
 
 
 
