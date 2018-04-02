@@ -1,7 +1,7 @@
 from multiprocessing import Pool
 from time import sleep
-from Client import Client
-from RSAClient import RSAKeyShareClient
+from client import Client, GreetingCli
+from rsa_client import RSAKeyShareClient
 import logging
 
 logger = logging.getLogger()
@@ -38,3 +38,7 @@ def test_RSA_keys_match_three_way():
     for player in playerlists:
         for pk_entry in player:
             assert pk_entry in actual_pubkeys
+
+def test_greeting_client():
+    x = start_async_rounds(GreetingCli, 3)
+    assert [y[1].get('greetings_sent') for y in x] == [2,1,0]

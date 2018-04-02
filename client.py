@@ -1,34 +1,5 @@
-from uuid import uuid4
-from yaml import load, dump
-
-import redis
-
-from Logging import LogLevel, readable_ident
-
-
-class RedisClient():
-    def __init__(self, channel):
-        self.ident = str(uuid4())
-        self.channel = channel
-        self.r = redis.StrictRedis(decode_responses=True)
-        self.p = self.r.pubsub(ignore_subscribe_messages=True)
-        self.p.subscribe(channel)
-        self.queue = []
-
-    def post_message(self, to=None, m_code=None, data=None):
-        return self.r.publish(self.channel,
-                              dump({
-                                  "sender_id": self.ident,
-                                  "to": to,
-                                  "m_code": m_code,
-                                  "data": dump(data)
-                              }))
-
-    def decode_message(message):
-        payload = load(message['data'])
-        payload['data'] = load(payload['data'])
-        return payload
-
+from redis_client import RedisClient
+from pkr_logging import LogLevel
 
 class Client(RedisClient):
     def __init__(self, initial_game):
@@ -75,7 +46,7 @@ class GameClient():
     # Takes a Queue of messages and returns a new game class along with
     # a new queue state (With the applied element removed)
     # These games are still impure in that they can freely send messages to
-    # other clients
+    # other clients through execution
     def apply_queue(self, queue):
         new_queue = []
         for e in queue:
@@ -106,14 +77,30 @@ class GreetingCli(GameClient):
     def __init__(self, cli, greetings_sent=0):
         super().__init__(cli)
         self.greetings_sent = greetings_sent
-        self.queue_map = [('hello_message', self.send_greeting)]
+        self.queue_map = [('hello_message', self.send_greeting),
+                          ('close_game', self.notify_game_close)]
         self.cli.post_message(data={'message_key': 'hello_message'})
+        self.end_game = False
 
     def is_game_over(self):
-        return self.greetings_sent >= 2
+        if self.greetings_sent >= 2:
+            self.cli.post_message(data={'message_key': 'close_game'})
+            return True
+        else:
+            return self.end_game
+
+    def notify_game_close(self, _):
+        self.end_game = True
 
     def send_greeting(self, data):
         self.cli.post_message(data={'Welcome: Player ': self.greetings_sent})
         self.greetings_sent += 1
         self.cli.log(LogLevel.INFO, "Greetings sent {}".format(
             self.greetings_sent))
+
+    def get_final_state(self):
+        state = (super(GreetingCli, self).get_final_state())
+        state.append({
+            'greetings_sent' : self.greetings_sent
+        })
+        return state
