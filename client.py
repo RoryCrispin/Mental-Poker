@@ -39,16 +39,11 @@ class Client(RedisClient):
 
 
 class GameClient():
-    IDENT_REQ_KEY = 'identify_request'
-    IDENT_RESP_KEY = 'identify_response'
 
 
     def __init__(self, cli):
         self.cli = cli
-        self.queue_map = [(GameClient.IDENT_REQ_KEY, self.recv_identify_request),
-                          (GameClient.IDENT_RESP_KEY, self.recv_identify_response)]
-        self.player_map = {}
-
+        self.queue_map = []
     # Takes a Queue of messages and returns a new game class along with
     # a new queue state (With the applied element removed)
     # These games are still impure in that they can freely send messages to
@@ -76,18 +71,7 @@ class GameClient():
 
     def get_final_state(self):
         print("Getting final state!")
-        return [{'root_state':True,
-                 'player_map': self.player_map}]
-
-    def recv_identify_request(self, _):
-        self.cli.post_message(data={'message_key': GameClient.IDENT_RESP_KEY})
-
-    def recv_identify_response(self, data):
-        self.cli.log(LogLevel.INFO, "Identify Response!")
-        self.player_map[data.get('sender_id')] = {}
-
-    def request_idenfity(self):
-        self.cli.post_message(data={'message_key': GameClient.IDENT_REQ_KEY})
+        return [{'root_state':True}]
 
 
 
@@ -95,8 +79,8 @@ class GreetingCli(GameClient):
     def __init__(self, cli, greetings_sent=0):
         super().__init__(cli)
         self.greetings_sent = greetings_sent
-        self.queue_map = [('hello_message', self.send_greeting),
-                          ('close_game', self.notify_game_close)]
+        self.queue_map.extend([('hello_message', self.send_greeting),
+                          ('close_game', self.notify_game_close)])
         self.cli.post_message(data={'message_key': 'hello_message'})
         self.end_game = False
 
@@ -115,7 +99,6 @@ class GreetingCli(GameClient):
         self.greetings_sent += 1
         self.cli.log(LogLevel.INFO, "Greetings sent {}".format(
             self.greetings_sent))
-        self.request_idenfity()
 
     def get_final_state(self):
         state = (super(GreetingCli, self).get_final_state())
