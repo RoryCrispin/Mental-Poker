@@ -1,5 +1,5 @@
 from redis_client import RedisClient
-from pkr_logging import LogLevel
+from pkr_logging import LogLevel, readable_ident
 
 class Client(RedisClient):
     def __init__(self, initial_game):
@@ -41,7 +41,8 @@ class Client(RedisClient):
 class GameClient():
     def __init__(self, cli):
         self.cli = cli
-        self.queue_map = []
+        self.queue_map = [('identify_request', self.recv_identify_request)]
+        self.player_map = {}
 
     # Takes a Queue of messages and returns a new game class along with
     # a new queue state (With the applied element removed)
@@ -70,7 +71,20 @@ class GameClient():
 
     def get_final_state(self):
         print("Getting final state!")
-        return [{'root_state':True}]
+        return [{'root_state':True,
+                 'player_map': self.player_map}]
+
+    def recv_identify_request(self, _):
+        self.cli.post_message(data={'message_key': 'identify_response',
+                                    'client_id': self.cli.ident})
+
+    def recv_identify_response(self, data):
+        self.cli.log(LogLevel.INFO, "Identify Response!")
+        self.player_map[data.get('client_id')] = {}
+
+    def request_idenfity(self):
+        self.cli.post_message(data={'message_key': 'identify_request'})
+
 
 
 class GreetingCli(GameClient):
@@ -97,10 +111,11 @@ class GreetingCli(GameClient):
         self.greetings_sent += 1
         self.cli.log(LogLevel.INFO, "Greetings sent {}".format(
             self.greetings_sent))
+        self.request_idenfity()
 
     def get_final_state(self):
         state = (super(GreetingCli, self).get_final_state())
         state.append({
-            'greetings_sent' : self.greetings_sent
+            'greetings_sent' : self.greetings_sent,
         })
         return state
