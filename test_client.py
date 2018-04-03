@@ -45,7 +45,7 @@ def test_greeting_client():
     assert [y[1].get('greetings_sent') for y in x] == [2, 1, 0]
 
 
-from ordered_turn_client import OrderedTurnClient
-def test_ordered_turn_client():
-    x = start_async_rounds(OrderedTurnClient, 3)
-    pass
+# from ordered_turn_client import OrderedTurnClient
+# def test_ordered_turn_client():
+#     x = start_async_rounds(OrderedTurnClient, 3)
+#     pass

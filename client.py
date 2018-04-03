@@ -39,8 +39,8 @@ class Client(RedisClient):
 
 
 class GameClient():
-
-
+    SENDER_ID = 'sender_id'
+    MESSAGE_KEY = 'message_key'
     def __init__(self, cli):
         self.cli = cli
         self.queue_map = []
@@ -51,7 +51,7 @@ class GameClient():
     def apply_queue(self, queue):
         new_queue = []
         for e in queue:
-            msg_key = e.get('data').get('message_key')
+            msg_key = e.get('data').get(self.MESSAGE_KEY)
             did_run_job = False
             for k, f in self.queue_map:
                 if msg_key == k:
