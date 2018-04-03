@@ -2,6 +2,7 @@ from multiprocessing import Pool
 from time import sleep
 from client import Client, GreetingCli
 from rsa_client import RSAKeyShareClient
+from ordered_turn_client import InsecureOrderedClient
 import logging
 
 logger = logging.getLogger()
@@ -27,9 +28,9 @@ def start_game(args):
 def test_RSA_keys_match_three_way():
     x = start_async_rounds(RSAKeyShareClient, 3)
     # For each client's state, extract it's own pubkey and ident as [(pk, id)]
-    actual_pubkeys = [(y[1]['ident'], y[1]['pubkey']) for y in x]
+    actual_pubkeys = [(y['ident'], y['pubkey']) for y in x]
     # Extract each player's list of external public keys
-    playerlists = [y[1]['playerlist'] for y in x]
+    playerlists = [y['playerlist'] for y in x]
 
     assert playerlists is not None
     assert actual_pubkeys is not None
@@ -42,10 +43,18 @@ def test_RSA_keys_match_three_way():
 
 def test_greeting_client():
     x = start_async_rounds(GreetingCli, 3)
-    assert [y[1].get('greetings_sent') for y in x] == [2, 1, 0]
+    assert [y.get('greetings_sent') for y in x] == [2, 1, 0]
 
 
 # from ordered_turn_client import OrderedTurnClient
 # def test_ordered_turn_client():
 #     x = start_async_rounds(OrderedTurnClient, 3)
 #     pass
+
+def test_insecure_ordering():
+    """Assert that all clients produce the same ordering"""
+    x = start_async_rounds(InsecureOrderedClient, 3)
+    peermaps = [y['peer_map'] for y in x]
+    assert all(x==peermaps[0] for x in peermaps)
+
+

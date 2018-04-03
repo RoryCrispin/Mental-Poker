@@ -71,7 +71,7 @@ class GameClient():
 
     def get_final_state(self):
         print("Getting final state!")
-        return [{'root_state':True}]
+        return {'root_state':True}
 
 
 
@@ -102,7 +102,7 @@ class GreetingCli(GameClient):
 
     def get_final_state(self):
         state = (super(GreetingCli, self).get_final_state())
-        state.append({
+        state.update({
             'greetings_sent' : self.greetings_sent,
         })
         return state

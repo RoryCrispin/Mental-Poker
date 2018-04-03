@@ -68,7 +68,7 @@ class RSAKeyShareClient(GameClient):
 
     def get_final_state(self):
         state = (super(RSAKeyShareClient, self).get_final_state())
-        state.append({
+        state.update({
             'ident':
             self.cli.ident,
             'pubkey':
