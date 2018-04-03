@@ -1,5 +1,7 @@
 from time import sleep
 
+from client import LogLevel
+
 from ordered_turn_client import InsecureOrderedClient
 
 class TurnTakingClient(InsecureOrderedClient):
@@ -49,14 +51,15 @@ class CountingClient(TurnTakingClient):
         self.counting_state = 0
 
     def take_turn(self):
+        self.cli.log(LogLevel.INFO, "Sending move %s" % self.counting_state)
         self.cli.post_message(data={self.MESSAGE_KEY: self.NEW_COUNT,
                                     self.NEW_COUNT: self.counting_state})
         self.end_my_turn()
 
     def handle_count(self, data):
         self.counting_state = (data['data'][self.NEW_COUNT])
+        self.cli.log(LogLevel.INFO, "Received move %s" % self.counting_state)
         self.counting_state += 1
-        self.take_turn_if_mine()
 
     def is_game_over(self):
         return False
