@@ -1,11 +1,18 @@
+from time import sleep
+
 from ordered_turn_client import InsecureOrderedClient
 
 class TurnTakingClient(InsecureOrderedClient):
     END_TURN='end_turn'
     def __init__(self, cli, max_players=3):
-        super().init(cli, max_players)
+        super().__init__(cli, max_players)
+        self.queue_map.extend([(self.END_TURN, self.recv_end_turn)])
         self.current_turn = 0
-        self.queue_map.extend([(self.TURN_MSG, self.handle_turn)])
+
+    def recv_end_turn(self, _):
+        # TODO: Assert from correct player
+        self.current_turn += 1
+        self.take_turn_if_mine()
 
     def alert_players_have_been_ordered(self):
         if self.is_my_turn():
@@ -15,12 +22,13 @@ class TurnTakingClient(InsecureOrderedClient):
         return self.get_current_turn() == self.cli.ident
 
     def get_current_turn(self):
-        for ident, dict in self.peer_map:
-            if dict.get('roll') == self.current_turn:
+        for ident, dict in self.peer_map.items():
+            if dict.get('roll') == self.current_turn % (self.max_players):
                 return ident
         raise IndexError
 
     def end_my_turn(self):
+        self.current_turn += 1
         self.cli.post_message(data={self.MESSAGE_KEY: self.END_TURN})
 
     def take_turn(self):
@@ -35,17 +43,20 @@ class TurnTakingClient(InsecureOrderedClient):
 
 class CountingClient(TurnTakingClient):
     NEW_COUNT= 'new_count'
-
     def __init__(self, cli, max_players=3):
-        super().init(cli, max_players)
+        super().__init__(cli, max_players)
         self.queue_map.extend([(self.NEW_COUNT, self.handle_count)])
-        self.count = 0
+        self.counting_state = 0
 
     def take_turn(self):
         self.cli.post_message(data={self.MESSAGE_KEY: self.NEW_COUNT,
-                                    self.NEW_COUNT: self.count})
-        self.count += 1
+                                    self.NEW_COUNT: self.counting_state})
+        self.end_my_turn()
 
     def handle_count(self, data):
-        print(data['data'][self.NEW_COUNT])
+        self.counting_state = (data['data'][self.NEW_COUNT])
+        self.counting_state += 1
         self.take_turn_if_mine()
+
+    def is_game_over(self):
+        return False
