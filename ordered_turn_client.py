@@ -1,53 +1,7 @@
 from uuid import uuid4
 from random import shuffle
 from client import GameClient, LogLevel
-
-
-class IdentifyClient(GameClient):
-    """This class extends the GameClient with an IDENTIFY command
-    which, when pinged - all player will respond with a pong message.
-    it is used to identify all players in a given channel"""
-    IDENT_REQ_KEY = 'identify_request'
-    IDENT_RESP_KEY = 'identify_response'
-    PEER_MAP = 'peer_map'
-
-    def __init__(self, cli):
-        super().__init__(cli)
-        self.peer_map = {self.cli.ident: {}}
-        self.queue_map.extend([(IdentifyClient.IDENT_REQ_KEY,
-                                self.recv_identify_request),
-                               (IdentifyClient.IDENT_RESP_KEY,
-                                self.recv_identify_response)])
-
-    def recv_identify_request(self, _):
-        self.cli.post_message(data={self.MESSAGE_KEY:
-                                        IdentifyClient.IDENT_RESP_KEY})
-
-    def recv_identify_response(self, data):
-        self.cli.log(LogLevel.INFO, "Recv identify")
-        if data.get(self.SENDER_ID) not in self.peer_map:
-            self.cli.log(LogLevel.INFO, "Identify Response!")
-            self.peer_map[data.get(self.SENDER_ID)] = {}
-            self.peer_did_join()
-
-    def request_idenfity(self):
-        self.cli.post_message(data={self.MESSAGE_KEY:
-                                        IdentifyClient.IDENT_REQ_KEY})
-        #Send out your own identity too
-        self.recv_identify_request(None)
-
-    def get_final_state(self):
-        state = super().get_final_state()
-        state.update({
-            self.PEER_MAP: self.peer_map
-        })
-        return state
-
-    def get_num_joined_players(self):
-        return len(self.peer_map.keys())
-
-    def peer_did_join(self):
-        pass
+from identifying_client import IdentifyClient
 
 
 class InsecureOrderedClient(IdentifyClient):
@@ -59,27 +13,41 @@ class InsecureOrderedClient(IdentifyClient):
     ROOM_FULL_ROLL = 'room_full_roll'
     JOIN_MESSAGE = 'join_message'
     ROLL = 'roll'
+    PLAYERS_HAVE_BEEN_INSECURE_ORDERED = 'players_have_been_insecure_ordered'
 
-    def __init__(self, cli, max_players=3):
-        super().__init__(cli)
+    def __init__(self, cli, state=None, max_players=3):
+        super().__init__(cli, state)
         self.queue_map.extend([(self.JOIN_MESSAGE,
                                 self.recv_join_message),
                                (self.ROOM_FULL_ROLL,
                                 self.recv_roll)])
 
-        self.cli.post_message(data={'message_key': 'join_message'})
         self.max_players = max_players
         self.room_closed = False
+
+    def init_existing_state(self, state):
+        super().init_existing_state(state)
+        if state.get(self.PLAYERS_HAVE_BEEN_INSECURE_ORDERED):
+            self.peer_map = state['peer_map']
+            self.players_have_been_insecure_ordered = True
+            self.alert_players_have_been_ordered()
+        else:
+            self.init_no_state(call_super=False)
+
+    def init_no_state(self, call_super=True):
+        if call_super:
+            super().init_no_state()
+        self.cli.post_message(data={'message_key': 'join_message'})
         # Pregenerate the roll
         self.roll = 'roll_' + str(uuid4()) + '_roll'
         self.peer_map[self.cli.ident][self.ROLL] = self.roll
-        self.players_have_been_ordered = False
+        self.players_have_been_insecure_ordered = False
 
     def recv_join_message(self, _):
         self.request_idenfity()
 
     def is_game_over(self):
-        return self.players_have_been_ordered
+        return self.players_have_been_insecure_ordered
 
     def alert_players_have_been_ordered(self):
         pass
@@ -113,7 +81,8 @@ class InsecureOrderedClient(IdentifyClient):
         for ident, _ in player_rolls:
             self.peer_map[ident][self.ROLL] = i
             i += 1
-        self.players_have_been_ordered = True
+        self.players_have_been_insecure_ordered = True
+        # self.cli.log(LogLevel.INFO, "I am player{}".format(0))
         self.alert_players_have_been_ordered()
 
 
@@ -122,6 +91,12 @@ class InsecureOrderedClient(IdentifyClient):
                                         self.ROOM_FULL_ROLL,
                                     self.ROLL: self.roll})
         self.cli.log(LogLevel.INFO, "Rolling {}".format(self.roll))
+
+    def get_final_state(self):
+        state = super().get_final_state()
+        state.update({self.PLAYERS_HAVE_BEEN_INSECURE_ORDERED:
+                          self.players_have_been_insecure_ordered})
+        return state
 
 
 class SecureOrderedClient(InsecureOrderedClient):

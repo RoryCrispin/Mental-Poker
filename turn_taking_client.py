@@ -1,4 +1,5 @@
 from time import sleep
+from uuid import uuid4
 
 from client import LogLevel
 
@@ -6,15 +7,21 @@ from ordered_turn_client import InsecureOrderedClient
 
 class TurnTakingClient(InsecureOrderedClient):
     END_TURN='end_turn'
-    def __init__(self, cli, max_players=3):
-        super().__init__(cli, max_players)
+    ROOM_CODE='room_code'
+    def __init__(self, cli, state=None, max_players=3):
+        super().__init__(cli, state, max_players)
         self.queue_map.extend([(self.END_TURN, self.recv_end_turn)])
         self.current_turn = 0
+        # Pregrnerate a room code; this will be overwritten if we're not player 0
+        self.room_code = uuid4()
 
-    def recv_end_turn(self, _):
+    def recv_end_turn(self, data):
         # TODO: Assert from correct player
-        self.current_turn += 1
-        self.take_turn_if_mine()
+        # The issue causing incorr ect turn synchronisation -> Not clearing the queue buffer between rounds, left over
+        # messages need to be deleted
+        if data['data'][self.ROOM_CODE] == self.room_code:
+            self.current_turn += 1
+            self.take_turn_if_mine()
 
     def alert_players_have_been_ordered(self):
         if self.is_my_turn():
@@ -31,7 +38,11 @@ class TurnTakingClient(InsecureOrderedClient):
 
     def end_my_turn(self):
         self.current_turn += 1
-        self.cli.post_message(data={self.MESSAGE_KEY: self.END_TURN})
+        self.cli.post_message(data={self.MESSAGE_KEY: self.END_TURN,
+                                    self.ROOM_CODE: self.room_code})
+
+    def message_for_this_room(self, room_code):
+        return room_code == self.room_code
 
     def take_turn(self):
         raise NotImplementedError
@@ -46,8 +57,8 @@ class TurnTakingClient(InsecureOrderedClient):
 
 class CountingClient(TurnTakingClient):
     NEW_COUNT= 'new_count'
-    def __init__(self, cli, max_players=3):
-        super().__init__(cli, max_players)
+    def __init__(self, cli, state=None, max_players=3):
+        super().__init__(cli, state, max_players)
         self.queue_map.extend([(self.NEW_COUNT, self.handle_count)])
         self.counting_state = 0
 
@@ -55,10 +66,19 @@ class CountingClient(TurnTakingClient):
         self.counting_state += 1
         self.cli.log(LogLevel.INFO, "Sending move %s" % self.counting_state)
         self.cli.post_message(data={self.MESSAGE_KEY: self.NEW_COUNT,
+                                    self.ROOM_CODE: self.room_code,
                                     self.NEW_COUNT: self.counting_state})
         self.end_my_turn()
 
     def handle_count(self, data):
+        if data['data'][self.ROOM_CODE] != self.room_code:
+            if self.current_turn == 0:
+                self.room_code = data['data'][self.ROOM_CODE]
+            else:
+                # This feature is not _fully_ tested. It's intended to block messages form other
+                # rooms from causing bugs in new rounds
+                print("Invalid message")
+                return False
         self.counting_state = (data['data'][self.NEW_COUNT])
         self.cli.log(LogLevel.INFO, "Received move %s" % self.counting_state)
 

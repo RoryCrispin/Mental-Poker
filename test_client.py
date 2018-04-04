@@ -26,7 +26,7 @@ def start_game(args):
 
 
 def test_RSA_keys_match_three_way():
-    x = start_async_rounds(RSAKeyShareClient, 3)
+    x = start_async_rounds([RSAKeyShareClient], 3)
     # For each client's state, extract it's own pubkey and ident as [(pk, id)]
     actual_pubkeys = [(y['ident'], y['pubkey']) for y in x]
     # Extract each player's list of external public keys
@@ -42,13 +42,13 @@ def test_RSA_keys_match_three_way():
 
 
 def test_greeting_client():
-    x = start_async_rounds(GreetingCli, 3)
+    x = start_async_rounds([GreetingCli], 3)
     assert [y.get('greetings_sent') for y in x] == [2, 1, 0]
 
 
 def test_insecure_ordering():
     """Assert that all clients produce the same ordering"""
-    x = start_async_rounds(InsecureOrderedClient, 3)
+    x = start_async_rounds([InsecureOrderedClient], 3)
     peermaps = [y['peer_map'] for y in x]
     assert all(x == peermaps[0] for x in peermaps)
 
@@ -57,7 +57,7 @@ from shuffling_client import ShufflingClient
 
 
 def test_shuffling_client():
-    x = start_async_rounds(ShufflingClient, 3)
+    x = start_async_rounds([ShufflingClient], 3)
     decks = [y['deck'] for y in x]
     assert (all(d == decks[0] for d in decks))
     assert (all(d != list(range(10)) for d in decks))
