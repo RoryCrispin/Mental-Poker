@@ -54,6 +54,23 @@ class TurnTakingClient(InsecureOrderedClient):
         if self.is_my_turn():
             self.take_turn()
 
+    def is_turn_valid(self, data):
+        if data['data'][self.ROOM_CODE] != self.room_code:
+            if self.current_turn == 0:
+                self.room_code = data['data'][self.ROOM_CODE]
+                return True
+            else:
+                # This feature is not _fully_ tested. It's intended to block messages form other
+                # rooms from causing bugs in new rounds
+                print("Invalid message")
+                return False
+        return True
+
+    def send_round_message(self, key, data):
+        data.update({self.MESSAGE_KEY: key,
+                               self.ROOM_CODE: self.room_code})
+        self.cli.post_message(data=data)
+
 
 class CountingClient(TurnTakingClient):
     NEW_COUNT= 'new_count'
@@ -71,16 +88,9 @@ class CountingClient(TurnTakingClient):
         self.end_my_turn()
 
     def handle_count(self, data):
-        if data['data'][self.ROOM_CODE] != self.room_code:
-            if self.current_turn == 0:
-                self.room_code = data['data'][self.ROOM_CODE]
-            else:
-                # This feature is not _fully_ tested. It's intended to block messages form other
-                # rooms from causing bugs in new rounds
-                print("Invalid message")
-                return False
-        self.counting_state = (data['data'][self.NEW_COUNT])
-        self.cli.log(LogLevel.INFO, "Received move %s" % self.counting_state)
+        if self.is_turn_valid(data):
+            self.counting_state = (data['data'][self.NEW_COUNT])
+            self.cli.log(LogLevel.INFO, "Received move %s" % self.counting_state)
 
     def is_game_over(self):
         return self.counting_state >= 10
