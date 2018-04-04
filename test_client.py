@@ -46,15 +46,18 @@ def test_greeting_client():
     assert [y.get('greetings_sent') for y in x] == [2, 1, 0]
 
 
-# from ordered_turn_client import OrderedTurnClient
-# def test_ordered_turn_client():
-#     x = start_async_rounds(OrderedTurnClient, 3)
-#     pass
-
 def test_insecure_ordering():
     """Assert that all clients produce the same ordering"""
     x = start_async_rounds(InsecureOrderedClient, 3)
     peermaps = [y['peer_map'] for y in x]
-    assert all(x==peermaps[0] for x in peermaps)
+    assert all(x == peermaps[0] for x in peermaps)
 
 
+from shuffling_client import ShufflingClient
+
+
+def test_shuffling_client():
+    x = start_async_rounds(ShufflingClient, 3)
+    decks = [y['deck'] for y in x]
+    assert (all(d == decks[0] for d in decks))
+    assert (all(d != list(range(10)) for d in decks))

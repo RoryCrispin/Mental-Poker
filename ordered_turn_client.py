@@ -37,7 +37,7 @@ class IdentifyClient(GameClient):
         self.recv_identify_request(None)
 
     def get_final_state(self):
-        state = super(IdentifyClient, self).get_final_state()
+        state = super().get_final_state()
         state.update({
             self.PEER_MAP: self.peer_map
         })
@@ -139,7 +139,7 @@ class SecureOrderedClient(InsecureOrderedClient):
 
     def recv_shuffled_list(self, data):
         pass
-        
+
     def alert_players_have_been_ordered(self):
         if self.peer_map.get(self.cli.ident).get(self.ROLL) == 0:
             # This is player 0, initiate the shuffle
@@ -147,6 +147,6 @@ class SecureOrderedClient(InsecureOrderedClient):
             shuffle(pl)
             self.cli.post_message(data={self.MESSAGE_KEY: self.SHUFFLED_LIST,
                                         self.SHUFFLED_LIST: pl})
-            
+
     def gen_playerlist(self):
         return list(self.peer_map.keys())

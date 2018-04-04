@@ -55,7 +55,7 @@ class GameClient():
             did_run_job = False
             for k, f in self.queue_map:
                 if msg_key == k:
-                    f(e)
+                    f(e) # TODO: to reject jobs, make this funtion return a Bool!
                     did_run_job = True
             if not did_run_job:
                 new_queue.append(e)

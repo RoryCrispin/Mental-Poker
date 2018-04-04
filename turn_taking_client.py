@@ -43,6 +43,7 @@ class TurnTakingClient(InsecureOrderedClient):
         if self.is_my_turn():
             self.take_turn()
 
+
 class CountingClient(TurnTakingClient):
     NEW_COUNT= 'new_count'
     def __init__(self, cli, max_players=3):
@@ -51,6 +52,7 @@ class CountingClient(TurnTakingClient):
         self.counting_state = 0
 
     def take_turn(self):
+        self.counting_state += 1
         self.cli.log(LogLevel.INFO, "Sending move %s" % self.counting_state)
         self.cli.post_message(data={self.MESSAGE_KEY: self.NEW_COUNT,
                                     self.NEW_COUNT: self.counting_state})
@@ -59,7 +61,7 @@ class CountingClient(TurnTakingClient):
     def handle_count(self, data):
         self.counting_state = (data['data'][self.NEW_COUNT])
         self.cli.log(LogLevel.INFO, "Received move %s" % self.counting_state)
-        self.counting_state += 1
 
     def is_game_over(self):
-        return False
+        return self.counting_state >= 10
+
