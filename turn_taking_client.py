@@ -23,6 +23,9 @@ class TurnTakingClient(InsecureOrderedClient):
             self.current_turn += 1
             self.take_turn_if_mine()
 
+    def is_first_turn(self):
+        return self.current_turn == 0
+
     def alert_players_have_been_ordered(self):
         if self.is_my_turn():
             self.take_turn()

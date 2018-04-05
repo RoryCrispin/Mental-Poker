@@ -12,7 +12,7 @@ class SRA_key():
         self.generateKey(self.keysize, pq)
 
     @classmethod
-    def from_new_pimes(cls, keysize):
+    def from_new_primes(cls, keysize):
         pq = cls.generate_primes(keysize)
         return cls(keysize, pq)
 
