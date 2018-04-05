@@ -52,10 +52,9 @@ class SecureDecryptionClient(TurnTakingClient):
                     return False
         return self.have_shared_my_component
 
-    def get_final_state(self):
-        state = super().get_final_state()
-        print("Decrypt with {}".format(self.cli.ident))
+    def fully_decrypt_deck(self):
         self.decrypt_deck()
+        print("Decrypt with {}".format(self.cli.ident))
         own_priv = self.key.get_private_component()
         for ident, vals in self.peer_map.items():
             if ident != self.cli.ident:
@@ -65,6 +64,10 @@ class SecureDecryptionClient(TurnTakingClient):
                 self.decrypt_deck()
         self.key.update_private_component(own_priv)
 
+
+class SecureShuffleSampleDecryptor(SecureDecryptionClient):
+    def get_final_state(self):
+        self.fully_decrypt_deck()
+        state = super().get_final_state()
         state.update({PokerWords.DECK_STATE: self.deck_state})
         return state
-

@@ -1,3 +1,5 @@
+from random import shuffle
+
 from turn_taking_client import TurnTakingClient
 from client import LogLevel
 from crypto.makeRsaKeys import SRA_key
@@ -31,6 +33,8 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
         self.cli.log(LogLevel.INFO, "Shuffled deck")
         self.encryptd_by.append(self.cli.ident)
         self.encrypt_deck()
+        print("Actually shuffling!")
+        shuffle(self.shuffle_state)
 
         self.send_round_message(self.SHUFFLE_DECK, {
             self.SHUFFLE_DECK: self.shuffle_state,
