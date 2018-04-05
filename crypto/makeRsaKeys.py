@@ -67,3 +67,9 @@ class SRA_key():
 
     def get_public_primes(self):
         return self.pq
+
+    def get_private_component(self):
+        return self.d
+
+    def update_private_component(self, d):
+        self.d = d
