@@ -4,6 +4,9 @@ from client import Client, GreetingCli
 from rsa_client import RSAKeyShareClient
 from ordered_turn_client import InsecureOrderedClient
 import logging
+from secure_shuffle_client import SecureShufflingClient
+from words import PokerWords
+from secure_decryption_client import SecureDecryptionClient
 
 logger = logging.getLogger()
 
@@ -61,3 +64,8 @@ def test_shuffling_client():
     decks = [y['deck'] for y in x]
     assert (all(d == decks[0] for d in decks))
     assert (all(d != list(range(10)) for d in decks))
+
+def test_shuffling_client():
+    x = start_async_rounds([SecureShufflingClient, SecureDecryptionClient], 3)
+    for client in x:
+        assert client.get(PokerWords.DECK_STATE) == list(range(1,10))

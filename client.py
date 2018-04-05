@@ -54,7 +54,7 @@ class Client(RedisClient):
             print("Next round")
             next_round = self.round_list[self.round_list_index](self, state=self.final_state)
             next_round.init_state()
-            if next_round.is_game_over():
+            if next_round.is_round_over():
                 self.advance_to_next_round()
             else:
                 return next_round
@@ -90,7 +90,7 @@ class GameClient():
             if not did_run_job:
                 new_queue.append(e)
         return (None, None,
-                self.get_final_state()) if self.is_game_over() else (
+                self.get_final_state()) if self.is_round_over() else (
                     self, new_queue, None)
 
     def init_existing_state(self, state):
@@ -102,7 +102,7 @@ class GameClient():
     def get_message(self, message):
         pass
 
-    def is_game_over(self):
+    def is_round_over(self):
         return False
 
     def get_final_state(self):
@@ -120,7 +120,7 @@ class GreetingCli(GameClient):
         self.cli.post_message(data={'message_key': 'hello_message'})
         self.end_game = False
 
-    def is_game_over(self):
+    def is_round_over(self):
         if self.greetings_sent >= 2:
             self.cli.post_message(data={'message_key': 'close_game'})
             return True

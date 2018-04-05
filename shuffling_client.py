@@ -24,7 +24,7 @@ class ShufflingClient(TurnTakingClient):
             self.shuffle_state = data['data'][self.SHUFFLE_DECK]
             self.shuffled_times += 1
 
-    def is_game_over(self):
+    def is_round_over(self):
         return self.shuffled_times >= self.max_players
 
     def get_final_state(self):

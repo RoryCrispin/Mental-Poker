@@ -22,7 +22,7 @@ class RSAKeyShareClient(GameClient):
                 'rsa_pubkey': self.key.publickey().exportKey('PEM').decode()
             })
 
-    def is_game_over(self):
+    def is_round_over(self):
         return len(self.player_map) >= self.max_players
 
     def recv_pubkey(self, e):

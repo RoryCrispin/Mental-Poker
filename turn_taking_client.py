@@ -95,6 +95,6 @@ class CountingClient(TurnTakingClient):
             self.counting_state = (data['data'][self.NEW_COUNT])
             self.cli.log(LogLevel.INFO, "Received move %s" % self.counting_state)
 
-    def is_game_over(self):
+    def is_round_over(self):
         return self.counting_state >= 10
 

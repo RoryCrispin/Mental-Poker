@@ -1,7 +1,5 @@
-from client import LogLevel
-from crypto.makeRsaKeys import SRA_key
 from turn_taking_client import TurnTakingClient
-from secure_shuffle_client import PokerWords, CryptoWords
+from words import PokerWords, CryptoWords
 
 
 class SecureDecryptionClient(TurnTakingClient):
@@ -34,10 +32,10 @@ class SecureDecryptionClient(TurnTakingClient):
         self.end_my_turn()
 
     def recv_private_component(self, data):
-        print("recv component")
         if self.is_turn_valid(data):
-            self.private_components.append(
-                (data[self.SENDER_ID], data['data'][CryptoWords.SHARE_PRIVATE]))
+            print("recv component")
+            self.peer_map[data[self.SENDER_ID]][CryptoWords.PRIVATE_COMPONENT] =\
+                data['data'][CryptoWords.SHARE_PRIVATE]
 
     def decrypt_deck(self, key=None):
         if key is None:
@@ -47,16 +45,26 @@ class SecureDecryptionClient(TurnTakingClient):
             new_deck.append(self.key.decrypt_message(card))
         self.deck_state = new_deck
 
-    def is_game_over(self):
-        return len(self.private_components) == 2 and self.have_shared_my_component
+    def is_round_over(self):
+        for ident, vals in self.peer_map.items():
+            if ident != self.cli.ident:
+                if vals.get(CryptoWords.PRIVATE_COMPONENT) is None:
+                    return False
+        return self.have_shared_my_component
 
     def get_final_state(self):
-        assert self.deck_state != [52]
         state = super().get_final_state()
         print("Decrypt with {}".format(self.cli.ident))
         self.decrypt_deck()
-        for id, d in self.private_components:
-            print("Decrpt with {}".format(id))
-            self.key.update_private_component(d)
-            self.decrypt_deck()
-        assert self.deck_state == list(range(1,10))
+        own_priv = self.key.get_private_component()
+        for ident, vals in self.peer_map.items():
+            if ident != self.cli.ident:
+                d = vals.get(CryptoWords.PRIVATE_COMPONENT)
+                print("Decrpt with {}".format(ident))
+                self.key.update_private_component(d)
+                self.decrypt_deck()
+        self.key.update_private_component(own_priv)
+
+        state.update({PokerWords.DECK_STATE: self.deck_state})
+        return state
+

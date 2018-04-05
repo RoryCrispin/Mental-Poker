@@ -46,7 +46,7 @@ class InsecureOrderedClient(IdentifyClient):
     def recv_join_message(self, _):
         self.request_idenfity()
 
-    def is_game_over(self):
+    def is_round_over(self):
         return self.players_have_been_insecure_ordered
 
     def alert_players_have_been_ordered(self):
@@ -109,7 +109,7 @@ class SecureOrderedClient(InsecureOrderedClient):
         super().init(cli, max_players)
         self.queue_map.extend([(self.SHUFFLED_LIST, self.recv_shuffled_list)])
 
-    def is_game_over(self):
+    def is_round_over(self):
         pass
 
     def recv_shuffled_list(self, data):

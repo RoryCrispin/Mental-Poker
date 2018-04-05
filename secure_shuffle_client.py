@@ -1,15 +1,8 @@
-from random import shuffle
-
 from turn_taking_client import TurnTakingClient
 from client import LogLevel
 from crypto.makeRsaKeys import SRA_key
+from words import PokerWords, CryptoWords
 
-class PokerWords():
-    DECK_STATE = 'deck_state'
-
-class CryptoWords():
-    SHARE_PRIVATE = 'share_private'
-    SRA_KEY = 'sra_key'
 
 class SecureShufflingClient(TurnTakingClient, CryptoWords):
     SHUFFLE_DECK = 'shuffle_deck'
@@ -23,10 +16,12 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
         self.queue_map.extend([(self.SHUFFLE_DECK, self.recv_shuffled_deck),
                                (self.SHARE_PRIMES, self.recv_primes)
                                ])
+
         self.shuffle_state = list(range(1,10))
         self.shuffled_times = 0
         self.private_components = []
         self.encryptd_by = []
+
 
     def take_turn(self):
         self.shuffled_times += 1
@@ -67,7 +62,7 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
             self.pq = data['data'][self.SHARE_PRIMES]
             self.key = SRA_key.from_existing_primes(self.KEYSIZE, self.pq)
 
-    def is_game_over(self):
+    def is_round_over(self):
         return len(self.encryptd_by) >= self.max_players
 
     def get_final_state(self):
