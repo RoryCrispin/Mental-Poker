@@ -8,7 +8,6 @@ class SecureDecryptionClient(TurnTakingClient):
         self.queue_map.extend([(CryptoWords.SHARE_PRIVATE, self.recv_private_component)])
         self.deck_state = None
         self.key = None
-        self.private_components = []
         self.have_shared_my_component = False
 
     def init_existing_state(self, state):
@@ -20,7 +19,6 @@ class SecureDecryptionClient(TurnTakingClient):
         raise ValueError
 
     def take_turn(self):
-        # TODO: If it's my card reveal, dont share my component
         self.share_my_private_component()
 
     def share_my_private_component(self):

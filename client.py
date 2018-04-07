@@ -87,6 +87,7 @@ class GameClient():
                 if msg_key == k:
                     f(e) # TODO: to reject jobs, make this funtion return a Bool!
                     did_run_job = True
+                    break
             if not did_run_job:
                 new_queue.append(e)
         return (None, None,

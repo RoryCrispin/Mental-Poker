@@ -74,6 +74,13 @@ class TurnTakingClient(InsecureOrderedClient):
                                self.ROOM_CODE: self.room_code})
         self.cli.post_message(data=data)
 
+    def get_ident_at_position(self, position):
+        for ident, peer in self.peer_map.items():
+            if peer['roll'] == position:
+                return ident
+        return None
+
+
 
 class CountingClient(TurnTakingClient):
     NEW_COUNT= 'new_count'
@@ -97,4 +104,5 @@ class CountingClient(TurnTakingClient):
 
     def is_round_over(self):
         return self.counting_state >= 10
+
 

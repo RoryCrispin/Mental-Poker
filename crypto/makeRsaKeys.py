@@ -1,8 +1,8 @@
 # RSA Key Generator
 # http://inventwithpython.com/hacking (BSD Licensed)
 
-import cryptomath
-import rabinMiller
+import crypto.cryptomath as cryptomath
+import crypto.rabinMiller as rabinMiller
 import random
 
 
