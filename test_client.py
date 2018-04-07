@@ -79,5 +79,10 @@ def test_secure_shuffling_client():
 
 def test_secure_deck_shuffling():
     x = start_async_rounds([DeckShuffleClient, SecureShuffleSampleDecryptor], 3)
-    pass
+    deck_states = []
+    for client in x:
+        deck_states.append( client.get(PokerWords.DECK_STATE))
+    assert deck_states[0] != list(range(10,62)) # This may fail if the shuffled list actually results in 1..9...
+    assert sorted(deck_states[0]) == list(range(10,62))
+    assert (all(d==deck_states[0] for d in deck_states))
 
