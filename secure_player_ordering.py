@@ -1,6 +1,5 @@
-from secure_shuffle_client import SecureShufflingClient
 from secure_decryption_client import SecureDecryptionClient
-from words import PokerWords
+from secure_shuffle_client import SecureShufflingClient
 
 
 class PlayerShuffleClient(SecureShufflingClient):
@@ -14,7 +13,7 @@ class PlayerShuffleClient(SecureShufflingClient):
     def get_player_rolls(self):
         player_rolls = []
         for _, peer in self.peer_map.items():
-            player_rolls.append(peer['roll'] + 10) # Add 2 because we can't encrypt numbers <= 1
+            player_rolls.append(peer['roll'] + 10)  # Add 2 because we can't encrypt numbers <= 1
         return player_rolls
 
 
@@ -22,6 +21,7 @@ class ShuffledPlayerDecryptionClient(SecureDecryptionClient):
     """Take the shuffled list of player indexes from PlayerShuffleClient and rearrange
     the players into these positions, such that the players have now been ordered in a
     fair, random permutation, and that no player has any control over where they're sat"""
+
     def get_final_state(self):
         state = super().get_final_state()
         self.fully_decrypt_deck()
@@ -29,7 +29,7 @@ class ShuffledPlayerDecryptionClient(SecureDecryptionClient):
         new_positions = []
         i = 0
         for new_position in self.deck_state:
-            new_position -= 2 # Remove the addition added to keep numbers >= 2 for SRA encryption
+            new_position -= 2  # Remove the addition added to keep numbers >= 2 for SRA encryption
             for ident, peer in self.peer_map.items():
                 if peer['roll'] == new_position:
                     new_positions.append((ident, i))

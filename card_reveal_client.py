@@ -4,7 +4,7 @@ from turn_taking_client import TurnTakingClient
 from words import PokerWords, CryptoWords
 
 
-class HandRevealClient(TurnTakingClient):
+class CardRevealClient(TurnTakingClient):
     NOT_SHARING_PRIVATE = 'not_sharing_private'
     REMOVE_LOCK = 'remove_lock'
 
@@ -35,8 +35,7 @@ class HandRevealClient(TurnTakingClient):
         if self.card.value is None:
             self.card.update_state(CryptoCard.GENERATED, self.cli.ident,
                                    self.deck_state[0])  # TODO: Extend the deck
-        decrypted_card = self.key.decrypt_message(self.card.value)
-        self.card.removed_lock(self.cli.ident, decrypted_card)
+        self.remove_my_lock()
         self.send_round_message(self.REMOVE_LOCK, {self.REMOVE_LOCK: self.card.value})
 
     def remove_my_lock(self):
@@ -74,3 +73,7 @@ class HandRevealClient(TurnTakingClient):
 
     def is_round_over(self):
         return self.received_all_peer_keys()
+
+    def get_final_state(self):
+        state = super().get_final_state()
+        state.update()

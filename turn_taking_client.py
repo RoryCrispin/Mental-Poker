@@ -1,13 +1,13 @@
-from time import sleep
 from uuid import uuid4
 
 from client import LogLevel
-
 from ordered_turn_client import InsecureOrderedClient
 
+
 class TurnTakingClient(InsecureOrderedClient):
-    END_TURN='end_turn'
-    ROOM_CODE='room_code'
+    END_TURN = 'end_turn'
+    ROOM_CODE = 'room_code'
+
     def __init__(self, cli, state=None, max_players=3):
         super().__init__(cli, state, max_players)
         self.queue_map.extend([(self.END_TURN, self.recv_end_turn)])
@@ -34,8 +34,8 @@ class TurnTakingClient(InsecureOrderedClient):
         return self.get_current_turn() == self.cli.ident
 
     def get_current_turn(self):
-        for ident, dict in self.peer_map.items():
-            if dict.get('roll') == self.current_turn % (self.max_players):
+        for ident, peer in self.peer_map.items():
+            if peer.get('roll') == self.current_turn % (self.max_players):
                 return ident
         raise IndexError
 
@@ -71,7 +71,7 @@ class TurnTakingClient(InsecureOrderedClient):
 
     def send_round_message(self, key, data):
         data.update({self.MESSAGE_KEY: key,
-                               self.ROOM_CODE: self.room_code})
+                     self.ROOM_CODE: self.room_code})
         self.cli.post_message(data=data)
 
     def get_ident_at_position(self, position):
@@ -81,9 +81,9 @@ class TurnTakingClient(InsecureOrderedClient):
         return None
 
 
-
 class CountingClient(TurnTakingClient):
-    NEW_COUNT= 'new_count'
+    NEW_COUNT = 'new_count'
+
     def __init__(self, cli, state=None, max_players=3):
         super().__init__(cli, state, max_players)
         self.queue_map.extend([(self.NEW_COUNT, self.handle_count)])
@@ -104,5 +104,3 @@ class CountingClient(TurnTakingClient):
 
     def is_round_over(self):
         return self.counting_state >= 10
-
-

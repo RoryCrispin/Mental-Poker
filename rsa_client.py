@@ -1,6 +1,7 @@
 from Crypto.PublicKey import RSA
 
-from client import GameClient, readable_ident, LogLevel
+from client import GameClient, LogLevel
+from pkr_logging import readable_ident
 
 
 class RSAKeyShareClient(GameClient):

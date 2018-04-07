@@ -1,4 +1,3 @@
-
 from makeRsaKeys import SRA_key
 
 
@@ -30,9 +29,10 @@ def test_commutativity():
     assert ea != eba
 
     da_eba = ka.decrypt_message(eba)
-    dab_eba  = kb.decrypt_message(da_eba)
+    dab_eba = kb.decrypt_message(da_eba)
 
     assert dab_eba == message
+
 
 def test_commutativity_three_way():
     ka = SRA_key.from_new_primes(1024)
@@ -48,10 +48,11 @@ def test_commutativity_three_way():
     assert eba != ecba
 
     da_ecba = ka.decrypt_message(ecba)
-    dab_ecba  = kb.decrypt_message(da_ecba)
+    dab_ecba = kb.decrypt_message(da_ecba)
     dcab_ecba = kc.decrypt_message(dab_ecba)
 
     assert dcab_ecba == message
+
 
 def test_share_provate_d_commutativity():
     ka = SRA_key.from_new_primes(1024)
@@ -72,7 +73,7 @@ def test_share_provate_d_commutativity():
     da_ecba = ka.decrypt_message(ecba)
 
     ka.update_private_component(bd)
-    dab_ecba  = ka.decrypt_message(da_ecba)
+    dab_ecba = ka.decrypt_message(da_ecba)
 
     ka.update_private_component(cd)
     dcab_ecba = ka.decrypt_message(dab_ecba)

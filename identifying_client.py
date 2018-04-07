@@ -9,7 +9,7 @@ class IdentifyClient(GameClient):
     IDENT_RESP_KEY = 'identify_response'
     PEER_MAP = 'peer_map'
 
-    def __init__(self, cli, state=None, max_players=3):
+    def __init__(self, cli, state=None):
         super().__init__(cli, state)
         self.queue_map.extend([(IdentifyClient.IDENT_REQ_KEY,
                                 self.recv_identify_request),

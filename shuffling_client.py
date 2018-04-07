@@ -2,12 +2,14 @@ from turn_taking_client import TurnTakingClient
 from client import LogLevel
 from random import shuffle
 
+
 class ShufflingClient(TurnTakingClient):
     SHUFFLE_DECK = 'shuffle_deck'
+
     def __init__(self, cli, state=None, max_players=3):
         super().__init__(cli, state, max_players)
         self.queue_map.extend([(self.SHUFFLE_DECK, self.recv_shuffle)])
-        self.shuffle_state = list(range(1,10))
+        self.shuffle_state = list(range(1, 10))
         self.shuffled_times = 0
 
     def take_turn(self):
@@ -33,4 +35,3 @@ class ShufflingClient(TurnTakingClient):
             'deck': self.shuffle_state
         })
         return state
-

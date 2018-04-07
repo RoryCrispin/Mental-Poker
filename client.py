@@ -1,8 +1,9 @@
-from time import sleep
 from random import uniform
+from time import sleep
 
+from pkr_logging import LogLevel
 from redis_client import RedisClient
-from pkr_logging import LogLevel, readable_ident
+
 
 class Client(RedisClient):
     def __init__(self, round_list):

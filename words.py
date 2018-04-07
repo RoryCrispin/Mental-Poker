@@ -1,6 +1,7 @@
 class PokerWords():
     DECK_STATE = 'deck_state'
     SHUFFLE_PLAYERS = 'shuffle_players'
+    CRYPTODECK_STATE = 'crypto_deck_state'
 
 
 class CryptoWords():

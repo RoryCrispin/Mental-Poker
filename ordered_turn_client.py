@@ -1,6 +1,6 @@
 from uuid import uuid4
-from random import shuffle
-from client import GameClient, LogLevel
+
+from client import LogLevel
 from identifying_client import IdentifyClient
 
 
@@ -38,7 +38,7 @@ class InsecureOrderedClient(IdentifyClient):
         if call_super:
             super().init_no_state()
         self.cli.post_message(data={'message_key': 'join_message'})
-        # Pregenerate the roll
+        # Pre-generate the roll
         self.roll = 'roll_' + str(uuid4()) + '_roll'
         self.peer_map[self.cli.ident][self.ROLL] = self.roll
         self.players_have_been_insecure_ordered = False
@@ -85,7 +85,6 @@ class InsecureOrderedClient(IdentifyClient):
         # self.cli.log(LogLevel.INFO, "I am player{}".format(0))
         self.alert_players_have_been_ordered()
 
-
     def send_random_roll(self):
         self.cli.post_message(data={self.MESSAGE_KEY:
                                         self.ROOM_FULL_ROLL,
@@ -98,30 +97,29 @@ class InsecureOrderedClient(IdentifyClient):
                           self.players_have_been_insecure_ordered})
         return state
 
-
-class SecureOrderedClient(InsecureOrderedClient):
-    """This class extends the client, when initialised all players will
-    be ordered into a random 'position' such that we can handle them as
-    though they were sitting around a physical table"""
-    SHUFFLED_LIST = 'shuffled_list'
-
-    def __init__(self, cli, max_players=3):
-        super().init(cli, max_players)
-        self.queue_map.extend([(self.SHUFFLED_LIST, self.recv_shuffled_list)])
-
-    def is_round_over(self):
-        pass
-
-    def recv_shuffled_list(self, data):
-        pass
-
-    def alert_players_have_been_ordered(self):
-        if self.peer_map.get(self.cli.ident).get(self.ROLL) == 0:
-            # This is player 0, initiate the shuffle
-            pl = self.gen_playerlist()
-            shuffle(pl)
-            self.cli.post_message(data={self.MESSAGE_KEY: self.SHUFFLED_LIST,
-                                        self.SHUFFLED_LIST: pl})
-
-    def gen_playerlist(self):
-        return list(self.peer_map.keys())
+# class SecureOrderedClient(InsecureOrderedClient):
+#     """This class extends the client, when initialised all players will
+#     be ordered into a random 'position' such that we can handle them as
+#     though they were sitting around a physical table"""
+#     SHUFFLED_LIST = 'shuffled_list'
+#
+#     def __init__(self, cli, max_players=3):
+#         super().init(cli, max_players)
+#         self.queue_map.extend([(self.SHUFFLED_LIST, self.recv_shuffled_list)])
+#
+#     def is_round_over(self):
+#         pass
+#
+#     def recv_shuffled_list(self, data):
+#         pass
+#
+#     def alert_players_have_been_ordered(self):
+#         if self.peer_map.get(self.cli.ident).get(self.ROLL) == 0:
+#             # This is player 0, initiate the shuffle
+#             pl = self.gen_playerlist()
+#             shuffle(pl)
+#             self.cli.post_message(data={self.MESSAGE_KEY: self.SHUFFLED_LIST,
+#                                         self.SHUFFLED_LIST: pl})
+#
+#     def gen_playerlist(self):
+#         return list(self.peer_map.keys())

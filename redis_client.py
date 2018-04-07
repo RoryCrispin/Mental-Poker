@@ -3,6 +3,7 @@ from yaml import load, dump
 
 import redis
 
+
 class RedisClient():
     def __init__(self, channel):
         self.ident = str(uuid4())
