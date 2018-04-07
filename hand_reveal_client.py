@@ -31,9 +31,10 @@ class HandRevealClient(TurnTakingClient):
             self.remove_my_lock_and_share()
             self.end_my_turn()
 
-    def remove_my_lock_and_share(self):  # TODO: join this with remove_my_lock method if self.card.value is None:
-        self.card.update_state(CryptoCard.GENERATED, self.cli.ident,
-                               self.deck_state[0])  # TODO: Extend the deck
+    def remove_my_lock_and_share(self):  # TODO: join this with remove_my_lock method
+        if self.card.value is None:
+            self.card.update_state(CryptoCard.GENERATED, self.cli.ident,
+                                   self.deck_state[0])  # TODO: Extend the deck
         decrypted_card = self.key.decrypt_message(self.card.value)
         self.card.removed_lock(self.cli.ident, decrypted_card)
         self.send_round_message(self.REMOVE_LOCK, {self.REMOVE_LOCK: self.card.value})
