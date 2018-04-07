@@ -18,6 +18,8 @@ class CardRevealClient(TurnTakingClient):
 
     def init_existing_state(self, state):
         self.deck_state = state[PokerWords.DECK_STATE]
+        self.cryptodeck_state = state[PokerWords.CRYPTODECK_STATE]
+        self.card = self.cryptodeck_state[0]
         self.key = state[CryptoWords.SRA_KEY]
         super().init_existing_state(state)
 
@@ -33,8 +35,9 @@ class CardRevealClient(TurnTakingClient):
 
     def remove_my_lock_and_share(self):  # TODO: join this with remove_my_lock method
         if self.card.value is None:
-            self.card.update_state(CryptoCard.GENERATED, self.cli.ident,
-                                   self.deck_state[0])  # TODO: Extend the deck
+            # self.card.update_state(CryptoCard.GENERATED, self.cli.ident,
+                                   # self.deck_state[0])  # TODO: Extend the deck
+            self.card = self.cryptodeck_state[0]
         self.remove_my_lock()
         self.send_round_message(self.REMOVE_LOCK, {self.REMOVE_LOCK: self.card.value})
 
@@ -69,7 +72,12 @@ class CardRevealClient(TurnTakingClient):
         return self.get_ident_at_position(0)
 
     def received_all_peer_keys(self):
-        return len(self.card.locks_removed) >= (self.max_players - 1)
+        if len(self.card.locks_present) == 0:
+            return True
+        return len(self.card.locks_present) == 1 and \
+            self.card.locks_present[0] == self.generating_card_for()
+
+        # return len(self.card.locks_removed) >= (self.max_players - 1)
 
     def is_round_over(self):
         return self.received_all_peer_keys()

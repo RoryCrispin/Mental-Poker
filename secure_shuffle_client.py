@@ -76,7 +76,7 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
         cryptodeck = []
         for card in self.shuffle_state:
             cryptocard = CryptoCard()
-            cryptocard.update_state(CryptoCard.GENERATED, self.encryptd_by, card)
+            cryptocard.generate_card(self.encryptd_by, card)
             cryptodeck.append(cryptocard)
 
         state.update({
