@@ -58,6 +58,7 @@ class GameClient():
         self.cli = cli
         self.queue_map = []
         self.state = state
+        self.previous_state = {}
 
     # Takes a Queue of messages and returns a new game class along with
     # a new queue state (With the applied element removed)
@@ -65,6 +66,7 @@ class GameClient():
     # other clients through execution
     def init_state(self):
         if self.state is not None:
+            self.previous_state = self.state
             self.init_existing_state(self.state)
         else:
             self.init_no_state()
@@ -99,8 +101,11 @@ class GameClient():
 
     def get_final_state(self):
         print("Getting final state!")
-        return {'root_state': True,
-                'ident': self.cli.ident}
+        state = self.previous_state
+        state.update({'root_state': True,
+                'ident': self.cli.ident,
+                })
+        return state
 
 
 class GreetingCli(GameClient):

@@ -17,7 +17,7 @@ class CardRevealClient(TurnTakingClient):
         self.card = CryptoCard()
 
     def init_existing_state(self, state):
-        self.deck_state = state[PokerWords.DECK_STATE]
+        # self.deck_state = state[PokerWords.DECK_STATE]
         self.cryptodeck_state = state[PokerWords.CRYPTODECK_STATE]
         self.card = self.cryptodeck_state[0]
         self.key = state[CryptoWords.SRA_KEY]

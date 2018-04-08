@@ -55,3 +55,13 @@ class PokerHandGameSequencer(GameSequencer):
         if state is None: return
         if state.get('crypto_deck_state') is not None:
             self.round_order[DeckShuffleClient] = True
+
+            # Check if all cards have been dealt yet?
+            finished_dealing = True
+            for card in state.get('crypto_deck_state'):
+                if card.dealt_to is not None and card.has_been_dealt is False:
+                    finished_dealing = False
+                    break
+            print("Finished dealing = {}".format(finished_dealing))
+            from card_reveal_client import CardRevealClient
+            self.round_order[CardRevealClient] = finished_dealing

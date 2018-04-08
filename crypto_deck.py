@@ -12,6 +12,7 @@ class CryptoCard():
         self.value = None
         self.locks_present = []
         self.dealt_to = None  # Identifies a the use of this card, ie: dealt to table /player 0
+        self.has_been_dealt = False
 
     def update_state(self, action, value):
         self.state_log.append({self.ACTION: action,
