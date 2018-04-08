@@ -6,7 +6,7 @@ from redis_client import RedisClient
 from game_sequencer import ManualGameSequencer
 
 
-class Client(RedisClient):
+class CommsClient(RedisClient):
     def __init__(self, game_sequencer: ManualGameSequencer):
         super().__init__('poker_chan')
         self.round_list_index = 0
@@ -58,7 +58,7 @@ class GameClient():
     SENDER_ID = 'sender_id'
     MESSAGE_KEY = 'message_key'
 
-    def __init__(self, cli: Client, state=None):
+    def __init__(self, cli: CommsClient, state=None):
         self.cli = cli
         self.queue_map = []
         self.state = state

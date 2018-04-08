@@ -3,7 +3,7 @@ from multiprocessing import Pool
 from time import sleep
 
 from card_reveal_client import CardRevealClient
-from client import Client, GreetingCli, GameClient
+from client import CommsClient, GreetingCli, GameClient
 from ordered_turn_client import InsecureOrderedClient
 from rsa_client import RSAKeyShareClient
 from secure_deck_shuffle import DeckShuffleClient
@@ -27,7 +27,7 @@ def start_async_rounds(round, process_count):
 def start_game(args):
     round, sleeptime, start_delay = args
     sleep(sleeptime)
-    cli = Client(round).begin()
+    cli = CommsClient(round).begin()
     return cli
 
 

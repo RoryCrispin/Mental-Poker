@@ -20,3 +20,7 @@ class ManualGameSequencer(GameSequencer):
             next_round.init_state()
             return next_round
         return None
+
+
+class PokerHandGameSequencer(GameSequencer):
+    pass
