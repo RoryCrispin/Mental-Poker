@@ -7,6 +7,11 @@ class GameSequencer():
 
 
 class ManualGameSequencer(GameSequencer):
+    """ Legacy game sequencer used lots in testing as
+    it allows arbitrary lists of rounds to be defined as an
+    array - to be sequenced through one by one - allowing for
+    isolation of game components so that they can be individually
+     tested and debugged."""
     def __init__(self, rounds):
         super().__init__()
         self.rounds = rounds
@@ -23,4 +28,8 @@ class ManualGameSequencer(GameSequencer):
 
 
 class PokerHandGameSequencer(GameSequencer):
-    pass
+    def __init__(self):
+        super().__init__()
+
+    def advance_to_next_round(self, cli, state=None):
+        pass

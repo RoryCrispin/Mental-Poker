@@ -1,6 +1,3 @@
-from random import uniform
-from time import sleep
-
 from pkr_logging import LogLevel
 from redis_client import RedisClient
 from game_sequencer import ManualGameSequencer
@@ -15,7 +12,6 @@ class CommsClient(RedisClient):
         self.logged_messages = []
         self.log(LogLevel.INFO, "I am client: {}".format(self.ident))
         self.game = game_sequencer.advance_to_next_round(self)
-
 
     def begin(self):
         for message in self.p.listen():
@@ -32,7 +28,7 @@ class CommsClient(RedisClient):
                         self.queue = []
                         if self.game is None:
                             return self.final_state
-            sleep(uniform(0.001, 0.01))
+            # sleep(uniform(0.001, 0.01))
 
     def message_is_for_me(self, payload):
         from_self = payload.get('sender_id') == self.ident
