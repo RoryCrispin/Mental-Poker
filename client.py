@@ -3,18 +3,19 @@ from time import sleep
 
 from pkr_logging import LogLevel
 from redis_client import RedisClient
+from game_sequencer import ManualGameSequencer
 
 
 class Client(RedisClient):
-    def __init__(self, round_list):
+    def __init__(self, game_sequencer: ManualGameSequencer):
         super().__init__('poker_chan')
         self.round_list_index = 0
-        self.round_list = round_list
+        self.game_sequencer = game_sequencer
         self.queue = []
         self.logged_messages = []
         self.log(LogLevel.INFO, "I am client: {}".format(self.ident))
-        self.game = round_list[0](self)
-        self.game.init_state()
+        self.game = game_sequencer.advance_to_next_round(self)
+
 
     def begin(self):
         for message in self.p.listen():
@@ -23,7 +24,7 @@ class Client(RedisClient):
 
                 if self.message_is_for_me(payload):
                     self.queue.append(payload)
-                    self.game, self.queue, self.final_state =\
+                    self.game, self.queue, self.final_state = \
                         self.game.apply_queue(self.queue)
                     if self.game is None:
                         self.log(LogLevel.VERBOSE, "Round Complete")
@@ -50,25 +51,18 @@ class Client(RedisClient):
         print("{} <> {}".format(str(log_level), message))
 
     def advance_to_next_round(self):
-        self.round_list_index += 1
-        if self.round_list_index < len(self.round_list):
-            print("Next round")
-            next_round = self.round_list[self.round_list_index](self, state=self.final_state)
-            next_round.init_state()
-            if next_round.is_round_over():
-                self.advance_to_next_round()
-            else:
-                return next_round
-        else:
-            return None
+        return self.game_sequencer.advance_to_next_round(self, self.final_state)
+
 
 class GameClient():
     SENDER_ID = 'sender_id'
     MESSAGE_KEY = 'message_key'
-    def __init__(self, cli, state=None):
+
+    def __init__(self, cli: Client, state=None):
         self.cli = cli
         self.queue_map = []
         self.state = state
+
     # Takes a Queue of messages and returns a new game class along with
     # a new queue state (With the applied element removed)
     # These games are still impure in that they can freely send messages to
@@ -86,14 +80,14 @@ class GameClient():
             did_run_job = False
             for k, f in self.queue_map:
                 if msg_key == k:
-                    f(e) # TODO: to reject jobs, make this funtion return a Bool!
+                    f(e)  # TODO: to reject jobs, make this funtion return a Bool!
                     did_run_job = True
                     break
             if not did_run_job:
                 new_queue.append(e)
         return (None, None,
                 self.get_final_state()) if self.is_round_over() else (
-                    self, new_queue, None)
+            self, new_queue, None)
 
     def init_existing_state(self, state):
         self.cli.log(LogLevel.INFO, "Init with existing state!")
@@ -109,9 +103,8 @@ class GameClient():
 
     def get_final_state(self):
         print("Getting final state!")
-        return {'root_state':True,
-                'ident':self.cli.ident}
-
+        return {'root_state': True,
+                'ident': self.cli.ident}
 
 
 class GreetingCli(GameClient):
@@ -119,7 +112,7 @@ class GreetingCli(GameClient):
         super().__init__(cli)
         self.greetings_sent = greetings_sent
         self.queue_map.extend([('hello_message', self.send_greeting),
-                          ('close_game', self.notify_game_close)])
+                               ('close_game', self.notify_game_close)])
         self.cli.post_message(data={'message_key': 'hello_message'})
         self.end_game = False
 
@@ -142,6 +135,6 @@ class GreetingCli(GameClient):
     def get_final_state(self):
         state = (super(GreetingCli, self).get_final_state())
         state.update({
-            'greetings_sent' : self.greetings_sent,
+            'greetings_sent': self.greetings_sent,
         })
         return state
