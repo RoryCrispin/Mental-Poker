@@ -109,7 +109,8 @@ class GameClient():
 
     def get_final_state(self):
         print("Getting final state!")
-        return {'root_state':True}
+        return {'root_state':True,
+                'ident':self.cli.ident}
 
 
 

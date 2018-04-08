@@ -2,7 +2,8 @@ import logging
 from multiprocessing import Pool
 from time import sleep
 
-from client import Client, GreetingCli
+from card_reveal_client import CardRevealClient
+from client import Client, GreetingCli, GameClient
 from ordered_turn_client import InsecureOrderedClient
 from rsa_client import RSAKeyShareClient
 from secure_deck_shuffle import DeckShuffleClient
@@ -86,3 +87,10 @@ def test_secure_deck_shuffling():
     assert deck_states[0] != list(range(10, 62))  # This may fail if the shuffled list actually results in 1..9...
     assert sorted(deck_states[0]) == list(range(10, 62))
     assert (all(d == deck_states[0] for d in deck_states))
+
+
+def test_card_reveal_client():
+    x = start_async_rounds([DeckShuffleClient, CardRevealClient], 3)
+    for state in x:
+        if state['crypto_deck_state'][0].locks_present is []:
+            assert state['crypto_deck_state'][0].value in range(10,62)

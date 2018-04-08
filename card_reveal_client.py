@@ -77,11 +77,10 @@ class CardRevealClient(TurnTakingClient):
         return len(self.card.locks_present) == 1 and \
             self.card.locks_present[0] == self.generating_card_for()
 
-        # return len(self.card.locks_removed) >= (self.max_players - 1)
-
     def is_round_over(self):
         return self.received_all_peer_keys()
 
     def get_final_state(self):
         state = super().get_final_state()
-        state.update()
+        state.update({PokerWords.CRYPTODECK_STATE: self.cryptodeck_state})
+        return state
