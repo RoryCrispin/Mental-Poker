@@ -1,0 +1,20 @@
+services:
+  - redis:latest
+
+before_script:
+  - apt-get update
+  - apt-get install python3
+  - apt-get install python3-pip -y
+  - python --version
+  - ls /usr/bin
+  - apt-cache search pip
+  - python3 --version
+  - pip3 install -r requirements.txt
+  - "redis-server &"
+
+test:
+    Host: redis
+    script:
+     - pytest
+    services:
+     - redis:latest
