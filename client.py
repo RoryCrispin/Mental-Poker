@@ -1,10 +1,10 @@
+from game_sequencer import GameSequencer
 from pkr_logging import LogLevel
 from redis_client import RedisClient
-from game_sequencer import ManualGameSequencer
 
 
 class CommsClient(RedisClient):
-    def __init__(self, game_sequencer: ManualGameSequencer):
+    def __init__(self, game_sequencer: GameSequencer):
         super().__init__('poker_chan')
         self.round_list_index = 0
         self.game_sequencer = game_sequencer
@@ -104,7 +104,7 @@ class GameClient():
 
 
 class GreetingCli(GameClient):
-    def __init__(self, cli, greetings_sent=0):
+    def __init__(self, cli, state=None, greetings_sent=0):
         super().__init__(cli)
         self.greetings_sent = greetings_sent
         self.queue_map.extend([('hello_message', self.send_greeting),

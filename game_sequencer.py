@@ -1,4 +1,6 @@
-class GameSequencer():
+
+
+class GameSequencer:
     def __init__(self):
         pass
 
@@ -12,6 +14,7 @@ class ManualGameSequencer(GameSequencer):
     array - to be sequenced through one by one - allowing for
     isolation of game components so that they can be individually
      tested and debugged."""
+
     def __init__(self, rounds):
         super().__init__()
         self.rounds = rounds
@@ -28,8 +31,27 @@ class ManualGameSequencer(GameSequencer):
 
 
 class PokerHandGameSequencer(GameSequencer):
+    SHUFFLE_DECK_PHASE = 'shuffle_deck_phase'
+    DEAL_CARD_PHASE = 'deal_card_phase'
+
     def __init__(self):
         super().__init__()
+        from card_reveal_client import CardRevealClient
+        from secure_deck_shuffle import DeckShuffleClient
+
+        self.round_order = {DeckShuffleClient: False,
+                            CardRevealClient: False}
 
     def advance_to_next_round(self, cli, state=None):
-        pass
+        self.update_round_completion_list(state)
+        for client, complete in self.round_order.items():
+            if not complete:
+                next_round = client(cli, state)
+                next_round.init_state()
+                return next_round
+
+    def update_round_completion_list(self, state):
+        from secure_deck_shuffle import DeckShuffleClient
+        if state is None: return
+        if state.get('crypto_deck_state') is not None:
+            self.round_order[DeckShuffleClient] = True

@@ -57,7 +57,8 @@ def test_greeting_client():
 
 def test_insecure_ordering():
     """Assert that all clients produce the same ordering"""
-    x = start_async_rounds([InsecureOrderedClient], 3)
+    rounds = ManualGameSequencer([InsecureOrderedClient])
+    x = start_async_rounds(rounds, 3)
     peermaps = [y['peer_map'] for y in x]
     assert all(x == peermaps[0] for x in peermaps)
 
@@ -66,34 +67,40 @@ from shuffling_client import ShufflingClient
 
 
 def test_shuffling_client():
-    x = start_async_rounds([ShufflingClient], 3)
+    rounds = ManualGameSequencer([ShufflingClient])
+    x = start_async_rounds(rounds, 3)
     decks = [y['deck'] for y in x]
     assert (all(d == decks[0] for d in decks))
     assert (all(d != list(range(10)) for d in decks))
 
 
 def test_secure_shuffling_client():
-    x = start_async_rounds([SecureShufflingClient, SecureShuffleSampleDecryptor], 3)
+    rounds = ManualGameSequencer([SecureShufflingClient, SecureShuffleSampleDecryptor])
+    x = start_async_rounds(rounds, 3)
     deck_states = []
     for client in x:
         deck_states.append(client.get(PokerWords.DECK_STATE))
-    assert deck_states[0] != list(range(1, 10))  # This may fail if the shuffled list actually results in 1..9...
+    assert deck_states[0] != list(range(1, 10))
+    # There's a 10! chance that this test will fail because the shuffled order
+    # is actually 1..10
     assert sorted(deck_states[0]) == list(range(1, 10))
     assert (all(d == deck_states[0] for d in deck_states))
 
 
 def test_secure_deck_shuffling():
-    x = start_async_rounds([DeckShuffleClient, SecureShuffleSampleDecryptor], 3)
+    rounds = ManualGameSequencer([DeckShuffleClient, SecureShuffleSampleDecryptor])
+    x = start_async_rounds(rounds, 3)
     deck_states = []
     for client in x:
         deck_states.append(client.get(PokerWords.DECK_STATE))
-    assert deck_states[0] != list(range(10, 62))  # This may fail if the shuffled list actually results in 1..9...
+    assert deck_states[0] != list(range(10, 62))
     assert sorted(deck_states[0]) == list(range(10, 62))
     assert (all(d == deck_states[0] for d in deck_states))
 
 
 def test_card_reveal_client():
-    x = start_async_rounds([DeckShuffleClient, CardRevealClient], 3)
+    rounds = ManualGameSequencer([DeckShuffleClient, CardRevealClient])
+    x = start_async_rounds(rounds, 3)
     for state in x:
         if state['crypto_deck_state'][0].locks_present is []:
             assert state['crypto_deck_state'][0].value in range(10,62)
