@@ -1,10 +1,10 @@
 from random import shuffle
 
-from crypto_deck import CryptoCard
+from crypto_deck import CryptoCard, CryptoWords
 from turn_taking_client import TurnTakingClient
 from client import LogLevel
 from crypto.makeRsaKeys import SRA_key
-from words import PokerWords, CryptoWords
+from poker_rounds.poker_helper import PokerWords
 
 
 class SecureShufflingClient(TurnTakingClient, CryptoWords):

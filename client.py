@@ -1,5 +1,5 @@
 from game_sequencer import GameSequencer
-from pkr_logging import LogLevel
+from client_logging import LogLevel
 from redis_client import RedisClient
 
 

@@ -29,3 +29,9 @@ class CryptoCard():
         self.deck_index = deck_index
         self.locks_present = encrypted_by[:]
         self.update_state(self.GENERATED, value)
+
+
+class CryptoWords():
+    SHARE_PRIVATE = 'share_private'
+    SRA_KEY = 'sra_key'
+    PRIVATE_COMPONENT = 'private_component'

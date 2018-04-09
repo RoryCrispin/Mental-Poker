@@ -1,5 +1,6 @@
 from turn_taking_client import TurnTakingClient
-from words import PokerWords, CryptoWords
+from crypto_deck import CryptoWords
+from poker_rounds.poker_helper import PokerWords
 
 
 class SecureDecryptionClient(TurnTakingClient):

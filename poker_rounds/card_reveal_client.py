@@ -1,8 +1,8 @@
 from client import GameClient
-from crypto_deck import CryptoCard
-from pkr_logging import LogLevel
+from crypto_deck import CryptoCard, CryptoWords
+from client_logging import LogLevel
 from turn_taking_client import TurnTakingClient
-from words import PokerWords, CryptoWords
+from poker_rounds.poker_helper import PokerWords
 
 
 class CardRevealClient(TurnTakingClient):

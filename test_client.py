@@ -2,15 +2,15 @@ import logging
 from multiprocessing import Pool
 from time import sleep
 
-from card_reveal_client import CardRevealClient
-from client import CommsClient, GreetingCli, GameClient
-from game_sequencer import ManualGameSequencer, PokerHandGameSequencer
+from poker_rounds.card_reveal_client import CardRevealClient
+from client import CommsClient, GreetingCli
+from game_sequencer import ManualGameSequencer
+from poker_rounds.poker_sequencer import PokerHandGameSequencer
 from ordered_turn_client import InsecureOrderedClient
-from rsa_client import RSAKeyShareClient
-from secure_deck_shuffle import DeckShuffleClient
+from poker_rounds.secure_deck_shuffle import DeckShuffleClient
 from secure_decryption_client import SecureShuffleSampleDecryptor
 from secure_shuffle_client import SecureShufflingClient
-from words import PokerWords
+from poker_rounds.poker_helper import PokerWords
 
 logger = logging.getLogger()
 
