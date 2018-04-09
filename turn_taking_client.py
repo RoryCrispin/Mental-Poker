@@ -80,6 +80,10 @@ class TurnTakingClient(InsecureOrderedClient):
                 return ident
         return None
 
+    def get_my_position(self):
+        return self.peer_map[self.cli.ident]['roll']
+
+
 
 class CountingClient(TurnTakingClient):
     NEW_COUNT = 'new_count'

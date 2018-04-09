@@ -36,11 +36,12 @@ class PokerHandGameSequencer(GameSequencer):
 
     def __init__(self):
         super().__init__()
-        from card_reveal_client import CardRevealClient
+        from card_reveal_client import CardRevealClient, HandDecoder
         from secure_deck_shuffle import DeckShuffleClient
 
         self.round_order = {DeckShuffleClient: False,
-                            CardRevealClient: False}
+                            CardRevealClient: False,
+                            HandDecoder: False}
 
     def advance_to_next_round(self, cli, state=None):
         self.update_round_completion_list(state)
@@ -65,5 +66,10 @@ class PokerHandGameSequencer(GameSequencer):
                     finished_dealing = False
                     break
             print("Finished dealing = {}".format(finished_dealing))
-            from card_reveal_client import CardRevealClient
+            from card_reveal_client import CardRevealClient, HandDecoder
             self.round_order[CardRevealClient] = finished_dealing
+
+            # Has hand been decoded
+            if state.get('hand') is not None:
+                self.round_order[HandDecoder] = True
+

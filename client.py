@@ -99,7 +99,7 @@ class GameClient():
     def is_round_over(self):
         return False
 
-    def get_final_state(self):
+    def get_final_state(self) -> dict:
         print("Getting final state!")
         state = self.previous_state
         state.update({'root_state': True,

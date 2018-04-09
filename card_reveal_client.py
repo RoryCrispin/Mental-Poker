@@ -1,3 +1,4 @@
+from client import GameClient
 from crypto_deck import CryptoCard
 from pkr_logging import LogLevel
 from turn_taking_client import TurnTakingClient
@@ -28,7 +29,7 @@ class CardRevealClient(TurnTakingClient):
     def get_card_for_decryption(self):
         index = 0
         for card in self.cryptodeck_state:
-            if self.card .dealt_to is None:
+            if self.card.dealt_to is None:
                 pass
             try:
                 if card.dealt_to >= 0 and not card.has_been_dealt:
@@ -52,7 +53,7 @@ class CardRevealClient(TurnTakingClient):
     def remove_my_lock_and_share(self):  # TODO: join this with remove_my_lock method
         if self.card.value is None:
             # self.card.update_state(CryptoCard.GENERATED, self.cli.ident,
-                                   # self.deck_state[0])  # TODO: Extend the deck
+            # self.deck_state[0])  # TODO: Extend the deck
             self.card = self.get_card_for_decryption()
         self.remove_my_lock()
         self.send_round_message(self.REMOVE_LOCK, {self.REMOVE_LOCK: self.card.value})
@@ -93,7 +94,7 @@ class CardRevealClient(TurnTakingClient):
             self.card.has_been_dealt = True
             return True
         if len(self.card.locks_present) == 1 and \
-            self.card.locks_present[0] == self.generating_card_for():
+                self.card.locks_present[0] == self.generating_card_for():
             self.card.has_been_dealt = True
             return True
         return False
@@ -107,3 +108,24 @@ class CardRevealClient(TurnTakingClient):
         state = super().get_final_state()
         state.update({PokerWords.CRYPTODECK_STATE: self.cryptodeck_state})
         return state
+
+
+class HandDecoder(TurnTakingClient):
+    def init_existing_state(self, state):
+        super().init_existing_state(state)
+        hand = []
+        for card in state['crypto_deck_state']:
+            if self.get_my_position() == card.dealt_to:
+                hand.append(card.value)
+        self.hand = hand
+
+    def get_final_state(self):
+        state = super().get_final_state()
+        state.update({PokerWords.HAND: self.hand})
+        return state
+
+    def is_round_over(self):
+        return self.hand is not None
+
+    def take_turn(self):
+        self.end_my_turn()
