@@ -1,4 +1,5 @@
 from game_sequencer import GameSequencer
+from poker_rounds.poker_setup import PokerSetup
 
 
 class PokerHandGameSequencer(GameSequencer):
@@ -9,10 +10,13 @@ class PokerHandGameSequencer(GameSequencer):
         super().__init__()
         from poker_rounds.card_reveal_client import CardRevealClient, HandDecoder
         from poker_rounds.secure_deck_shuffle import DeckShuffleClient
+        from poker_rounds.betting_round_client import BettingClient
 
         self.round_order = {DeckShuffleClient: False,
                             CardRevealClient: False,
-                            HandDecoder: False}
+                            HandDecoder: False,
+                            PokerSetup: False,
+                            BettingClient: False}
 
     def advance_to_next_round(self, cli, state=None):
         self.update_round_completion_list(state)
@@ -36,10 +40,14 @@ class PokerHandGameSequencer(GameSequencer):
                 if card.dealt_to >=0 and card.has_been_dealt is False:
                     finished_dealing = False
                     break
-            print("Finished dealing = {}".format(finished_dealing))
             from poker_rounds.card_reveal_client import CardRevealClient, HandDecoder
             self.round_order[CardRevealClient] = finished_dealing
 
             # Has hand been decoded
             if state.get('hand') is not None:
                 self.round_order[HandDecoder] = True
+
+            # Have run poker setup
+            if PokerSetup.have_built_poker_player_map(state):
+                self.round_order[PokerSetup] = True
+

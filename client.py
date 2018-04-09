@@ -1,11 +1,15 @@
 from game_sequencer import GameSequencer
 from client_logging import LogLevel
 from redis_client import RedisClient
-
+import logging
 
 class CommsClient(RedisClient):
     def __init__(self, game_sequencer: GameSequencer):
         super().__init__('poker_chan')
+        self.log_level = 0
+        self.logger = logging.getLogger("pkr")
+        print(self.logger.level)
+        self.logger.warning("Hello")
         self.round_list_index = 0
         self.game_sequencer = game_sequencer
         self.queue = []
