@@ -19,9 +19,25 @@ class CardRevealClient(TurnTakingClient):
     def init_existing_state(self, state):
         # self.deck_state = state[PokerWords.DECK_STATE]
         self.cryptodeck_state = state[PokerWords.CRYPTODECK_STATE]
-        self.card = self.cryptodeck_state[0]
+
+        self.card = self.get_card_for_decryption()
+        # self.card = self.cryptodeck_state[0]
         self.key = state[CryptoWords.SRA_KEY]
         super().init_existing_state(state)
+
+    def get_card_for_decryption(self):
+        index = 0
+        for card in self.cryptodeck_state:
+            if self.card .dealt_to is None:
+                pass
+            try:
+                if card.dealt_to >= 0 and not card.has_been_dealt:
+                    print(index)
+                    return card
+            except(TypeError):
+                return None
+            index += 1
+        return None
 
     def take_turn(self):
         if self.is_my_card():
@@ -37,7 +53,7 @@ class CardRevealClient(TurnTakingClient):
         if self.card.value is None:
             # self.card.update_state(CryptoCard.GENERATED, self.cli.ident,
                                    # self.deck_state[0])  # TODO: Extend the deck
-            self.card = self.cryptodeck_state[0]
+            self.card = self.get_card_for_decryption()
         self.remove_my_lock()
         self.send_round_message(self.REMOVE_LOCK, {self.REMOVE_LOCK: self.card.value})
 
@@ -69,15 +85,22 @@ class CardRevealClient(TurnTakingClient):
         return self.generating_card_for() == self.cli.ident
 
     def generating_card_for(self):
-        return self.get_ident_at_position(0)
+        # return self.get_ident_at_position(0)
+        return self.get_ident_at_position(self.card.dealt_to)
 
     def received_all_peer_keys(self):
         if len(self.card.locks_present) == 0:
+            self.card.has_been_dealt = True
             return True
-        return len(self.card.locks_present) == 1 and \
-            self.card.locks_present[0] == self.generating_card_for()
+        if len(self.card.locks_present) == 1 and \
+            self.card.locks_present[0] == self.generating_card_for():
+            self.card.has_been_dealt = True
+            return True
+        return False
 
     def is_round_over(self):
+        if self.card is None:
+            return True
         return self.received_all_peer_keys()
 
     def get_final_state(self):

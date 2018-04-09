@@ -13,6 +13,7 @@ class CryptoCard():
         self.locks_present = []
         self.dealt_to = None  # Identifies a the use of this card, ie: dealt to table /player 0
         self.has_been_dealt = False
+        self.deck_index = None
 
     def update_state(self, action, value):
         self.state_log.append({self.ACTION: action,
@@ -24,7 +25,7 @@ class CryptoCard():
         self.locks_present.remove(by)
         self.update_state(self.DECRYPTED, new_value)
 
-    def generate_card(self, encrypted_by, value):
-        self.locks_present = encrypted_by #TODO: The locks-present log is getting pointered to and overwritten
-        # need to identify where the pointer is and make it a copy instead!
+    def generate_card(self, encrypted_by, value, deck_index):
+        self.deck_index = deck_index
+        self.locks_present = encrypted_by[:]
         self.update_state(self.GENERATED, value)

@@ -4,7 +4,7 @@ from time import sleep
 
 from card_reveal_client import CardRevealClient
 from client import CommsClient, GreetingCli, GameClient
-from game_sequencer import ManualGameSequencer
+from game_sequencer import ManualGameSequencer, PokerHandGameSequencer
 from ordered_turn_client import InsecureOrderedClient
 from rsa_client import RSAKeyShareClient
 from secure_deck_shuffle import DeckShuffleClient
@@ -104,3 +104,11 @@ def test_card_reveal_client():
     for state in x:
         if state['crypto_deck_state'][0].locks_present is []:
             assert state['crypto_deck_state'][0].value in range(10,62)
+
+def test_hand_reveal_client():
+    pokerSequencer = PokerHandGameSequencer()
+    x = start_async_rounds(pokerSequencer, 3)
+    import pdb; pdb.set_trace()
+    for state in x:
+        pass
+

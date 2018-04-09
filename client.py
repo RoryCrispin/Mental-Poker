@@ -71,21 +71,21 @@ class GameClient():
         else:
             self.init_no_state()
 
-    def apply_queue(self, queue):
+    def apply_queue(self, queue): # -> GameClient, Queue, FinalState
         new_queue = []
-        for e in queue:
-            msg_key = e.get('data').get(self.MESSAGE_KEY)
+        for event in queue:
+            msg_key = event.get('data').get(self.MESSAGE_KEY)
             did_run_job = False
-            for k, f in self.queue_map:
+            for k, queue_handler_func in self.queue_map:
                 if msg_key == k:
-                    f(e)  # TODO: to reject jobs, make this funtion return a Bool!
+                    queue_handler_func(event)  # TODO: to reject jobs, make this funtion return a Bool!
                     did_run_job = True
                     break
             if not did_run_job:
-                new_queue.append(e)
+                new_queue.append(event)
         return (None, None,
-                self.get_final_state()) if self.is_round_over() else (
-            self, new_queue, None)
+                self.get_final_state()) if self.is_round_over() else \
+            (self, new_queue, None)
 
     def init_existing_state(self, state):
         self.cli.log(LogLevel.INFO, "Init with existing state!")

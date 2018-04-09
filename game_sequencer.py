@@ -59,7 +59,9 @@ class PokerHandGameSequencer(GameSequencer):
             # Check if all cards have been dealt yet?
             finished_dealing = True
             for card in state.get('crypto_deck_state'):
-                if card.dealt_to is not None and card.has_been_dealt is False:
+                if card.dealt_to is None:
+                    break
+                if card.dealt_to >=0 and card.has_been_dealt is False:
                     finished_dealing = False
                     break
             print("Finished dealing = {}".format(finished_dealing))
