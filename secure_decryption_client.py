@@ -70,3 +70,14 @@ class SecureShuffleSampleDecryptor(SecureDecryptionClient):
         state = super().get_final_state()
         state.update({PokerWords.DECK_STATE: self.deck_state})
         return state
+
+class ShowdownDeckDecryptor(SecureShuffleSampleDecryptor):
+    def get_final_state(self):
+        self.fully_decrypt_deck()
+        state = super().get_final_state()
+        i=0
+        for card in self.deck_state:
+            state['crypto_deck_state'][i].value = card
+            i += 1
+        state.update({PokerWords.DECK_STATE: self.deck_state})
+        return state

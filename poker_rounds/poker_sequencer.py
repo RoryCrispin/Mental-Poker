@@ -2,6 +2,7 @@ from game_sequencer import GameSequencer
 from poker_rounds.betting_round_client import BettingClient
 from poker_rounds.open_card_reveal_client import OpenCardRevealClient
 from poker_rounds.poker_setup import PokerSetup
+from secure_decryption_client import SecureDecryptionClient, SecureShuffleSampleDecryptor, ShowdownDeckDecryptor
 
 
 class PokerHandGameSequencer(GameSequencer):
@@ -23,6 +24,7 @@ class PokerHandGameSequencer(GameSequencer):
                             }
         self.betting_rounds_played = 0
         self.open_cards_revealed = 0
+        self.game_over = False
 
     def advance_to_next_round(self, cli, state=None):
         self.update_round_completion_list(state)
@@ -35,9 +37,11 @@ class PokerHandGameSequencer(GameSequencer):
                 else:
                     return next_round
         next_round = self.get_betting_reveal_state()
-        next_round = next_round(cli, state)
-        next_round.init_state()
-        return next_round
+        if next_round is not None:
+            next_round = next_round(cli, state)
+            next_round.init_state()
+            return next_round
+
 
 
 
@@ -77,7 +81,11 @@ class PokerHandGameSequencer(GameSequencer):
 
     def get_betting_reveal_state(self):
         if self.open_cards_revealed == 3:
-            raise IndexError
+            if not self.game_over:
+                self.game_over = True
+                return SecureShuffleSampleDecryptor
+            else:
+                return None
         if self.betting_rounds_played > self.open_cards_revealed:
             self.open_cards_revealed +=1
             return OpenCardRevealClient
