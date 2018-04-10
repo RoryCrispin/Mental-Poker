@@ -24,7 +24,10 @@ class PokerHandGameSequencer(GameSequencer):
             if not complete:
                 next_round = client(cli, state)
                 next_round.init_state()
-                return next_round
+                if next_round.is_round_over():
+                    return self.advance_to_next_round(cli, next_round.get_final_state())
+                else:
+                    return next_round
 
     def update_round_completion_list(self, state):
         from poker_rounds.secure_deck_shuffle import DeckShuffleClient

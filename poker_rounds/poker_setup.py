@@ -1,16 +1,15 @@
+from client import GameClient
 from poker_rounds.poker_game import PokerGame
 from turn_taking_client import TurnTakingClient
 
 
-class PokerSetup(TurnTakingClient):
-
+class PokerSetup(GameClient):
     def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players)
+        super().__init__(cli, state)
 
     def init_existing_state(self, state):
-        self.build_player_map(state)
         super().init_existing_state(state)
-        # if not self.have_built_poker_player_map(state):
+        self.build_player_map(state)
 
     @staticmethod
     def have_built_poker_player_map(state):
@@ -19,27 +18,25 @@ class PokerSetup(TurnTakingClient):
     def build_player_map(self, state):
         print("-----------------------Poker Setup--------------")
         self.game = PokerGame()
-        for _,  player in state['peer_map'].items():
+        for _, player in state['peer_map'].items():
             player[PokerPlayer.POKER_PLAYER] = PokerPlayer(self.game)
-
-    def take_turn(self):
-        print("turna")
-        self.end_my_turn()
-
-    def handle_turn(self, data):
-        pass
+        self.peer_map = state['peer_map']
 
     def is_round_over(self):
         state = {'peer_map': self.peer_map}
         return self.have_built_poker_player_map(state)
 
-
+    def get_final_state(self):
+        state = super().get_final_state()
+        state.update({'peer_map': self.peer_map})
+        print("EDND")
+        return state
 
 
 class PokerPlayer:
     POKER_PLAYER = 'poker_player'
 
-    def __init__(self,  game: PokerGame):
+    def __init__(self, game: PokerGame):
         self.game = game
         self.action_log = []
         self.folded = False
@@ -58,4 +55,3 @@ class PokerPlayer:
             self.add_to_pot(self.game.blind * 2)
         else:
             self.add_to_pot(self.game.blind)
-

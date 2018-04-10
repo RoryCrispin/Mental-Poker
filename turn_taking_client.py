@@ -81,7 +81,7 @@ class TurnTakingClient(InsecureOrderedClient):
     def get_peer_at_position(self, position):
         for ident, peer in self.peer_map.items():
             if peer['roll'] == position:
-                return (ident, peer)
+                return ident, peer
         return None
 
     def get_my_position(self):

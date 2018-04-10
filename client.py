@@ -63,6 +63,7 @@ class GameClient():
         self.queue_map = []
         self.state = state
         self.previous_state = {}
+        self.logger = logging.getLogger()
 
     # Takes a Queue of messages and returns a new game class along with
     # a new queue state (With the applied element removed)
