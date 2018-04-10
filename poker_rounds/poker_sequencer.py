@@ -1,4 +1,5 @@
 from game_sequencer import GameSequencer
+from poker_rounds.betting_round_client import BettingClient
 from poker_rounds.poker_setup import PokerSetup
 
 
@@ -17,6 +18,7 @@ class PokerHandGameSequencer(GameSequencer):
                             HandDecoder: False,
                             PokerSetup: False,
                             BettingClient: False}
+        self.have_bet = False
 
     def advance_to_next_round(self, cli, state=None):
         self.update_round_completion_list(state)
@@ -54,3 +56,5 @@ class PokerHandGameSequencer(GameSequencer):
             if PokerSetup.have_built_poker_player_map(state):
                 self.round_order[PokerSetup] = True
 
+            if state.get('betting_run') == True:
+                self.round_order[BettingClient] = True

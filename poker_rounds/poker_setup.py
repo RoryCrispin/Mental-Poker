@@ -18,8 +18,8 @@ class PokerSetup(GameClient):
     def build_player_map(self, state):
         print("-----------------------Poker Setup--------------")
         self.game = PokerGame()
-        for _, player in state['peer_map'].items():
-            player[PokerPlayer.POKER_PLAYER] = PokerPlayer(self.game)
+        for ident, player in state['peer_map'].items():
+            player[PokerPlayer.POKER_PLAYER] = PokerPlayer(ident, self.game)
         self.peer_map = state['peer_map']
 
     def is_round_over(self):
@@ -29,14 +29,14 @@ class PokerSetup(GameClient):
     def get_final_state(self):
         state = super().get_final_state()
         state.update({'peer_map': self.peer_map})
-        print("EDND")
         return state
 
 
 class PokerPlayer:
     POKER_PLAYER = 'poker_player'
 
-    def __init__(self, game: PokerGame):
+    def __init__(self, ident, game: PokerGame):
+        self.ident = ident
         self.game = game
         self.action_log = []
         self.folded = False

@@ -111,3 +111,11 @@ def test_hand_reveal_client():
     x = start_async_rounds(poker_sequencer, 3)
     for state in x:
         assert len(state.get(PokerWords.HAND)) == 2
+
+    # Check betting round works
+    peer_maps = [y['peer_map'] for y in x]
+    playermaps = []
+    for client_pm in peer_maps:
+        for _, playermap in client_pm.items():
+            playermaps.append(playermap['poker_player'])
+    assert all((d.cash_in_pot == playermaps[0].cash_in_pot for d in playermaps))

@@ -14,6 +14,7 @@ class TurnTakingClient(InsecureOrderedClient):
         self.current_turn = 0
         # Pregrnerate a room code; this will be overwritten if we're not player 0
         self.room_code = uuid4()
+        self.setup_finished = False
 
     def recv_end_turn(self, data):
         # TODO: Assert from correct player
@@ -27,15 +28,17 @@ class TurnTakingClient(InsecureOrderedClient):
         return self.current_turn == 0
 
     def alert_players_have_been_ordered(self):
+        print("ordered!")
         if self.is_my_turn():
             self.take_turn()
+            # print("dont take turn just yet!!")
 
     def is_my_turn(self):
         return self.get_current_turn() == self.cli.ident
 
     def get_current_turn(self):
         for ident, peer in self.peer_map.items():
-            if peer.get('roll') == self.current_turn % (self.max_players):
+            if peer.get('roll') == self.current_turn % self.max_players:
                 return ident
         raise IndexError
 
