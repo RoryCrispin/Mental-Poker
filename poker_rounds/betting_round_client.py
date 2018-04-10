@@ -22,9 +22,7 @@ class BettingClient(TurnTakingClient):
                                (BettingCodes.CALL, self.handle_call),
                                (BettingCodes.BET, self.handle_bet)
                                ])
-        self.have_played_this_round = False
         self.initial_moves_from = []
-        self.turns_made = 0
 
     def init_blinds(self):
         self.cli.log(LogLevel.VERBOSE, "Init Blinds")
@@ -43,7 +41,6 @@ class BettingClient(TurnTakingClient):
 
     def take_turn(self):
         if not self.player.folded:
-            self.turns_made +=1
             self.initial_moves_from.append(self.cli.ident)
             i = randint(0, 10)
             if i > 6:
@@ -54,7 +51,6 @@ class BettingClient(TurnTakingClient):
 
     def make_call(self):
         print("Making Call")
-        self.have_played_this_round = True
         self.send_round_message(BettingCodes.CALL, {})
         self.apply_call(self.player)
 
@@ -96,7 +92,6 @@ class BettingClient(TurnTakingClient):
     def handle_call(self, data):
         player: PokerPlayer = self.get_player_from_turn_message(data)
         if self.is_turn_valid(data):
-            self.turns_made += 1
             self.initial_moves_from.append(player.ident)
             self.apply_call(player)
             print(LogLevel.INFO, 'Player {} calls'.format(player.ident))
@@ -104,14 +99,12 @@ class BettingClient(TurnTakingClient):
     def handle_fold(self, data):
         player: PokerPlayer = self.get_player_from_turn_message(data)
         if self.is_turn_valid(data):
-            self.turns_made += 1
             self.initial_moves_from.append(player.ident)
             player.folded = True
 
     def handle_bet(self, data):
         player: PokerPlayer = self.get_player_from_turn_message(data)
         if self.is_turn_valid(data):
-            self.turns_made += 1
             self.initial_moves_from.append(player.ident)
             amount = data['data'][self.BET_AMOUNT]
             self.apply_bet(player, amount)

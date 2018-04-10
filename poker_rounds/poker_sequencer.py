@@ -1,5 +1,6 @@
 from game_sequencer import GameSequencer
 from poker_rounds.betting_round_client import BettingClient
+from poker_rounds.open_card_reveal_client import OpenCardRevealClient
 from poker_rounds.poker_setup import PokerSetup
 
 
@@ -17,8 +18,11 @@ class PokerHandGameSequencer(GameSequencer):
                             CardRevealClient: False,
                             HandDecoder: False,
                             PokerSetup: False,
-                            BettingClient: False}
+                            BettingClient: False,
+                            OpenCardRevealClient: False}
         self.have_bet = False
+        self.betting_rounds_played = 0
+        self.open_cards_revealed = 0
 
     def advance_to_next_round(self, cli, state=None):
         self.update_round_completion_list(state)
@@ -39,14 +43,19 @@ class PokerHandGameSequencer(GameSequencer):
 
             # Check if all cards have been dealt yet?
             finished_dealing = True
+            all_open_cards_dealt = True
             for card in state.get('crypto_deck_state'):
                 if card.dealt_to is None:
                     break
                 if card.dealt_to >=0 and card.has_been_dealt is False:
                     finished_dealing = False
                     break
+                if card.dealt_to <0 and card.has_been_dealt is False:
+                    all_open_cards_dealt = False
+                    break
             from poker_rounds.card_reveal_client import CardRevealClient, HandDecoder
             self.round_order[CardRevealClient] = finished_dealing
+            self.round_order[OpenCardRevealClient] = all_open_cards_dealt
 
             # Has hand been decoded
             if state.get('hand') is not None:
@@ -56,5 +65,11 @@ class PokerHandGameSequencer(GameSequencer):
             if PokerSetup.have_built_poker_player_map(state):
                 self.round_order[PokerSetup] = True
 
-            if state.get('betting_run') == True:
+            if state.get('betting_run'):
                 self.round_order[BettingClient] = True
+
+
+
+
+
+
