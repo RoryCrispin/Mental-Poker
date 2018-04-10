@@ -18,9 +18,9 @@ class PokerHandGameSequencer(GameSequencer):
                             CardRevealClient: False,
                             HandDecoder: False,
                             PokerSetup: False,
-                            BettingClient: False,
-                            OpenCardRevealClient: False}
-        self.have_bet = False
+                            # BettingClient: False,
+                            # OpenCardRevealClient: False
+                            }
         self.betting_rounds_played = 0
         self.open_cards_revealed = 0
 
@@ -34,10 +34,17 @@ class PokerHandGameSequencer(GameSequencer):
                     return self.advance_to_next_round(cli, next_round.get_final_state())
                 else:
                     return next_round
+        next_round = self.get_betting_reveal_state()
+        next_round = next_round(cli, state)
+        next_round.init_state()
+        return next_round
+
+
 
     def update_round_completion_list(self, state):
         from poker_rounds.secure_deck_shuffle import DeckShuffleClient
-        if state is None: return
+        if state is None:
+            return
         if state.get('crypto_deck_state') is not None:
             self.round_order[DeckShuffleClient] = True
 
@@ -47,15 +54,15 @@ class PokerHandGameSequencer(GameSequencer):
             for card in state.get('crypto_deck_state'):
                 if card.dealt_to is None:
                     break
-                if card.dealt_to >=0 and card.has_been_dealt is False:
+                if card.dealt_to >= 0 and card.has_been_dealt is False:
                     finished_dealing = False
                     break
-                if card.dealt_to <0 and card.has_been_dealt is False:
+                if card.dealt_to < 0 and card.has_been_dealt is False:
                     all_open_cards_dealt = False
                     break
             from poker_rounds.card_reveal_client import CardRevealClient, HandDecoder
             self.round_order[CardRevealClient] = finished_dealing
-            self.round_order[OpenCardRevealClient] = all_open_cards_dealt
+            # self.round_order[OpenCardRevealClient] = all_open_cards_dealt
 
             # Has hand been decoded
             if state.get('hand') is not None:
@@ -68,8 +75,13 @@ class PokerHandGameSequencer(GameSequencer):
             if state.get('betting_run'):
                 self.round_order[BettingClient] = True
 
-
-
-
-
+    def get_betting_reveal_state(self):
+        if self.open_cards_revealed == 3:
+            raise IndexError
+        if self.betting_rounds_played > self.open_cards_revealed:
+            self.open_cards_revealed +=1
+            return OpenCardRevealClient
+        else:
+            self.betting_rounds_played += 1
+            return BettingClient
 
