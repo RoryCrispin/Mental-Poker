@@ -1,8 +1,7 @@
 from random import randint
 
 from client_logging import LogLevel
-from poker_rounds.poker_game import PokerGame
-from poker_rounds.poker_setup import PokerPlayer
+from poker_rounds.poker_game import PokerGame, PokerPlayer
 from turn_taking_client import TurnTakingClient
 
 

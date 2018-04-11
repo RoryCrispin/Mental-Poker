@@ -3,7 +3,7 @@ from random import shuffle
 from client import LogLevel
 from crypto.makeRsaKeys import SRA_key
 from crypto_deck import CryptoCard, CryptoWords
-from poker_rounds.poker_helper import PokerWords
+from poker_rounds.poker_game import PokerWords
 from turn_taking_client import TurnTakingClient
 
 

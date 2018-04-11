@@ -10,7 +10,7 @@ from ordered_turn_client import InsecureOrderedClient
 from poker_rounds.secure_deck_shuffle import DeckShuffleClient
 from secure_decryption_client import SecureShuffleSampleDecryptor
 from secure_shuffle_client import SecureShufflingClient
-from poker_rounds.poker_helper import PokerWords
+from poker_rounds.poker_game import PokerWords
 
 logger = logging.getLogger()
 
