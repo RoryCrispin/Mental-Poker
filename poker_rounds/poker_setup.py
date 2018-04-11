@@ -4,6 +4,7 @@ from poker_rounds.poker_game import PokerGame, PokerPlayer
 
 class PokerSetup(GameClient):
     def __init__(self, cli, state=None, max_players=3):
+        self.max_players = max_players
         super().__init__(cli, state)
 
     def init_existing_state(self, state):
@@ -16,7 +17,7 @@ class PokerSetup(GameClient):
 
     def build_player_map(self, state):
         print("-----------------------Poker Setup--------------")
-        self.game = PokerGame()
+        self.game = PokerGame(self.max_players)
         for ident, player in state['peer_map'].items():
             player[PokerPlayer.POKER_PLAYER] = PokerPlayer(ident, self.game)
         self.peer_map = state['peer_map']

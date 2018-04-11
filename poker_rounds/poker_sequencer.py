@@ -16,7 +16,7 @@ class PokerHandGameSequencer(GameSequencer):
 
         self.round_order = {DeckShuffleClient: False,
                             CardRevealClient: False,
-                            HandDecoder: False,
+                            HandDecoder: False,  # TODO: Three flop cards, then turn and river
                             PokerSetup: False,
                             }
         self.betting_rounds_played = 0
@@ -38,9 +38,6 @@ class PokerHandGameSequencer(GameSequencer):
             next_round = next_round(cli, state)
             next_round.init_state()
             return next_round
-
-
-
 
     def update_round_completion_list(self, state):
         from poker_rounds.secure_deck_shuffle import DeckShuffleClient
@@ -82,9 +79,8 @@ class PokerHandGameSequencer(GameSequencer):
             else:
                 return None
         if self.betting_rounds_played > self.open_cards_revealed:
-            self.open_cards_revealed +=1
+            self.open_cards_revealed += 1
             return OpenCardRevealClient
         else:
             self.betting_rounds_played += 1
             return BettingClient
-

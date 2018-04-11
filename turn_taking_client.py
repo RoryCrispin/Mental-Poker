@@ -41,6 +41,7 @@ class TurnTakingClient(InsecureOrderedClient):
         raise IndexError
 
     def end_my_turn(self):
+        print("Ending my turn")
         self.current_turn += 1
         self.cli.post_message(data={self.MESSAGE_KEY: self.END_TURN,
                                     self.ROOM_CODE: self.room_code})
@@ -81,13 +82,12 @@ class TurnTakingClient(InsecureOrderedClient):
 
     def get_peer_at_position(self, position):
         for ident, peer in self.peer_map.items():
-            if peer['roll'] == position:
+            if peer['roll'] == position % self.max_players:  # Mod with max players so function is cyclic
                 return ident, peer
         return None
 
     def get_my_position(self):
         return self.peer_map[self.cli.ident]['roll']
-
 
 
 class CountingClient(TurnTakingClient):
