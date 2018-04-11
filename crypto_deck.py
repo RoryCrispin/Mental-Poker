@@ -18,7 +18,7 @@ class CryptoCard():
 
     def update_state(self, action, value):
         self.state_log.append({self.ACTION: action,
-                               self.LOCKS_PRESENT: self.locks_present,
+                               self.LOCKS_PRESENT: self.locks_present.copy(),
                                self.VALUE: value})
         self.value = value
 
@@ -32,8 +32,8 @@ class CryptoCard():
         self.update_state(self.GENERATED, value)
 
     def showdown_decrypt(self, value):
+        self.locks_present.clear()
         self.update_state(self.SHOWDOWN_DECRYPT, value)
-        self.locks_present = []
 
 
 
