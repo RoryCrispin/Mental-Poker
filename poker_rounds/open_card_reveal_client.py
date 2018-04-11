@@ -5,7 +5,7 @@ from poker_rounds.poker_game import PokerGame, PokerWords
 
 class OpenCardRevealClient(CardRevealClient):
     def take_turn(self):
-        self.cli.log(LogLevel.INFO, "Removed my lock of communal cardlib")
+        self.cli.log(LogLevel.INFO, "Removed my lock of communal card")
         self.remove_my_lock_and_share()
         self.end_my_turn()
 
@@ -27,6 +27,9 @@ class OpenCardRevealClient(CardRevealClient):
 
     def received_all_peer_keys(self):
         return len(self.card.locks_present) == 0
+
+    def recv_lock_removed(self, data):
+        super().recv_lock_removed(data)
 
     def get_final_state(self):
         self.cli.log(LogLevel.INFO, "Got community cardlib: {}".format(self.card.value))

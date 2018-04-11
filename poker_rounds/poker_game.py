@@ -4,7 +4,7 @@ class PokerGame():
     CARD_REVEAL = 'card_reveal'
     def __init__(self, blind=10):
         self.blind = blind
-        self.starting_cash = 100
+        self.starting_cash = 1000000000
         self.state_log = []
 
 
@@ -16,7 +16,6 @@ class PokerPlayer:
         self.game = game
         self.action_log = []
         self.folded = False
-        self.allin = self.is_all_in()
         self.cash_in_hand = game.starting_cash
         self.cash_in_pot = 0
 
