@@ -1,6 +1,6 @@
+from client_logging import LogLevel
 from poker_rounds.card_reveal_client import CardRevealClient
 from poker_rounds.poker_helper import PokerWords
-from src.game.Log import LogLevel
 
 
 class OpenCardRevealClient(CardRevealClient):

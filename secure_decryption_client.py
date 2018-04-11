@@ -1,6 +1,6 @@
+from client_logging import LogLevel
 from crypto_deck import CryptoWords
 from poker_rounds.poker_helper import PokerWords, fresh_deck
-from src.game.Log import LogLevel
 from turn_taking_client import TurnTakingClient
 
 

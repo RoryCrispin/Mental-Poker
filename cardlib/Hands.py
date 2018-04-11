@@ -2,7 +2,7 @@ from enum import IntEnum
 from itertools import combinations
 from itertools import groupby
 
-from src.card import utils
+from cardlib import utils
 
 
 class HandEnum(IntEnum):
