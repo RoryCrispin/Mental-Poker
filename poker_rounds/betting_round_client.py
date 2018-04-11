@@ -1,6 +1,7 @@
 from random import randint
 
 from client_logging import LogLevel
+from poker_rounds.poker_game import PokerGame
 from poker_rounds.poker_setup import PokerPlayer
 from turn_taking_client import TurnTakingClient
 
@@ -23,6 +24,7 @@ class BettingClient(TurnTakingClient):
                                (BettingCodes.BET, self.handle_bet)
                                ])
         self.initial_moves_from = []
+        self.game: PokerGame
 
     def init_blinds(self):
         self.cli.log(LogLevel.VERBOSE, "Init Blinds")
@@ -34,6 +36,7 @@ class BettingClient(TurnTakingClient):
         lilb.set_blind(big_blind=False)
 
     def alert_players_have_been_ordered(self):
+        self.game: PokerGame = self.state['game']
         self.init_blinds()
         self.player = self.peer_map[self.cli.ident][PokerPlayer.POKER_PLAYER]
         if self.is_my_turn():
@@ -60,6 +63,8 @@ class BettingClient(TurnTakingClient):
         self.send_round_message(BettingCodes.BET, {self.BET_AMOUNT: amount})
 
     def apply_call(self, player):
+        self.game.state_log.append({PokerGame.FROM: player.ident,
+                                    PokerGame.ACTION: BettingCodes.CALL})
         player.add_to_pot(self.cash_needed_for_call(player))
 
     def cash_needed_for_call(self, player):
@@ -67,6 +72,9 @@ class BettingClient(TurnTakingClient):
         return max_pot_size - player.cash_in_pot
 
     def apply_bet(self, player: PokerPlayer, bet_raise: int):
+        self.game.state_log.append({PokerGame.FROM: player.ident,
+                                    PokerGame.ACTION: BettingCodes.BET,
+                                    'raise': bet_raise})
         bet_amount = bet_raise + self.cash_needed_for_call(player)
         return player.add_to_pot(bet_amount)
 

@@ -1,5 +1,6 @@
 from client_logging import LogLevel
 from poker_rounds.card_reveal_client import CardRevealClient
+from poker_rounds.poker_game import PokerGame
 from poker_rounds.poker_helper import PokerWords
 
 
@@ -36,5 +37,6 @@ class OpenCardRevealClient(CardRevealClient):
             state[PokerWords.OPEN_CARDS] = []
         # state[PokerWords.OPEN_CARDS].append(self.cardlib)
         state[PokerWords.OPEN_CARDS].append((self.card.dealt_to, self.card.value))
+        state['game'].state_log.append({PokerGame.CARD_REVEAL: self.card.value})
         return state
 

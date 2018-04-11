@@ -1,6 +1,5 @@
 from client import GameClient
 from poker_rounds.poker_game import PokerGame
-from turn_taking_client import TurnTakingClient
 
 
 class PokerSetup(GameClient):
@@ -28,7 +27,8 @@ class PokerSetup(GameClient):
 
     def get_final_state(self):
         state = super().get_final_state()
-        state.update({'peer_map': self.peer_map})
+        state.update({'peer_map': self.peer_map,
+                      'game': self.game})
         return state
 
 
