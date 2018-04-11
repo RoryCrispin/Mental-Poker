@@ -5,7 +5,7 @@ from src.game.Log import LogLevel
 
 class OpenCardRevealClient(CardRevealClient):
     def take_turn(self):
-        self.cli.log(LogLevel.INFO, "Removed my lock of communal card")
+        self.cli.log(LogLevel.INFO, "Removed my lock of communal cardlib")
         self.remove_my_lock_and_share()
         self.end_my_turn()
 
@@ -29,12 +29,12 @@ class OpenCardRevealClient(CardRevealClient):
         return len(self.card.locks_present) == 0
 
     def get_final_state(self):
-        self.cli.log(LogLevel.INFO, "Got community card: {}".format(self.card.value))
+        self.cli.log(LogLevel.INFO, "Got community cardlib: {}".format(self.card.value))
         self.card.has_been_dealt = True
         state = super().get_final_state()
         if state.get(PokerWords.OPEN_CARDS) is None:
             state[PokerWords.OPEN_CARDS] = []
-        # state[PokerWords.OPEN_CARDS].append(self.card)
+        # state[PokerWords.OPEN_CARDS].append(self.cardlib)
         state[PokerWords.OPEN_CARDS].append((self.card.dealt_to, self.card.value))
         return state
 

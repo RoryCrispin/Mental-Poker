@@ -87,7 +87,7 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
             cryptocard.generate_card(self.encryptd_by, card, i)
             cryptodeck.append(cryptocard)
 
-        # Prepare the card with their assigned player.
+        # Prepare the cardlib with their assigned player.
         index = 0
         for player_index in range(0, self.max_players):
             for _ in range(0,2):

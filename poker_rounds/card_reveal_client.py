@@ -62,13 +62,13 @@ class CardRevealClient(TurnTakingClient):
 
             if self.received_all_peer_keys() and self.is_my_card():
                 self.remove_my_lock()
-                self.cli.log(LogLevel.INFO, "Received locked card: {}".format(self.card.value))
+                self.cli.log(LogLevel.INFO, "Received locked cardlib: {}".format(self.card.value))
 
     def is_card_valid(self):
         if self.card.value in range(10, 62):
             return True
         else:
-            self.cli.log(LogLevel.ERROR, "Generated an invalid card!")
+            self.cli.log(LogLevel.ERROR, "Generated an invalid cardlib!")
             raise ValueError
 
     def recv_not_sharing_private(self, data):
