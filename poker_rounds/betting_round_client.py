@@ -11,6 +11,8 @@ class BettingCodes():
     FOLD = 'fold'
     ALLIN = 'all_in'
     SKIP = 'skip'
+    BIG_BLIND = 'big_blind'
+    SMALL_BLIND = 'small_blind'
 
 
 class BettingClient(TurnTakingClient):
@@ -29,13 +31,31 @@ class BettingClient(TurnTakingClient):
         self.game: PokerGame
 
     def init_blind_bets(self):
+        # Clear blind flag:
+        for _, player in self.peer_map.items():
+            player[PokerPlayer.POKER_PLAYER].reset_blind_flag()
+
+        # TODO: Get blind players to skip their first turns
         self.cli.log(LogLevel.VERBOSE, "Init Blinds")
         # TODO: we skip the first player because of next TODO
-        bigb: PokerPlayer = self.get_peer_at_position(1)[1][PokerPlayer.POKER_PLAYER]
-        bigb.set_blind(big_blind=True)
+        dealer_position = self.game.dealer
+        self.game.advance_to_next_dealer()
+        print("Dealer is {}".format(dealer_position))
 
-        lilb: PokerPlayer = self.get_peer_at_position(2)[1][PokerPlayer.POKER_PLAYER]
-        lilb.set_blind(big_blind=False)
+        big_blind_played = False
+        small_blind_played = False
+
+        # TODO: check if player can afford blind
+        for i in range(dealer_position + 1, dealer_position + self.max_players + 1):
+            ident, player_map = self.get_peer_at_position(i)
+            player = player_map[PokerPlayer.POKER_PLAYER]
+            if not player.is_all_in() and not player.folded:
+                if not big_blind_played:
+                    player.set_blind(big_blind=True)
+                    big_blind_played = True
+                elif not small_blind_played:
+                    player.set_blind(big_blind=False)
+                    small_blind_played = True
 
     def alert_players_have_been_ordered(self):
         self.game: PokerGame = self.state['game']
@@ -49,7 +69,7 @@ class BettingClient(TurnTakingClient):
         if self.player.folded or self.player.is_all_in():
             possible_moves.append(BettingCodes.SKIP)
         else:
-            possible_moves.append(BettingCodes.ALLIN)  # TODO: Uncomment
+            possible_moves.append(BettingCodes.ALLIN)
             if player.cash_in_hand == self.cash_needed_for_call(player):
                 possible_moves.append(BettingCodes.CALL)
             if player.cash_in_hand > self.cash_needed_for_call(player):
@@ -59,6 +79,8 @@ class BettingClient(TurnTakingClient):
                 possible_moves.append(BettingCodes.BET)
         return possible_moves
 
+    def get_max_raise(self, player: PokerPlayer):
+        return player.cash_in_hand - self.cash_needed_for_call(player) - 1
 
     def take_turn(self):
         if not self.player.folded:
@@ -68,19 +90,11 @@ class BettingClient(TurnTakingClient):
                 self.make_skip()
                 self.end_my_turn()
                 return
-
-            # The extremely smart poker 'AI' follows...
-            # move_choice = []
-            # move_choice.extend([BettingCodes.CALL] * 10)
-            # move_choice.extend([BettingCodes.BET] * 5)
-            # move_choice.extend([BettingCodes.FOLD] * 100)
-
             next_move = choice(self.get_possible_moves(self.player))
-
             if next_move is BettingCodes.CALL:
                 self.make_call()
             elif next_move is BettingCodes.BET:
-                self.make_bet(randint(1, 5))
+                self.make_bet(randint(1, self.player.cash_in_hand))
             elif next_move is BettingCodes.FOLD:
                 self.make_fold()
             elif next_move is BettingCodes.ALLIN:
@@ -122,8 +136,12 @@ class BettingClient(TurnTakingClient):
         player.add_to_pot(self.cash_needed_for_call(player))
 
     def cash_needed_for_call(self, player):
-        max_pot_size = max(self.get_active_pots())
-        return max_pot_size - player.cash_in_pot
+        try:
+            max_pot_size = max(self.get_unfolded_pots())
+            return max_pot_size - player.cash_in_pot
+        except ValueError:
+            print("No active pots!")
+            return None
 
     def apply_bet(self, player: PokerPlayer, bet_raise: int):
         self.game.state_log.append({PokerGame.FROM: player.ident,
@@ -137,23 +155,32 @@ class BettingClient(TurnTakingClient):
                                     PokerGame.ACTION: BettingCodes.ALLIN})
         return player.add_to_pot(player.cash_in_hand)
 
-
     def is_round_over(self):
         active_pots = self.get_active_pots()
         all_pots_equal = all([p == active_pots[0] for p in active_pots])
-        all_players_moved = len(self.initial_moves_from) >= self.max_players # TODO: We should filter initial_moves to
+        all_players_moved = len(self.initial_moves_from) >= self.max_players  # TODO: We should filter initial_moves to
         # TODO: unique idents only.
         over = all_players_moved and all_pots_equal
         if over:
             print("======================================")
         return over
 
-    def get_active_pots(self):
+    def get_unfolded_pots(self):
         active_pots = []
         player: PokerPlayer
         for _, peer in self.peer_map.items():
             player = peer[PokerPlayer.POKER_PLAYER]
             if player.folded:
+                break
+            active_pots.append(player.cash_in_pot)
+        return active_pots
+
+    def get_active_pots(self):
+        active_pots = []
+        player: PokerPlayer
+        for _, peer in self.peer_map.items():
+            player = peer[PokerPlayer.POKER_PLAYER]
+            if player.folded or player.is_all_in():
                 break
             active_pots.append(player.cash_in_pot)
         return active_pots
@@ -189,12 +216,13 @@ class BettingClient(TurnTakingClient):
     def handle_all_in(self, data):
         player: PokerPlayer = self.get_player_from_turn_message(data)
         if self.is_turn_valid(data):
+            print("Got All In from {}".format(player.ident))
             self.apply_all_in(player)
 
     def is_turn_valid(self, data):
         if super().is_turn_valid(data):
             return True
-            #TODO: Check for all in/folded players making illegal moves
+            # TODO: Check for all in/folded players making illegal moves
 
     def get_player_from_turn_message(self, data) -> PokerPlayer:
         return self.peer_map[data[self.SENDER_ID]][PokerPlayer.POKER_PLAYER]
