@@ -6,6 +6,7 @@ class CryptoCard():
     LOCKS_REMOVED = 'locks_removed'
     LOCKS_PRESENT = 'locks_present'
     VALUE = 'value'
+    SHOWDOWN_DECRYPT = 'showdown_decrypt'
 
     def __init__(self):
         self.state_log = []
@@ -27,8 +28,13 @@ class CryptoCard():
 
     def generate_card(self, encrypted_by, value, deck_index):
         self.deck_index = deck_index
-        self.locks_present = encrypted_by[:]
+        self.locks_present = encrypted_by.copy()
         self.update_state(self.GENERATED, value)
+
+    def showdown_decrypt(self, value):
+        self.update_state(self.SHOWDOWN_DECRYPT, value)
+        self.locks_present = []
+
 
 
 class CryptoWords():

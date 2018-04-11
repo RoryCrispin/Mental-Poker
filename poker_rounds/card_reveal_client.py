@@ -1,8 +1,7 @@
-from client import GameClient
-from crypto_deck import CryptoCard, CryptoWords
 from client_logging import LogLevel
-from turn_taking_client import TurnTakingClient
+from crypto_deck import CryptoCard, CryptoWords
 from poker_rounds.poker_helper import PokerWords
+from turn_taking_client import TurnTakingClient
 
 
 class CardRevealClient(TurnTakingClient):
@@ -30,7 +29,6 @@ class CardRevealClient(TurnTakingClient):
                 pass
             try:
                 if card.dealt_to >= 0 and not card.has_been_dealt:
-                    print(index)
                     return card
             except(TypeError):
                 return None
@@ -40,7 +38,7 @@ class CardRevealClient(TurnTakingClient):
     def take_turn(self):
         if self.is_my_card():
             self.send_round_message(self.NOT_SHARING_PRIVATE, {})
-            self.cli.log(LogLevel.VERBOSE, "Not sharing")
+            self.cli.log(LogLevel.VERBOSE, "Not sharing my private key")
             self.end_my_turn()
         else:
             self.cli.log(LogLevel.VERBOSE, "Removed my lock")
@@ -49,8 +47,6 @@ class CardRevealClient(TurnTakingClient):
 
     def remove_my_lock_and_share(self):  # TODO: join this with remove_my_lock method
         if self.card.value is None:
-            # self.card.update_state(CryptoCard.GENERATED, self.cli.ident,
-            # self.deck_state[0])  # TODO: Extend the deck
             self.card = self.get_card_for_decryption()
         self.remove_my_lock()
         self.send_round_message(self.REMOVE_LOCK, {self.REMOVE_LOCK: self.card.value})

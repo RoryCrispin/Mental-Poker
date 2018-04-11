@@ -28,10 +28,8 @@ class TurnTakingClient(InsecureOrderedClient):
         return self.current_turn == 0
 
     def alert_players_have_been_ordered(self):
-        print("ordered!")
         if self.is_my_turn():
             self.take_turn()
-            # print("dont take turn just yet!!")
 
     def is_my_turn(self):
         return self.get_current_turn() == self.cli.ident
@@ -68,7 +66,7 @@ class TurnTakingClient(InsecureOrderedClient):
             else:
                 # This feature is not _fully_ tested. It's intended to block messages form other
                 # rooms from causing bugs in new rounds
-                print("Invalid message")
+                self.cli.log(LogLevel.ERROR, "Invalid message")
                 return False
         return True
 

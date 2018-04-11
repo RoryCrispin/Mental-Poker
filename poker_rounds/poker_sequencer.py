@@ -2,7 +2,7 @@ from game_sequencer import GameSequencer
 from poker_rounds.betting_round_client import BettingClient
 from poker_rounds.open_card_reveal_client import OpenCardRevealClient
 from poker_rounds.poker_setup import PokerSetup
-from secure_decryption_client import SecureDecryptionClient, SecureShuffleSampleDecryptor, ShowdownDeckDecryptor
+from secure_decryption_client import ShowdownDeckDecryptor
 
 
 class PokerHandGameSequencer(GameSequencer):
@@ -13,14 +13,11 @@ class PokerHandGameSequencer(GameSequencer):
         super().__init__()
         from poker_rounds.card_reveal_client import CardRevealClient, HandDecoder
         from poker_rounds.secure_deck_shuffle import DeckShuffleClient
-        from poker_rounds.betting_round_client import BettingClient
 
         self.round_order = {DeckShuffleClient: False,
                             CardRevealClient: False,
                             HandDecoder: False,
                             PokerSetup: False,
-                            # BettingClient: False,
-                            # OpenCardRevealClient: False
                             }
         self.betting_rounds_played = 0
         self.open_cards_revealed = 0
@@ -54,7 +51,6 @@ class PokerHandGameSequencer(GameSequencer):
 
             # Check if all cards have been dealt yet?
             finished_dealing = True
-            all_open_cards_dealt = True
             for card in state.get('crypto_deck_state'):
                 if card.dealt_to is None:
                     break
@@ -66,7 +62,6 @@ class PokerHandGameSequencer(GameSequencer):
                     break
             from poker_rounds.card_reveal_client import CardRevealClient, HandDecoder
             self.round_order[CardRevealClient] = finished_dealing
-            # self.round_order[OpenCardRevealClient] = all_open_cards_dealt
 
             # Has hand been decoded
             if state.get('hand') is not None:
@@ -83,7 +78,7 @@ class PokerHandGameSequencer(GameSequencer):
         if self.open_cards_revealed == 3:
             if not self.game_over:
                 self.game_over = True
-                return SecureShuffleSampleDecryptor
+                return ShowdownDeckDecryptor
             else:
                 return None
         if self.betting_rounds_played > self.open_cards_revealed:

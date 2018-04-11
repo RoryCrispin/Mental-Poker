@@ -1,15 +1,15 @@
-from game_sequencer import GameSequencer
-from client_logging import LogLevel
-from redis_client import RedisClient
 import logging
+
+from client_logging import LogLevel
+from game_sequencer import GameSequencer
+from redis_client import RedisClient
+
 
 class CommsClient(RedisClient):
     def __init__(self, game_sequencer: GameSequencer):
         super().__init__('poker_chan')
         self.log_level = 0
         self.logger = logging.getLogger("pkr")
-        print(self.logger.level)
-        self.logger.warning("Hello")
         self.round_list_index = 0
         self.game_sequencer = game_sequencer
         self.queue = []
@@ -76,14 +76,14 @@ class GameClient():
         else:
             self.init_no_state()
 
-    def apply_queue(self, queue): # -> GameClient, Queue, FinalState
+    def apply_queue(self, queue):  # -> GameClient, Queue, FinalState
         new_queue = []
         for event in queue:
             msg_key = event.get('data').get(self.MESSAGE_KEY)
             did_run_job = False
             for k, queue_handler_func in self.queue_map:
                 if msg_key == k:
-                    queue_handler_func(event)  # TODO: to reject jobs, make this funtion return a Bool!
+                    queue_handler_func(event)
                     did_run_job = True
                     break
             if not did_run_job:
@@ -105,11 +105,10 @@ class GameClient():
         return False
 
     def get_final_state(self) -> dict:
-        print("Getting final state!")
         state = self.previous_state
         state.update({'root_state': True,
-                'ident': self.cli.ident,
-                })
+                      'ident': self.cli.ident,
+                      })
         return state
 
 

@@ -50,12 +50,12 @@ class BettingClient(TurnTakingClient):
         self.end_my_turn()
 
     def make_call(self):
-        print("Making Call")
+        self.cli.log(LogLevel.INFO, "Making Call")
         self.send_round_message(BettingCodes.CALL, {})
         self.apply_call(self.player)
 
     def make_bet(self, amount: int):
-        print("Making bet of {}".format(amount))
+        self.cli.log(LogLevel.INFO, "Making bet of {}".format(amount))
         self.apply_bet(self.player, amount)
         self.send_round_message(BettingCodes.BET, {self.BET_AMOUNT: amount})
 
@@ -94,7 +94,7 @@ class BettingClient(TurnTakingClient):
         if self.is_turn_valid(data):
             self.initial_moves_from.append(player.ident)
             self.apply_call(player)
-            print(LogLevel.INFO, 'Player {} calls'.format(player.ident))
+            self.cli.log(LogLevel.INFO, 'Player {} calls'.format(player.ident))
 
     def handle_fold(self, data):
         player: PokerPlayer = self.get_player_from_turn_message(data)
@@ -108,7 +108,7 @@ class BettingClient(TurnTakingClient):
             self.initial_moves_from.append(player.ident)
             amount = data['data'][self.BET_AMOUNT]
             self.apply_bet(player, amount)
-            print("Player {} bets {}".format(player.ident, amount))
+            self.cli.log(LogLevel.INFO, "Player {} bets {}".format(player.ident, amount))
 
     def get_player_from_turn_message(self, data) -> PokerPlayer:
         return self.peer_map[data[self.SENDER_ID]][PokerPlayer.POKER_PLAYER]

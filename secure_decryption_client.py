@@ -1,6 +1,7 @@
-from turn_taking_client import TurnTakingClient
 from crypto_deck import CryptoWords
-from poker_rounds.poker_helper import PokerWords
+from poker_rounds.poker_helper import PokerWords, fresh_deck
+from src.game.Log import LogLevel
+from turn_taking_client import TurnTakingClient
 
 
 class SecureDecryptionClient(TurnTakingClient):
@@ -23,7 +24,7 @@ class SecureDecryptionClient(TurnTakingClient):
         self.share_my_private_component()
 
     def share_my_private_component(self):
-        print("shared my componrnt")
+        self.cli.log(LogLevel.VERBOSE, "Shared my private component")
         self.have_shared_my_component = True
         self.send_round_message(CryptoWords.SHARE_PRIVATE, {
             CryptoWords.SHARE_PRIVATE: self.key.get_private_component()
@@ -32,8 +33,8 @@ class SecureDecryptionClient(TurnTakingClient):
 
     def recv_private_component(self, data):
         if self.is_turn_valid(data):
-            print("recv component")
-            self.peer_map[data[self.SENDER_ID]][CryptoWords.PRIVATE_COMPONENT] =\
+            self.cli.log(LogLevel.VERBOSE, "Received peer private component")
+            self.peer_map[data[self.SENDER_ID]][CryptoWords.PRIVATE_COMPONENT] = \
                 data['data'][CryptoWords.SHARE_PRIVATE]
 
     def decrypt_deck(self, key=None):
@@ -53,7 +54,7 @@ class SecureDecryptionClient(TurnTakingClient):
 
     def fully_decrypt_deck(self):
         self.decrypt_deck()
-        print("Decrypt with {}".format(self.cli.ident))
+        self.cli.log(LogLevel.VERBOSE, "Decrypt deck with {}".format(self.cli.ident))
         own_priv = self.key.get_private_component()
         for ident, vals in self.peer_map.items():
             if ident != self.cli.ident:
@@ -71,13 +72,18 @@ class SecureShuffleSampleDecryptor(SecureDecryptionClient):
         state.update({PokerWords.DECK_STATE: self.deck_state})
         return state
 
-class ShowdownDeckDecryptor(SecureShuffleSampleDecryptor):
+
+class ShowdownDeckDecryptor(SecureDecryptionClient):
     def get_final_state(self):
         self.fully_decrypt_deck()
         state = super().get_final_state()
-        i=0
+        i = 0
         for card in self.deck_state:
-            state['crypto_deck_state'][i].value = card
+            state['crypto_deck_state'][i].showdown_decrypt(card)
             i += 1
         state.update({PokerWords.DECK_STATE: self.deck_state})
+        self.check_original_deck_was_valid(self.deck_state)
         return state
+
+    def check_original_deck_was_valid(self, deck):
+        assert sorted(deck) == fresh_deck

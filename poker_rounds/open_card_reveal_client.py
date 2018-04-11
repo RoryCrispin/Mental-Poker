@@ -1,7 +1,6 @@
 from poker_rounds.card_reveal_client import CardRevealClient
 from poker_rounds.poker_helper import PokerWords
 from src.game.Log import LogLevel
-from turn_taking_client import TurnTakingClient
 
 
 class OpenCardRevealClient(CardRevealClient):
@@ -17,7 +16,6 @@ class OpenCardRevealClient(CardRevealClient):
                 pass
             try:
                 if card.dealt_to <= 0 and not card.has_been_dealt:
-                    print(index)
                     return card
             except(TypeError):
                 return None
@@ -31,7 +29,7 @@ class OpenCardRevealClient(CardRevealClient):
         return len(self.card.locks_present) == 0
 
     def get_final_state(self):
-        print("Got community card: {}".format(self.card.value))
+        self.cli.log(LogLevel.INFO, "Got community card: {}".format(self.card.value))
         self.card.has_been_dealt = True
         state = super().get_final_state()
         if state.get(PokerWords.OPEN_CARDS) is None:

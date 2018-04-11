@@ -66,7 +66,7 @@ class InsecureOrderedClient(IdentifyClient):
         self.peer_map[data.get(self.SENDER_ID)][self.ROLL] = \
             data['data'][self.ROLL]
         if self.received_all_rolls():
-            print("All rolls recvd")
+            self.cli.log(LogLevel.VERBOSE, "All peer rolls have been received")
             self.order_players()
 
     def order_players(self):
