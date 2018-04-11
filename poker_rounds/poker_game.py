@@ -16,6 +16,7 @@ class PokerPlayer:
         self.game = game
         self.action_log = []
         self.folded = False
+        self.allin = self.is_all_in()
         self.cash_in_hand = game.starting_cash
         self.cash_in_pot = 0
 
@@ -31,6 +32,9 @@ class PokerPlayer:
             self.add_to_pot(self.game.blind * 2)
         else:
             self.add_to_pot(self.game.blind)
+
+    def is_all_in(self):
+        return self.cash_in_hand == 0
 
 
 fresh_deck = list(range(10,62))

@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choice
 
 from client_logging import LogLevel
 from poker_rounds.poker_game import PokerGame, PokerPlayer
@@ -10,6 +10,7 @@ class BettingCodes():
     BET = 'bet'
     FOLD = 'fold'
     ALLIN = 'all_in'
+    SKIP = 'skip'
 
 
 class BettingClient(TurnTakingClient):
@@ -25,7 +26,7 @@ class BettingClient(TurnTakingClient):
         self.initial_moves_from = []
         self.game: PokerGame
 
-    def init_blinds(self):
+    def init_blind_bets(self):
         self.cli.log(LogLevel.VERBOSE, "Init Blinds")
         # TODO: we skip the first player because of next TODO
         bigb: PokerPlayer = self.get_peer_at_position(1)[1][PokerPlayer.POKER_PLAYER]
@@ -36,7 +37,7 @@ class BettingClient(TurnTakingClient):
 
     def alert_players_have_been_ordered(self):
         self.game: PokerGame = self.state['game']
-        self.init_blinds()
+        self.init_blind_bets()
         self.player = self.peer_map[self.cli.ident][PokerPlayer.POKER_PLAYER]
         if self.is_my_turn():
             self.take_turn()
@@ -44,12 +45,37 @@ class BettingClient(TurnTakingClient):
     def take_turn(self):
         if not self.player.folded:
             self.initial_moves_from.append(self.cli.ident)
-            i = randint(0, 10)
-            if i > 6:
+
+            if self.player.folded or self.player.allin:
+                self.make_skip()
+                self.end_my_turn()
+                return
+
+            # The extremely smart poker 'AI' follows...
+            move_choice = [
+                BettingCodes.CALL * 10,
+                BettingCodes.BET * 5,
+                BettingCodes.FOLD * 100,
+            ]
+            next_move = choice(move_choice)
+
+            if next_move is BettingCodes.CALL:
                 self.make_call()
-            else:
+            elif next_move is BettingCodes.BET:
                 self.make_bet(randint(1, 5))
+            elif next_move is BettingCodes.FOLD:
+                self.make_fold()
         self.end_my_turn()
+
+    def make_skip(self):
+        print("Skipping move")
+        self.send_round_message(BettingCodes.SKIP, {})
+
+    def make_fold(self):
+        self.apply_fold(self.player)
+
+    def apply_fold(self, player: PokerPlayer):
+        player.folded = True
 
     def make_call(self):
         self.cli.log(LogLevel.INFO, "Making Call")
@@ -80,7 +106,8 @@ class BettingClient(TurnTakingClient):
     def is_round_over(self):
         active_pots = self.get_active_pots()
         all_pots_equal = all([p == active_pots[0] for p in active_pots])
-        all_players_moved = len(self.initial_moves_from) >= self.max_players
+        all_players_moved = len(self.initial_moves_from) >= self.max_players # TODO: We should filter initial_moves to
+        # TODO: unique idents only.
         over = all_players_moved and all_pots_equal
         if over:
             print("======================================")
@@ -108,6 +135,7 @@ class BettingClient(TurnTakingClient):
         if self.is_turn_valid(data):
             self.initial_moves_from.append(player.ident)
             player.folded = True
+            self.cli.log(LogLevel.INFO, "Player {} folds".format(player.ident))
 
     def handle_bet(self, data):
         player: PokerPlayer = self.get_player_from_turn_message(data)
@@ -116,6 +144,16 @@ class BettingClient(TurnTakingClient):
             amount = data['data'][self.BET_AMOUNT]
             self.apply_bet(player, amount)
             self.cli.log(LogLevel.INFO, "Player {} bets {}".format(player.ident, amount))
+
+    def handle_skip(self, data):
+        if self.is_turn_valid():
+            print("Got skip from {}".format(data[self.SENDER_ID]))
+            pass
+
+    def is_turn_valid(self, data):
+        if super().is_turn_valid(data):
+            return True
+            #TODO: Check for all in/folded players making illegal moves
 
     def get_player_from_turn_message(self, data) -> PokerPlayer:
         return self.peer_map[data[self.SENDER_ID]][PokerPlayer.POKER_PLAYER]
