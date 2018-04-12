@@ -3,7 +3,7 @@ class PokerGame():
     FROM = 'ident'
     CARD_REVEAL = 'card_reveal'
 
-    def __init__(self, blind=10, max_players=3):
+    def __init__(self, max_players=3, blind=10):
         self.max_players = max_players
         self.blind = blind
         self.starting_cash = 200

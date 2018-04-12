@@ -52,9 +52,6 @@ class TurnTakingClient(InsecureOrderedClient):
     def take_turn(self):
         raise NotImplementedError
 
-    def handle_turn(self, data):
-        raise NotImplementedError
-
     def take_turn_if_mine(self):
         if self.is_my_turn():
             self.take_turn()
