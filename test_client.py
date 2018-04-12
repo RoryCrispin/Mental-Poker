@@ -1,16 +1,17 @@
 import logging
 from multiprocessing import Pool
+
 from time import sleep
 
-from poker_rounds.card_reveal_client import CardRevealClient
 from client import CommsClient, GreetingCli
 from game_sequencer import ManualGameSequencer
-from poker_rounds.poker_sequencer import PokerHandGameSequencer
 from ordered_turn_client import InsecureOrderedClient
+from poker_rounds.card_reveal_client import CardRevealClient
+from poker_rounds.poker_game import PokerWords
+from poker_rounds.poker_sequencer import PokerHandGameSequencer
 from poker_rounds.secure_deck_shuffle import DeckShuffleClient
 from secure_decryption_client import SecureShuffleSampleDecryptor
 from secure_shuffle_client import SecureShufflingClient
-from poker_rounds.poker_game import PokerWords
 
 logger = logging.getLogger()
 
@@ -119,3 +120,10 @@ def test_hand_reveal_client():
         for _, playermap in client_pm.items():
             playermaps.append(playermap['poker_player'])
     assert all((d.cash_in_pot == playermaps[0].cash_in_pot for d in playermaps))
+
+
+def test_lots_of_rounds():
+    while True:
+        poker_sequencer = PokerHandGameSequencer()
+        x = start_async_rounds(poker_sequencer, 3)
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Another poker round @@@@@@@@@@@@@@@@@@@@@@@@@@@'")

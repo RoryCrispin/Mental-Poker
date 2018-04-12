@@ -1,3 +1,6 @@
+from uuid import uuid4
+
+
 class PokerGame():
     ACTION = 'action'
     FROM = 'ident'
@@ -9,12 +12,18 @@ class PokerGame():
         self.starting_cash = 200
         self.state_log = []
         self.dealer = 0
+        self.last_raise = None
 
     def advance_to_next_dealer(self):
         if self.dealer == self.max_players:
             self.dealer = 0
         else:
             self.dealer += 1
+
+    def new_raise(self) -> str:
+        print("~~ There is a new raise~~")
+        self.last_raise = str(uuid4())
+        return self.last_raise
 
 
 class PokerPlayer:
@@ -28,6 +37,7 @@ class PokerPlayer:
         self.cash_in_hand = game.starting_cash
         self.cash_in_pot = 0
         self.did_play_blind_this_round = False
+        self.last_raise_i_have_called = None
 
     def add_to_pot(self, amount: int) -> bool:
         if self.cash_in_hand >= amount:
@@ -55,6 +65,7 @@ class PokerPlayer:
                 self.add_to_pot(self.cash_in_hand)
             else:
                 self.add_to_pot(self.game.blind * 2)
+            self.game.new_raise()
         else:
             self.game.state_log.append({
                 PokerGame.FROM: self.ident,

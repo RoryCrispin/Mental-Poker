@@ -15,22 +15,28 @@ class CommsClient(RedisClient):
         self.queue = []
         self.logged_messages = []
         self.log(LogLevel.INFO, "I am client: {}".format(self.ident))
-        self.game = game_sequencer.advance_to_next_round(self)
+        self.round = game_sequencer.advance_to_next_round(self)
 
     def begin(self):
         for message in self.p.listen():
             if message['type'] == 'message':
+                if message['data'] == 'pdb_start':
+                    import ipdb;
+                    ipdb.set_trace()
+                    break
+                if message['data'] == 'dump_game_log':
+                    pass
                 payload = RedisClient.decode_message(message)
 
                 if self.message_is_for_me(payload):
                     self.queue.append(payload)
-                    self.game, self.queue, self.final_state = \
-                        self.game.apply_queue(self.queue)
-                    if self.game is None:
+                    self.round, self.queue, self.final_state = \
+                        self.round.apply_queue(self.queue)
+                    if self.round is None:
                         self.log(LogLevel.VERBOSE, "Round Complete")
-                        self.game = self.advance_to_next_round()
+                        self.round = self.advance_to_next_round()
                         self.queue = []
-                        if self.game is None:
+                        if self.round is None:
                             return self.final_state
             # sleep(uniform(0.001, 0.01))
 

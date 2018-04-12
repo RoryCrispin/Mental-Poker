@@ -72,8 +72,6 @@ class BettingClient(TurnTakingClient):
             possible_moves.append(BettingCodes.SKIP)
         else:
             possible_moves.append(BettingCodes.ALLIN)
-            if player.cash_in_hand == self.cash_needed_for_call(player):
-                possible_moves.append(BettingCodes.CALL)
             if player.cash_in_hand > self.cash_needed_for_call(player):
                 possible_moves.append(BettingCodes.CALL)
                 possible_moves.append(BettingCodes.CALL)
@@ -88,11 +86,6 @@ class BettingClient(TurnTakingClient):
     def take_turn(self):
         if not self.player.folded:
             self.initial_moves_from.append(self.cli.ident)
-
-            if self.player.folded or self.player.is_all_in():
-                self.make_skip()
-                self.end_my_turn()
-                return
             next_move = choice(self.get_possible_moves(self.player))
             if next_move is BettingCodes.CALL:
                 self.make_call()
@@ -102,8 +95,11 @@ class BettingClient(TurnTakingClient):
                 self.make_fold()
             elif next_move is BettingCodes.ALLIN:
                 self.make_all_in()
+            elif next_move is BettingCodes.SKIP:
+                self.make_skip()
             else:
                 self.cli.log(LogLevel.ERROR, "No move generated!")
+                print(self.get_possible_moves(self.player))
         self.end_my_turn()
 
     def make_all_in(self):
@@ -133,21 +129,26 @@ class BettingClient(TurnTakingClient):
     def apply_all_in(self, player: PokerPlayer):
         self.game.state_log.append({PokerGame.FROM: player.ident,
                                     PokerGame.ACTION: BettingCodes.ALLIN})
+        self.game.new_raise()
         return player.add_to_pot(player.cash_in_hand)
 
     def apply_bet(self, player: PokerPlayer, bet_raise: int):
         self.game.state_log.append({PokerGame.FROM: player.ident,
                                     PokerGame.ACTION: BettingCodes.BET,
                                     'raise': bet_raise})
+        self.game.new_raise()
         bet_amount = bet_raise + self.cash_needed_for_call(player)
         return player.add_to_pot(bet_amount)
 
     def apply_call(self, player):
         self.game.state_log.append({PokerGame.FROM: player.ident,
                                     PokerGame.ACTION: BettingCodes.CALL})
+        player.last_raise_i_have_called = self.game.last_raise
         player.add_to_pot(self.cash_needed_for_call(player))
 
     def apply_fold(self, player: PokerPlayer):
+        self.game.state_log.append({PokerGame.FROM: player.ident,
+                                    PokerGame.ACTION: BettingCodes.FOLD})
         player.folded = True
 
     def handle_all_in(self, data):
@@ -176,7 +177,7 @@ class BettingClient(TurnTakingClient):
         player: PokerPlayer = self.get_player_from_turn_message(data)
         if self.is_turn_valid(data):
             self.initial_moves_from.append(player.ident)
-            player.folded = True
+            self.apply_fold(player)
             self.cli.log(LogLevel.INFO, "Player {} folds".format(player.ident))
 
     def handle_skip(self, data):
@@ -199,64 +200,73 @@ class BettingClient(TurnTakingClient):
             return None
 
     def is_round_over(self):
-        # active_pots = self.get_active_pots()
-        # all_pots_equal = all([p == active_pots[0] for p in active_pots])
-
-        all_pots_equal = all([self.cash_needed_for_call(p) == 0 for p in self.get_active_players()])
-        all_players_moved = len(set(self.initial_moves_from)) >= self.max_players
-        # TODO: unique idents only.
-        over = all_players_moved and all_pots_equal
+        # TODO: Get rid of all_players_moved
+        over = self.all_active_players_have_called_last_raise()
+        print("Folded players: {}, All in players: {}, Active players: {}, Called {}"
+              .format(len(self.get_folded_players()),
+                      len(self.get_all_in_players()),
+                      len(self.get_active_players()),
+                      self.players_have_called_last_raise()))
         if over:
             print("======================================")
-            print([self.cash_needed_for_call(p) for p in self.get_active_players()])
-        else:
-            print("All moved = {}, pots eq = {}".format(all_players_moved, all_pots_equal))
-        print("All pots {}".format(self.get_all_pots()))
-
         return over
 
     def get_unfolded_pots(self):
-        active_pots = []
-        player: PokerPlayer
-        for _, peer in self.peer_map.items():
-            player = peer[PokerPlayer.POKER_PLAYER]
-            if player.folded:
-                break
-            active_pots.append(player.cash_in_pot)
-        return active_pots
+        unfolded = set(self.get_every_player()) - set(self.get_folded_players())
+        return [p.cash_in_pot for p in unfolded]
 
     def get_active_players(self) -> [PokerPlayer]:
-        active_players = []
+        return list(set(self.get_every_player())
+                    - set(self.get_folded_players())
+                    - set(self.get_all_in_players()))
+
+    def get_folded_players(self):
+        folded_players = []
         player: PokerPlayer
-        for _, peer in self.peer_map.items():
-            player = peer[PokerPlayer.POKER_PLAYER]
-            if player.folded or player.is_all_in():
-                break
-            active_players.append(player)
-        return active_players
+        for player in self.get_every_player():
+            if player.folded:
+                folded_players.append(player.cash_in_pot)
+        return folded_players
+
+    def get_all_in_players(self):
+        all_in_players = []
+        player: PokerPlayer
+        for player in self.get_every_player():
+            if player.is_all_in():
+                all_in_players.append(player)
+        return all_in_players
 
     def get_active_pots(self):
         active_pots = []
         player: PokerPlayer
-        for _, peer in self.peer_map.items():
-            player = peer[PokerPlayer.POKER_PLAYER]
-            if player.folded or player.is_all_in():
-                break
-            active_pots.append(player.cash_in_pot)
+        for player in self.get_every_player():
+            if not player.folded and not player.is_all_in():
+                active_pots.append(player.cash_in_pot)
         return active_pots
 
     def get_all_pots(self):
-        active_pots = []
-        player: PokerPlayer
+        return [player.cash_in_hand for player in self.get_every_player()]
+
+    def get_every_player(self):
+        players = []
         for _, peer in self.peer_map.items():
             player = peer[PokerPlayer.POKER_PLAYER]
-            active_pots.append(player.cash_in_pot)
-        return active_pots
+            players.append(player)
+        return players
 
     def is_turn_valid(self, data):
         if super().is_turn_valid(data):
             return True
             # TODO: Check for all in/folded players making illegal moves
+
+    def all_active_players_have_called_last_raise(self):
+        return all([player.last_raise_i_have_called == self.game.last_raise
+                    for player in self.get_active_players()])
+
+    def players_have_called_last_raise(self):
+        return [player.last_raise_i_have_called == self.game.last_raise
+                for player in self.get_active_players()]
+
 
     def get_player_from_turn_message(self, data) -> PokerPlayer:
         return self.peer_map[data[self.SENDER_ID]][PokerPlayer.POKER_PLAYER]
