@@ -11,6 +11,8 @@ class PokerHandGameSequencer(GameSequencer):
 
     FIRST_BETTING_ROUND = 'first_betting_round'
     FLOP_REVEAL = 'flop_reveal'
+    FLOP_REVEAL_TWO = 'flop_reveal_two'
+    FLOP_REVEAL_THREE = 'flop_reveal_three'
     SECOND_BETTING_ROUND = 'second_betting_round'
     TURN_REVEAL = 'turn_reveal'
     THIRD_BETTING_ROUND = 'third_betting_round'
@@ -31,6 +33,8 @@ class PokerHandGameSequencer(GameSequencer):
         self.betting_round_order = {
             self.FIRST_BETTING_ROUND: False,
             self.FLOP_REVEAL: False,
+            self.FLOP_REVEAL_TWO: False,
+            self.FLOP_REVEAL_THREE: False,
             self.SECOND_BETTING_ROUND: False,
             self.TURN_REVEAL: False,
             self.THIRD_BETTING_ROUND: False,
@@ -40,6 +44,8 @@ class PokerHandGameSequencer(GameSequencer):
         self.betting_round_map = {
             self.FIRST_BETTING_ROUND: BettingClient,
             self.FLOP_REVEAL: OpenCardRevealClient,
+            self.FLOP_REVEAL_TWO: OpenCardRevealClient,
+            self.FLOP_REVEAL_THREE: OpenCardRevealClient,
             self.SECOND_BETTING_ROUND: BettingClient,
             self.TURN_REVEAL: OpenCardRevealClient,
             self.THIRD_BETTING_ROUND: BettingClient,

@@ -223,8 +223,6 @@ class BettingClient(TurnTakingClient):
                       self.players_have_called_last_raise()))
         if all_players_called_last_raise or one_unfolded_player:
             print("======================================")
-            # print(yaml.dump(self.game.state_log))
-            print("======================================")
             if self.get_peer_at_position(0)[0] == self.cli.ident:
                 self.send_round_message(self.LEAVE_ROOM, {})
             return True
