@@ -27,7 +27,7 @@ class CommsClient(RedisClient):
                 if message['data'] == 'dump_game_log':
                     pass
                 payload = RedisClient.decode_message(message)
-
+                # print(yaml.dump(payload['data']))
                 if self.message_is_for_me(payload):
                     self.queue.append(payload)
                     self.round, self.queue, self.final_state = \
@@ -38,6 +38,8 @@ class CommsClient(RedisClient):
                         self.queue = []
                         if self.round is None:
                             return self.final_state
+                    else:
+                        print("round is not over")
             # sleep(uniform(0.001, 0.01))
 
     def message_is_for_me(self, payload):
@@ -93,6 +95,7 @@ class GameClient():
                     did_run_job = True
                     break
             if not did_run_job:
+                print(">>>>> Did not run a job {}".format(msg_key))
                 new_queue.append(event)
         return (None, None,
                 self.get_final_state()) if self.is_round_over() else \

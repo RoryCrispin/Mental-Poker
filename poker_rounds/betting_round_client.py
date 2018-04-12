@@ -1,7 +1,5 @@
 from random import randint, choice
 
-import yaml
-
 from client_logging import LogLevel
 from poker_rounds.poker_game import PokerGame, PokerPlayer
 from turn_taking_client import TurnTakingClient
@@ -82,8 +80,8 @@ class BettingClient(TurnTakingClient):
                 possible_moves.append(BettingCodes.CALL)
                 possible_moves.append(BettingCodes.CALL)
                 possible_moves.append(BettingCodes.CALL)
-
-                possible_moves.append(BettingCodes.BET)
+                if self.get_max_raise(player) > 0:
+                    possible_moves.append(BettingCodes.BET)
         return possible_moves
 
     def get_max_raise(self, player: PokerPlayer):
@@ -106,6 +104,7 @@ class BettingClient(TurnTakingClient):
             else:
                 self.cli.log(LogLevel.ERROR, "No move generated!")
                 print(self.get_possible_moves(self.player))
+        # if not self.is_round_over():
         self.end_my_turn()
 
     def get_current_turn(self):
@@ -224,8 +223,10 @@ class BettingClient(TurnTakingClient):
                       self.players_have_called_last_raise()))
         if all_players_called_last_raise or one_unfolded_player:
             print("======================================")
-            print(yaml.dump(self.game.state_log))
+            # print(yaml.dump(self.game.state_log))
             print("======================================")
+            if self.get_peer_at_position(0)[0] == self.cli.ident:
+                self.send_round_message(self.LEAVE_ROOM, {})
             return True
         return False
 
@@ -292,5 +293,6 @@ class BettingClient(TurnTakingClient):
         state = super().get_final_state()
         state.update({'max_players': self.max_players,
                       'betting_run': True,
+                      'num_active_players': len(self.get_active_players()),
                       'num_folded_players': len(self.get_folded_players())})
         return state

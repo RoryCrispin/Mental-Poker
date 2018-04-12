@@ -7,23 +7,34 @@ from ordered_turn_client import InsecureOrderedClient
 class TurnTakingClient(InsecureOrderedClient):
     END_TURN = 'end_turn'
     ROOM_CODE = 'room_code'
+    LEAVE_ROOM = 'leave_room'
 
     def __init__(self, cli, state=None, max_players=3):
         super().__init__(cli, state, max_players)
-        self.queue_map.extend([(self.END_TURN, self.recv_end_turn)])
+        self.queue_map.extend([(self.END_TURN, self.recv_end_turn),
+                               (self.LEAVE_ROOM, self.recv_leave_room)])
         print("Reset current turn")
         self.current_turn = 0
         # Pregrnerate a room code; this will be overwritten if we're not player 0
         self.room_code = uuid4()
         self.setup_finished = False
 
+    def recv_leave_room(self, data):
+        if self.is_turn_valid(data):
+            pass
+
     def recv_end_turn(self, data):
         # TODO: Assert from correct player
         # The issue causing incorr ect turn synchronisation -> Not clearing the queue buffer between rounds, left over
         # messages need to be deleted
+
+        # TODO: This is common place where the game stops running turns
         if data['data'][self.ROOM_CODE] == self.room_code:
-            self.current_turn += 1
-            self.take_turn_if_mine()
+            if not data[self.SENDER_ID] == self.get_current_turn():
+                print("INVALID TURN")
+            else:
+                self.current_turn += 1
+        self.take_turn_if_mine()
 
     def is_first_turn(self):
         return self.current_turn == 0
@@ -64,11 +75,7 @@ class TurnTakingClient(InsecureOrderedClient):
                 self.room_code = data['data'][self.ROOM_CODE]
                 return True
             else:
-                # This feature is not _fully_ tested. It's intended to block messages form other
-                # rooms from causing bugs in new rounds
                 raise ValueError("Invalid Message")
-                # self.cli.log(LogLevel.ERROR, "Invalid message")
-                return False
         return True
 
     def send_round_message(self, key, data):

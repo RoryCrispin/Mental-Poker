@@ -100,28 +100,20 @@ class PokerHandGameSequencer(GameSequencer):
                 self.round_order[BettingClient] = True
 
     def get_betting_reveal_state(self, state):
-        # if self.open_cards_revealed == 2:
-        #     if not self.game_over:
-        #         self.game_over = True
-        #         return ShowdownDeckDecryptor
-        #     else:
-        #         return None
-        # if self.betting_rounds_played > self.open_cards_revealed:
-        #     self.open_cards_revealed += 1
-        #     return OpenCardRevealClient
-        # else:
-        #     self.betting_rounds_played += 1
-        #     return BettingClient
         for round_name, complete in self.betting_round_order.items():
             if not complete:
-                if state.get('num_folded_players') is not None \
-                        and state.get('num_folded_players') == (state.get('max_players') - 1):
-                    print("{{{ n -1 players have folded }} ")
-                    raise ValueError("DO we ever hit this??")  # TODO: Remove
+                only_one_player_left = state.get('num_folded_players') is not None \
+                                       and state.get('num_folded_players') == (state.get('max_players') - 1)
+                no_active_players = state.get('num_active_players') is not None \
+                                    and state.get('num_active_players') == 0
+                if only_one_player_left or no_active_players:
+                    print("only one: {}, no active players: {}".format(only_one_player_left,
+                                                                       no_active_players))
                     if not self.betting_round_order.get(self.SHOWDOWN):
                         self.betting_round_order.update({self.SHOWDOWN: True})
                         return self.betting_round_map.get(self.SHOWDOWN)
                     else:
                         return None
                 self.betting_round_order.update({round_name: True})
+                print("]]]]]]]] Running round {} ]]]]]]]]]]".format(round_name))
                 return self.betting_round_map.get(round_name)
