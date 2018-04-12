@@ -28,8 +28,8 @@ class OpenCardRevealClient(CardRevealClient):
     def received_all_peer_keys(self):
         return len(self.card.locks_present) == 0
 
-    def recv_lock_removed(self, data):
-        super().recv_lock_removed(data)
+    # def recv_lock_removed(self, data):
+    #     super().recv_lock_removed(data)
 
     def get_final_state(self):
         self.cli.log(LogLevel.INFO, "Got community cardlib: {}".format(self.card.value))

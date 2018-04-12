@@ -11,6 +11,7 @@ class TurnTakingClient(InsecureOrderedClient):
     def __init__(self, cli, state=None, max_players=3):
         super().__init__(cli, state, max_players)
         self.queue_map.extend([(self.END_TURN, self.recv_end_turn)])
+        print("Reset current turn")
         self.current_turn = 0
         # Pregrnerate a room code; this will be overwritten if we're not player 0
         self.room_code = uuid4()
@@ -37,6 +38,7 @@ class TurnTakingClient(InsecureOrderedClient):
     def get_current_turn(self):
         for ident, peer in self.peer_map.items():
             if peer.get('roll') == self.current_turn % self.max_players:
+                print("Turn>> {}, {}".format(ident, ident == self.cli.ident))
                 return ident
         raise IndexError
 
@@ -64,7 +66,8 @@ class TurnTakingClient(InsecureOrderedClient):
             else:
                 # This feature is not _fully_ tested. It's intended to block messages form other
                 # rooms from causing bugs in new rounds
-                self.cli.log(LogLevel.ERROR, "Invalid message")
+                raise ValueError("Invalid Message")
+                # self.cli.log(LogLevel.ERROR, "Invalid message")
                 return False
         return True
 

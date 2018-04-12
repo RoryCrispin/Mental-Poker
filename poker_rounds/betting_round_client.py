@@ -1,5 +1,7 @@
 from random import randint, choice
 
+import yaml
+
 from client_logging import LogLevel
 from poker_rounds.poker_game import PokerGame, PokerPlayer
 from turn_taking_client import TurnTakingClient
@@ -63,7 +65,7 @@ class BettingClient(TurnTakingClient):
         self.game: PokerGame = self.state['game']
         self.init_blind_bets()
         self.player = self.peer_map[self.cli.ident][PokerPlayer.POKER_PLAYER]
-        if self.is_my_turn():
+        if self.is_my_turn() and not self.is_round_over():
             self.take_turn()
 
     def get_possible_moves(self, player: PokerPlayer):
@@ -71,8 +73,11 @@ class BettingClient(TurnTakingClient):
         if self.player.folded or self.player.is_all_in():
             possible_moves.append(BettingCodes.SKIP)
         else:
-            possible_moves.append(BettingCodes.ALLIN)
-            possible_moves.append(BettingCodes.FOLD)
+            # possible_moves.append(BettingCodes.ALLIN)  # TODO: Uncomment
+            # possible_moves.append(BettingCodes.FOLD)
+            if player.cash_in_hand == self.cash_needed_for_call(player):
+                possible_moves.append(BettingCodes.ALLIN)  # TODO: Uncomment
+                possible_moves.append(BettingCodes.FOLD)
             if player.cash_in_hand > self.cash_needed_for_call(player):
                 possible_moves.append(BettingCodes.CALL)
                 possible_moves.append(BettingCodes.CALL)
@@ -102,6 +107,14 @@ class BettingClient(TurnTakingClient):
                 self.cli.log(LogLevel.ERROR, "No move generated!")
                 print(self.get_possible_moves(self.player))
         self.end_my_turn()
+
+    def get_current_turn(self):
+        current_turn_index = (self.game.dealer + 2 + self.current_turn) % self.max_players
+        print("@@ Current turn index: {}, {}".format(current_turn_index, self.current_turn))
+        for ident, peer in self.peer_map.items():
+            if peer.get('roll') == current_turn_index:
+                return ident
+        raise IndexError
 
     def make_all_in(self):
         self.cli.log(LogLevel.INFO, "I go all in")
@@ -202,15 +215,19 @@ class BettingClient(TurnTakingClient):
 
     def is_round_over(self):
         # TODO: Get rid of all_players_moved
-        over = self.all_active_players_have_called_last_raise()
+        all_players_called_last_raise = self.all_active_players_have_called_last_raise()
+        one_unfolded_player = len(self.get_folded_players()) == (self.max_players - 1)
         print("Folded players: {}, All in players: {}, Active players: {}, Called {}"
               .format(len(self.get_folded_players()),
                       len(self.get_all_in_players()),
                       len(self.get_active_players()),
                       self.players_have_called_last_raise()))
-        if over:
+        if all_players_called_last_raise or one_unfolded_player:
             print("======================================")
-        return over
+            print(yaml.dump(self.game.state_log))
+            print("======================================")
+            return True
+        return False
 
     def get_unfolded_pots(self):
         unfolded = set(self.get_every_player()) - set(self.get_folded_players())
@@ -273,5 +290,7 @@ class BettingClient(TurnTakingClient):
 
     def get_final_state(self):
         state = super().get_final_state()
-        state.update({'betting_run': True})
+        state.update({'max_players': self.max_players,
+                      'betting_run': True,
+                      'num_folded_players': len(self.get_folded_players())})
         return state

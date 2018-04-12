@@ -74,6 +74,10 @@ class SecureShuffleSampleDecryptor(SecureDecryptionClient):
 
 
 class ShowdownDeckDecryptor(SecureDecryptionClient):
+    def __init__(self, cli, state=None, max_players=3):
+        print("++++++++++++++++++++++++++++++++++ Showdown ++++++++++++++++++++++++++")
+        super().__init__(cli, state, max_players)
+
     def get_final_state(self):
         self.fully_decrypt_deck()
         state = super().get_final_state()
