@@ -72,6 +72,7 @@ class BettingClient(TurnTakingClient):
             possible_moves.append(BettingCodes.SKIP)
         else:
             possible_moves.append(BettingCodes.ALLIN)
+            possible_moves.append(BettingCodes.FOLD)
             if player.cash_in_hand > self.cash_needed_for_call(player):
                 possible_moves.append(BettingCodes.CALL)
                 possible_moves.append(BettingCodes.CALL)
@@ -216,8 +217,8 @@ class BettingClient(TurnTakingClient):
         return [p.cash_in_pot for p in unfolded]
 
     def get_active_players(self) -> [PokerPlayer]:
-        return list(set(self.get_every_player())
-                    - set(self.get_folded_players())
+        return list((set(self.get_every_player())
+                     - set(self.get_folded_players()))
                     - set(self.get_all_in_players()))
 
     def get_folded_players(self):
@@ -225,7 +226,7 @@ class BettingClient(TurnTakingClient):
         player: PokerPlayer
         for player in self.get_every_player():
             if player.folded:
-                folded_players.append(player.cash_in_pot)
+                folded_players.append(player)
         return folded_players
 
     def get_all_in_players(self):
@@ -266,7 +267,6 @@ class BettingClient(TurnTakingClient):
     def players_have_called_last_raise(self):
         return [player.last_raise_i_have_called == self.game.last_raise
                 for player in self.get_active_players()]
-
 
     def get_player_from_turn_message(self, data) -> PokerPlayer:
         return self.peer_map[data[self.SENDER_ID]][PokerPlayer.POKER_PLAYER]
