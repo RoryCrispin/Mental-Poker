@@ -26,12 +26,17 @@ class Rank(IntEnum):
 
 
 class Card:
-    def __init__(self, rank, face):
-        self.rank = rank
-        self.face = face
+    def __init__(self, rank, face=None):
+        if face is None:
+            val = rank
+            self.rank = Rank(val % 13)
+            self.face = Face(val % 4)
+        else:
+            self.rank = rank
+            self.face = face
 
     def __repr__(self):
-        return ("%s %s" % (self.rank.name, self.face.name))
+        return "%s %s" % (self.rank.name, self.face.name)
 
     def __sortkey__(self):
         return self.rank

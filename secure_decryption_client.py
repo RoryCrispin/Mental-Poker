@@ -88,7 +88,7 @@ class ShowdownDeckDecryptor(SecureDecryptionClient):
             i += 1
         for card in state['crypto_deck_state']:
             if card.dealt_to is not None and card.dealt_to < 0 and not card.has_been_dealt:
-                state.get('game').state_log.append({self.SHOWDOWN_REVEAL: card.value})
+                state.get('game').state_log.append({self.SHOWDOWN_REVEAL: str(card.get_card())})
 
         state.update({PokerWords.DECK_STATE: self.deck_state})
         self.check_original_deck_was_valid(self.deck_state)

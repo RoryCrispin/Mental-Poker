@@ -21,7 +21,6 @@ class OpenCardRevealClient(CardRevealClient):
                 return None
             index += 1
         raise ValueError("No card to decrypt")
-        # return None
 
     def generating_card_for(self):
         return self.card.dealt_to
@@ -29,17 +28,13 @@ class OpenCardRevealClient(CardRevealClient):
     def received_all_peer_keys(self):
         return len(self.card.locks_present) == 0
 
-    # def recv_lock_removed(self, data):
-    #     super().recv_lock_removed(data)
-
     def get_final_state(self):
-        self.cli.log(LogLevel.INFO, "Got community cardlib: {}".format(self.card.value))
+        self.cli.log(LogLevel.INFO, "Got community card: {}".format(self.card.value))
         self.card.has_been_dealt = True
         state = super().get_final_state()
         if state.get(PokerWords.OPEN_CARDS) is None:
             state[PokerWords.OPEN_CARDS] = []
-        # state[PokerWords.OPEN_CARDS].append(self.cardlib)
         state[PokerWords.OPEN_CARDS].append((self.card.dealt_to, self.card.value))
-        state['game'].state_log.append({PokerGame.CARD_REVEAL: self.card.value})
+        state['game'].state_log.append({PokerGame.CARD_REVEAL: str(self.card.get_card())})
         return state
 

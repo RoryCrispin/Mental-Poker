@@ -66,20 +66,19 @@ class BettingClient(TurnTakingClient):
         self.player = self.peer_map[self.cli.ident][PokerPlayer.POKER_PLAYER]
         if self.is_my_turn() and not self.is_round_over():
             self.take_turn()
-        else:
-            print("round over: {}.. not taking turn".format(self.is_round_over()))
 
     def get_possible_moves_for_player(self, player: PokerPlayer):
         possible_moves = []
         if self.player.folded or self.player.is_all_in():
             possible_moves.append(BettingCodes.SKIP)
         else:
-            possible_moves.append(BettingCodes.ALLIN)  # TODO: Uncomment
+            possible_moves.append(BettingCodes.ALLIN)
             possible_moves.append(BettingCodes.FOLD)
             if player.cash_in_hand == self.cash_needed_for_call(player):
-                possible_moves.append(BettingCodes.ALLIN)  # TODO: Uncomment
+                possible_moves.append(BettingCodes.ALLIN)
                 possible_moves.append(BettingCodes.FOLD)
             if player.cash_in_hand > self.cash_needed_for_call(player):
+                # We make calling more likely TODO: remove
                 possible_moves.append(BettingCodes.CALL)
                 possible_moves.append(BettingCodes.CALL)
                 possible_moves.append(BettingCodes.CALL)

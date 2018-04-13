@@ -5,6 +5,7 @@ from client_logging import LogLevel
 
 class PokerGame():
     ACTION = 'action'
+    DEALT_CARD = 'dealt_card'
     FROM = 'ident'
     CARD_REVEAL = 'card_reveal'
 

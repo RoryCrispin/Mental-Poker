@@ -1,3 +1,5 @@
+from cardlib.Card import Card
+
 class CryptoCard():
     ENCRYPTED = 'encrypted'
     DECRYPTED = 'decrypted'
@@ -35,6 +37,12 @@ class CryptoCard():
         self.locks_present.clear()
         self.update_state(self.SHOWDOWN_DECRYPT, value)
 
+    def get_card(self):
+        if not self.locks_present:
+            return Card(self.value)
+        else:
+            print("Not fully decrypted!")
+            return None
 
 
 class CryptoWords():

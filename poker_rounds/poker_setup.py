@@ -1,3 +1,4 @@
+from cardlib.Card import Card
 from client import GameClient
 from poker_rounds.poker_game import PokerGame, PokerPlayer
 
@@ -17,6 +18,9 @@ class PokerSetup(GameClient):
 
     def build_player_map(self, state):
         self.game = PokerGame(self.max_players)
+        for card in state['hand']:
+            self.game.state_log.append({PokerGame.ACTION: PokerGame.DEALT_CARD,
+                                        PokerGame.DEALT_CARD: str(Card(card))})
         for ident, player in state['peer_map'].items():
             player[PokerPlayer.POKER_PLAYER] = PokerPlayer(ident, self.game)
         self.peer_map = state['peer_map']
