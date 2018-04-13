@@ -94,7 +94,7 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
                 cryptodeck[index].dealt_to = player_index
                 index += 1
         # Prepare the table cards
-        for index in range(0, 6):
+        for index in range(0, 5):
             location = (self.max_players*2) + index
             cryptodeck[location].dealt_to = -1- index
         return cryptodeck

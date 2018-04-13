@@ -64,8 +64,6 @@ class CardRevealClient(TurnTakingClient):
             if self.received_all_peer_keys() and self.is_my_card():
                 self.remove_my_lock()
                 self.cli.log(LogLevel.INFO, "Received locked card: {}".format(self.card.value))
-        else:
-            print("ERRRR")  # TODO: remove
 
     def is_card_valid(self):
         if self.card.value in range(10, 62):

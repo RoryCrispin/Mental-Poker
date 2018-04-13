@@ -13,7 +13,6 @@ class TurnTakingClient(InsecureOrderedClient):
         super().__init__(cli, state, max_players)
         self.queue_map.extend([(self.END_TURN, self.recv_end_turn),
                                (self.LEAVE_ROOM, self.recv_leave_room)])
-        print("Reset current turn")
         self.current_turn = 0
         # Pregrnerate a room code; this will be overwritten if we're not player 0
         self.room_code = uuid4()
@@ -31,7 +30,7 @@ class TurnTakingClient(InsecureOrderedClient):
         # TODO: This is common place where the game stops running turns
         if data['data'][self.ROOM_CODE] == self.room_code:
             if not data[self.SENDER_ID] == self.get_current_turn():
-                print("INVALID TURN")
+                self.cli.log(LogLevel.ERROR, "An invalid turn was made: {}".format(data))
             else:
                 self.current_turn += 1
         self.take_turn_if_mine()
@@ -49,12 +48,10 @@ class TurnTakingClient(InsecureOrderedClient):
     def get_current_turn(self):
         for ident, peer in self.peer_map.items():
             if peer.get('roll') == self.current_turn % self.max_players:
-                print("Turn>> {}, {}".format(ident, ident == self.cli.ident))
                 return ident
         raise IndexError
 
     def end_my_turn(self):
-        print("Ending my turn")
         self.current_turn += 1
         self.cli.post_message(data={self.MESSAGE_KEY: self.END_TURN,
                                     self.ROOM_CODE: self.room_code})

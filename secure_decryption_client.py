@@ -54,12 +54,12 @@ class SecureDecryptionClient(TurnTakingClient):
 
     def fully_decrypt_deck(self):
         self.decrypt_deck()
-        self.cli.log(LogLevel.VERBOSE, "Decrypt deck with {}".format(self.cli.ident))
+        self.cli.log(LogLevel.VERBOSE, "Decrypting deck with own key")
         own_priv = self.key.get_private_component()
         for ident, vals in self.peer_map.items():
             if ident != self.cli.ident:
                 d = vals.get(CryptoWords.PRIVATE_COMPONENT)
-                print("Decrpt with {}".format(ident))
+                self.cli.log(LogLevel.VERBOSE, "Decrpting deck with {}".format(ident))
                 self.key.update_private_component(d)
                 self.decrypt_deck()
         self.key.update_private_component(own_priv)
@@ -74,8 +74,9 @@ class SecureShuffleSampleDecryptor(SecureDecryptionClient):
 
 
 class ShowdownDeckDecryptor(SecureDecryptionClient):
+    SHOWDOWN_REVEAL = 'showdown_reveal'
+
     def __init__(self, cli, state=None, max_players=3):
-        print("++++++++++++++++++++++++++++++++++ Showdown ++++++++++++++++++++++++++")
         super().__init__(cli, state, max_players)
 
     def get_final_state(self):
@@ -85,8 +86,13 @@ class ShowdownDeckDecryptor(SecureDecryptionClient):
         for card in self.deck_state:
             state['crypto_deck_state'][i].showdown_decrypt(card)
             i += 1
+        for card in state['crypto_deck_state']:
+            if card.dealt_to is not None and card.dealt_to < 0 and not card.has_been_dealt:
+                state.get('game').state_log.append({self.SHOWDOWN_REVEAL: card.value})
+
         state.update({PokerWords.DECK_STATE: self.deck_state})
         self.check_original_deck_was_valid(self.deck_state)
+
         return state
 
     def check_original_deck_was_valid(self, deck):

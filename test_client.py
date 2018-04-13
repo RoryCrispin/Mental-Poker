@@ -126,4 +126,3 @@ def test_lots_of_rounds():
     while True:
         poker_sequencer = PokerHandGameSequencer()
         x = start_async_rounds(poker_sequencer, 3)
-        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Another poker round @@@@@@@@@@@@@@@@@@@@@@@@@@@'")

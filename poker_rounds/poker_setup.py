@@ -16,7 +16,6 @@ class PokerSetup(GameClient):
         return PokerPlayer.POKER_PLAYER in list(state['peer_map'].items())[0][1]
 
     def build_player_map(self, state):
-        print("-----------------------Poker Setup--------------")
         self.game = PokerGame(self.max_players)
         for ident, player in state['peer_map'].items():
             player[PokerPlayer.POKER_PLAYER] = PokerPlayer(ident, self.game)

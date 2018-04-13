@@ -34,7 +34,6 @@ class OpenCardRevealClient(CardRevealClient):
 
     def get_final_state(self):
         self.cli.log(LogLevel.INFO, "Got community cardlib: {}".format(self.card.value))
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         self.card.has_been_dealt = True
         state = super().get_final_state()
         if state.get(PokerWords.OPEN_CARDS) is None:

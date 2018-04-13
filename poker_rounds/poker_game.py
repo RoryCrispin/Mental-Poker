@@ -1,5 +1,7 @@
 from uuid import uuid4
 
+from client_logging import LogLevel
+
 
 class PokerGame():
     ACTION = 'action'
@@ -21,7 +23,6 @@ class PokerGame():
             self.dealer += 1
 
     def new_raise(self) -> str:
-        print("~~ There is a new raise~~")
         self.last_raise = str(uuid4())
         return self.last_raise
 
@@ -49,7 +50,7 @@ class PokerPlayer:
     def reset_blind_flag(self):
         self.did_play_blind_this_round = False
 
-    def set_blind(self, big_blind=True):
+    def set_blind(self, logging_func, big_blind=True):
         from poker_rounds.betting_round_client import BettingCodes
         self.did_play_blind_this_round = True
         if big_blind:
@@ -58,10 +59,10 @@ class PokerPlayer:
                 PokerGame.FROM: self.ident,
                 PokerGame.ACTION: BettingCodes.BIG_BLIND
             })
-            print("Player {} plays BIG blind".format(self.ident))
+            logging_func(LogLevel.INFO, "Player {} plays BIG blind".format(self.ident))
 
             if self.cash_in_hand < self.game.blind * 2:
-                print("Going ALL IN for blind")
+                logging_func(LogLevel.INFO, "Going ALL IN for blind")
                 self.add_to_pot(self.cash_in_hand)
             else:
                 self.add_to_pot(self.game.blind * 2)
@@ -71,9 +72,9 @@ class PokerPlayer:
                 PokerGame.FROM: self.ident,
                 PokerGame.ACTION: BettingCodes.SMALL_BLIND
             })
-            print("Player {} plays SMALL blind".format(self.ident))
+            logging_func(LogLevel.INFO, "Player {} plays SMALL blind".format(self.ident))
             if self.cash_in_hand < self.game.blind:
-                print("^^ goes ALL IN for blind")
+                logging_func(LogLevel.INFO, "^^ goes ALL IN for blind")
                 self.add_to_pot(self.cash_in_hand)
             else:
                 self.add_to_pot(self.game.blind)

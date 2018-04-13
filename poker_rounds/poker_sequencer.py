@@ -113,13 +113,10 @@ class PokerHandGameSequencer(GameSequencer):
                 no_active_players = state.get('num_active_players') is not None \
                                     and state.get('num_active_players') == 0
                 if only_one_player_left or no_active_players:
-                    print("only one: {}, no active players: {}".format(only_one_player_left,
-                                                                       no_active_players))
                     if not self.betting_round_order.get(self.SHOWDOWN):
                         self.betting_round_order.update({self.SHOWDOWN: True})
                         return self.betting_round_map.get(self.SHOWDOWN)
                     else:
                         return None
                 self.betting_round_order.update({round_name: True})
-                print("]]]]]]]] Running round {} ]]]]]]]]]]".format(round_name))
                 return self.betting_round_map.get(round_name)
