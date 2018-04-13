@@ -102,16 +102,16 @@ class PokerHandGameSequencer(GameSequencer):
             if PokerSetup.have_built_poker_player_map(state):
                 self.round_order[PokerSetup] = True
 
-            if state.get('betting_run'):
-                self.round_order[BettingClient] = True
 
     def get_betting_reveal_state(self, state):
         for round_name, complete in self.betting_round_order.items():
             if not complete:
                 only_one_player_left = state.get('num_folded_players') is not None \
                                        and state.get('num_folded_players') == (state.get('max_players') - 1)
+
                 no_active_players = state.get('num_active_players') is not None \
                                     and state.get('num_active_players') == 0
+
                 if only_one_player_left or no_active_players:
                     if not self.betting_round_order.get(self.SHOWDOWN):
                         self.betting_round_order.update({self.SHOWDOWN: True})

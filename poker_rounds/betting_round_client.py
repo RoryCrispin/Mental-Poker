@@ -1,6 +1,7 @@
-from random import randint, choice
+from random import randint
 
 from client_logging import LogLevel
+from poker_rounds.betting_player import AIBettingPlayer
 from poker_rounds.poker_game import PokerGame, PokerPlayer
 from turn_taking_client import TurnTakingClient
 
@@ -28,6 +29,12 @@ class BettingClient(TurnTakingClient):
                                (BettingCodes.ALLIN, self.handle_all_in)
                                ])
         self.game: PokerGame
+
+        if self.cli.round_args.get('betting_player') is None:
+            self.betting_player = AIBettingPlayer()
+            # raise ValueError
+        else:
+            self.betting_player = self.cli.round_args.get('betting_player')
 
     def init_blind_bets(self):
         # Clear blind flag:
@@ -83,7 +90,9 @@ class BettingClient(TurnTakingClient):
 
     def take_turn(self):
         if not self.player.folded:
-            next_move = choice(self.get_possible_moves_for_player(self.player))
+            possible_moves = self.get_possible_moves_for_player(self.player)
+            next_move = self.betting_player.get_move(possible_moves)
+
             if next_move is BettingCodes.CALL:
                 self.make_call()
             elif next_move is BettingCodes.BET:
