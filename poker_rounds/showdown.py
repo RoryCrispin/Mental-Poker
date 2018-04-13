@@ -1,5 +1,5 @@
 from cardlib.Hands import HandRank
-from poker_rounds.poker_game import PokerWords, PokerPlayer, fresh_deck
+from poker_rounds.poker_game import PokerWords, PokerPlayer, fresh_deck, PokerGame
 from secure_decryption_client import SecureDecryptionClient
 
 
@@ -19,7 +19,7 @@ class ShowdownDeckDecryptor(SecureDecryptionClient):
         self.check_original_deck_was_valid(self.deck_state)
         poker_players = self.get_list_of_poker_players(state)
         table_cards = self.get_table_cards(state)
-        self.get_winnings(poker_players, table_cards)
+        self.determine_winnings(poker_players, table_cards)
         state.update({PokerWords.DECK_STATE: self.deck_state,
                       'poker_players': poker_players,
                       'table_cards': table_cards})
@@ -56,8 +56,45 @@ class ShowdownDeckDecryptor(SecureDecryptionClient):
                 peer = self.get_peer_at_position(card.dealt_to)[1]
                 peer[PokerPlayer.POKER_PLAYER].hand.append(card.get_card())
 
-    def get_winnings(self, poker_players, table_cards):
-        hands = [(player.ident, player.hand + table_cards) for player in poker_players if not player.folded]
+    def get_pots(self, poker_players):
+        return [(x, x.cash_in_pot) for x in poker_players if x.cash_in_pot > 0]
+
+    def determine_winnings(self, poker_players, table_cards):
+        # hands = [(player, player.hand + table_cards) for player in poker_players if not player.folded]
+        # decoded_hands = [(x[0], HandRank.getHand(x[1])) for x in hands]
+        # sorted_hands = sorted(decoded_hands, key=lambda x: x[1], reverse=True)
+
+        while len(self.get_invested_players(poker_players)) > 1:
+            current_pot = 0
+            minimum_pot = min([x[1] for x in self.get_pots(poker_players)])
+            invested_players = self.get_invested_players(poker_players)
+            for player, _ in self.get_invested_players(poker_players):
+                player.cash_in_pot -= minimum_pot
+                current_pot += minimum_pot
+            # Get best hand from invested players
+            winner = [self.get_winner([x[0] for x in invested_players], table_cards)][0][0]
+            winner.winnings += current_pot
+        if len(self.get_invested_players(poker_players)) == 1:
+            player = self.get_invested_players(poker_players)[0][0]
+            player.winnings += player.cash_in_pot
+            player.cash_in_pot = 0
+
+        self.update_game_state_log_with_winnings(poker_players)
+
+    def update_game_state_log_with_winnings(self, poker_players):
+        for player in poker_players:
+            if player.winnings > 0:
+                self.state['game'].state_log.append({PokerGame.ACTION: PokerWords.WINNINGS,
+                                                     'ident': player.ident,
+                                                     PokerWords.WINNINGS: player.winnings})
+
+    # TODO: add support for draws!
+    def get_winner(self, list_of_players, table_cards):
+        hands = [(player, player.hand + table_cards) for player in list_of_players if not player.folded]
         decoded_hands = [(x[0], HandRank.getHand(x[1])) for x in hands]
         sorted_hands = sorted(decoded_hands, key=lambda x: x[1], reverse=True)
+        return sorted_hands[0]
+
+    def get_invested_players(self, poker_players):
+        return [(x, x.cash_in_pot) for x in poker_players if x.cash_in_pot > 0]
         pass

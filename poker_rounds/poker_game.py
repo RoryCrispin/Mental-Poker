@@ -40,6 +40,7 @@ class PokerPlayer:
         self.did_play_blind_this_round = False
         self.last_raise_i_have_called = None
         self.hand = []
+        self.winnings = 0
 
     def add_to_pot(self, amount: int) -> bool:
         if self.cash_in_hand >= amount:
@@ -88,6 +89,7 @@ fresh_deck = list(range(10, 62))
 
 
 class PokerWords():
+    WINNINGS = 'winnings'
     OPEN_CARDS = 'open_cards'
     HAND = 'hand'
     DECK_STATE = 'deck_state'

@@ -91,17 +91,17 @@ class BettingClient(TurnTakingClient):
 
     def take_turn(self):
         possible_moves = self.get_possible_moves_for_player(self.player)
-        next_move = self.betting_player.get_move(possible_moves)
+        next_move = self.betting_player.get_move(self, possible_moves)
 
-        if next_move is BettingCodes.CALL:
+        if next_move == BettingCodes.CALL:
             self.make_call()
-        elif next_move is BettingCodes.BET:
+        elif next_move == BettingCodes.BET:
             self.make_bet(randint(1, self.get_max_raise(self.player)))
-        elif next_move is BettingCodes.FOLD:
+        elif next_move == BettingCodes.FOLD:
             self.make_fold()
-        elif next_move is BettingCodes.ALLIN:
+        elif next_move == BettingCodes.ALLIN:
             self.make_all_in()
-        elif next_move is BettingCodes.SKIP:
+        elif next_move == BettingCodes.SKIP:
             self.make_skip()
         else:
             self.cli.log(LogLevel.ERROR, "No move generated!")
