@@ -66,6 +66,8 @@ class BettingClient(TurnTakingClient):
         self.player = self.peer_map[self.cli.ident][PokerPlayer.POKER_PLAYER]
         if self.is_my_turn() and not self.is_round_over():
             self.take_turn()
+        else:
+            print("round over: {}.. not taking turn".format(self.is_round_over()))
 
     def get_possible_moves_for_player(self, player: PokerPlayer):
         possible_moves = []
@@ -89,22 +91,21 @@ class BettingClient(TurnTakingClient):
         return player.cash_in_hand - self.cash_needed_for_call(player) - 1
 
     def take_turn(self):
-        if not self.player.folded:
-            possible_moves = self.get_possible_moves_for_player(self.player)
-            next_move = self.betting_player.get_move(possible_moves)
+        possible_moves = self.get_possible_moves_for_player(self.player)
+        next_move = self.betting_player.get_move(possible_moves)
 
-            if next_move is BettingCodes.CALL:
-                self.make_call()
-            elif next_move is BettingCodes.BET:
-                self.make_bet(randint(1, self.get_max_raise(self.player)))
-            elif next_move is BettingCodes.FOLD:
-                self.make_fold()
-            elif next_move is BettingCodes.ALLIN:
-                self.make_all_in()
-            elif next_move is BettingCodes.SKIP:
-                self.make_skip()
-            else:
-                self.cli.log(LogLevel.ERROR, "No move generated!")
+        if next_move is BettingCodes.CALL:
+            self.make_call()
+        elif next_move is BettingCodes.BET:
+            self.make_bet(randint(1, self.get_max_raise(self.player)))
+        elif next_move is BettingCodes.FOLD:
+            self.make_fold()
+        elif next_move is BettingCodes.ALLIN:
+            self.make_all_in()
+        elif next_move is BettingCodes.SKIP:
+            self.make_skip()
+        else:
+            self.cli.log(LogLevel.ERROR, "No move generated!")
         self.end_my_turn()
 
     def get_current_turn(self):
