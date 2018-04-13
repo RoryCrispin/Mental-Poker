@@ -1,6 +1,6 @@
 from client_logging import LogLevel
 from poker_rounds.card_reveal_client import CardRevealClient
-from poker_rounds.poker_game import PokerGame, PokerWords
+from poker_rounds.poker_game import PokerGame
 
 
 class OpenCardRevealClient(CardRevealClient):
@@ -32,9 +32,9 @@ class OpenCardRevealClient(CardRevealClient):
         self.cli.log(LogLevel.INFO, "Got community card: {}".format(self.card.value))
         self.card.has_been_dealt = True
         state = super().get_final_state()
-        if state.get(PokerWords.OPEN_CARDS) is None:
-            state[PokerWords.OPEN_CARDS] = []
-        state[PokerWords.OPEN_CARDS].append((self.card.dealt_to, self.card.value))
+        # if state.get(PokerWords.OPEN_CARDS) is None:
+        #     state[PokerWords.OPEN_CARDS] = []
+        # state[PokerWords.OPEN_CARDS].append((self.card.dealt_to, self.card.value))
         state['game'].state_log.append({PokerGame.CARD_REVEAL: str(self.card.get_card())})
         return state
 

@@ -2,7 +2,7 @@ from game_sequencer import GameSequencer
 from poker_rounds.betting_round_client import BettingClient
 from poker_rounds.open_card_reveal_client import OpenCardRevealClient
 from poker_rounds.poker_setup import PokerSetup
-from secure_decryption_client import ShowdownDeckDecryptor
+from poker_rounds.showdown import ShowdownDeckDecryptor
 
 
 class PokerHandGameSequencer(GameSequencer):

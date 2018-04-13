@@ -1,6 +1,6 @@
 from client_logging import LogLevel
 from crypto_deck import CryptoWords
-from poker_rounds.poker_game import fresh_deck, PokerWords
+from poker_rounds.poker_game import PokerWords
 from turn_taking_client import TurnTakingClient
 
 
@@ -73,27 +73,3 @@ class SecureShuffleSampleDecryptor(SecureDecryptionClient):
         return state
 
 
-class ShowdownDeckDecryptor(SecureDecryptionClient):
-    SHOWDOWN_REVEAL = 'showdown_reveal'
-
-    def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players)
-
-    def get_final_state(self):
-        self.fully_decrypt_deck()
-        state = super().get_final_state()
-        i = 0
-        for card in self.deck_state:
-            state['crypto_deck_state'][i].showdown_decrypt(card)
-            i += 1
-        for card in state['crypto_deck_state']:
-            if card.dealt_to is not None and card.dealt_to < 0 and not card.has_been_dealt:
-                state.get('game').state_log.append({self.SHOWDOWN_REVEAL: str(card.get_card())})
-
-        state.update({PokerWords.DECK_STATE: self.deck_state})
-        self.check_original_deck_was_valid(self.deck_state)
-
-        return state
-
-    def check_original_deck_was_valid(self, deck):
-        assert sorted(deck) == fresh_deck

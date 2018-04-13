@@ -84,11 +84,10 @@ class TurnTakingClient(InsecureOrderedClient):
         ident, _ = self.get_peer_at_position(position)
         return ident
 
-    def get_peer_at_position(self, position):
-        for ident, peer in self.peer_map.items():
-            if peer['roll'] == position % self.max_players:  # Mod with max players so function is cyclic
-                return ident, peer
-        return None
+    def get_peer_at_position(self, position, peer_map=None):
+        if peer_map is None:
+            peer_map = self.peer_map
+        return [peer for peer in peer_map.items() if peer[1]['roll'] == position % self.max_players][0]
 
     def get_my_position(self):
         return self.peer_map[self.cli.ident]['roll']

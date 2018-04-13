@@ -34,12 +34,12 @@ class PokerPlayer:
     def __init__(self, ident, game: PokerGame):
         self.ident = ident
         self.game = game
-        self.action_log = []
         self.folded = False
         self.cash_in_hand = game.starting_cash
         self.cash_in_pot = 0
         self.did_play_blind_this_round = False
         self.last_raise_i_have_called = None
+        self.hand = []
 
     def add_to_pot(self, amount: int) -> bool:
         if self.cash_in_hand >= amount:
