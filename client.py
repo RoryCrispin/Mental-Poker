@@ -63,13 +63,19 @@ class CommsClient(RedisClient):
 class GameClient():
     SENDER_ID = 'sender_id'
     MESSAGE_KEY = 'message_key'
-
+    IDENT_REQ_KEY = 'identify_request'
+    IDENT_RESP_KEY = 'identify_response'
+    PEER_MAP = 'peer_map'
     def __init__(self, cli: CommsClient, state=None):
         self.cli = cli
         self.queue_map = []
         self.state = state
         self.previous_state = {}
         self.logger = logging.getLogger("pkr")
+        self.queue_map.extend([(self.IDENT_REQ_KEY,
+                                self.recv_identify_request),
+                               (self.IDENT_RESP_KEY,
+                                self.recv_identify_response)])
 
     # Takes a Queue of messages and returns a new game class along with
     # a new queue state (With the applied element removed)
@@ -101,9 +107,35 @@ class GameClient():
 
     def init_existing_state(self, state):
         self.cli.log(LogLevel.VERBOSE, "Init round with existing state!")
+        self.peer_map = state['peer_map']
 
     def init_no_state(self):
         self.cli.log(LogLevel.VERBOSE, "Init round with no state!")
+        self.peer_map = {self.cli.ident: {}}
+
+    def request_idenfity(self):
+        self.cli.log(LogLevel.INFO, "Requesting Identify")
+        self.cli.post_message(data={self.MESSAGE_KEY:
+                                        self.IDENT_REQ_KEY})
+        # Send out your own identity too
+        self.recv_identify_request(None)
+
+    def request_idenfity(self):
+        self.cli.log(LogLevel.INFO, "Requesting Identify")
+        self.cli.post_message(data={self.MESSAGE_KEY:
+                                        self.IDENT_REQ_KEY})
+        # Send out your own identity too
+        self.recv_identify_request(None)
+
+    def recv_identify_response(self, data):
+        if data.get(self.SENDER_ID) not in self.peer_map:
+            self.cli.log(LogLevel.INFO, "Identify Response!")
+            self.peer_map[data.get(self.SENDER_ID)] = {}
+            self.peer_did_join()
+
+    def recv_identify_request(self, _):
+        self.cli.post_message(data={self.MESSAGE_KEY:
+                                        self.IDENT_RESP_KEY})
 
     def is_round_over(self):
         return False
@@ -112,8 +144,14 @@ class GameClient():
         state = self.previous_state
         state.update({'root_state': True,
                       'ident': self.cli.ident,
+                      self.PEER_MAP: self.peer_map
                       })
         return state
+
+    def get_num_joined_players(self):
+        return len(self.peer_map.keys())
+
+
 
 
 class GreetingCli(GameClient):

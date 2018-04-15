@@ -1,10 +1,9 @@
 from uuid import uuid4
 
-from client import LogLevel
-from identifying_client import IdentifyClient
+from client import LogLevel, GameClient
 
 
-class InsecureOrderedClient(IdentifyClient):
+class InsecureOrderedClient(GameClient):
     """This client implements an insecure ordering protocol in which
     all players publish a random key, and players are ordered based on
     their random keys. It's insecure because players cannot confirm that
