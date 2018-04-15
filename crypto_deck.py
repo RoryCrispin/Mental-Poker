@@ -14,7 +14,7 @@ class CryptoCard():
         self.state_log = []
         self.value = None
         self.locks_present = []
-        self.dealt_to = None  # Identifies a the use of this cardlib, ie: dealt to table /player 0
+        self.dealt_to = None  # Identifies a the use of this card, ie: dealt to table /player 0
         self.has_been_dealt = False
         self.deck_index = None
 

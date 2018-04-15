@@ -105,9 +105,6 @@ class GameClient():
     def init_no_state(self):
         self.cli.log(LogLevel.VERBOSE, "Init round with no state!")
 
-    def get_message(self, message):
-        pass
-
     def is_round_over(self):
         return False
 

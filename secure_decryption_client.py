@@ -59,7 +59,7 @@ class SecureDecryptionClient(TurnTakingClient):
         for ident, vals in self.peer_map.items():
             if ident != self.cli.ident:
                 d = vals.get(CryptoWords.PRIVATE_COMPONENT)
-                self.cli.log(LogLevel.VERBOSE, "Decrpting deck with {}".format(ident))
+                self.cli.log(LogLevel.VERBOSE, "Decrypting deck with {}".format(ident))
                 self.key.update_private_component(d)
                 self.decrypt_deck()
         self.key.update_private_component(own_priv)

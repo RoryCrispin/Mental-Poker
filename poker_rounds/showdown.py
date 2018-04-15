@@ -96,5 +96,6 @@ class ShowdownDeckDecryptor(SecureDecryptionClient):
         return sorted_hands[0]
 
     def get_invested_players(self, poker_players):
-        return [(x, x.cash_in_pot) for x in poker_players if x.cash_in_pot > 0]
-        pass
+        return [(x, x.cash_in_pot)
+                for x in poker_players
+                if x.cash_in_pot > 0]

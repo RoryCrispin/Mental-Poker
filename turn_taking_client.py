@@ -1,10 +1,10 @@
 from uuid import uuid4
 
 from client import LogLevel
-from ordered_turn_client import InsecureOrderedClient
+from ordered_turn_client import SecureOrderedClient
 
 
-class TurnTakingClient(InsecureOrderedClient):
+class TurnTakingClient(SecureOrderedClient):
     END_TURN = 'end_turn'
     ROOM_CODE = 'room_code'
     LEAVE_ROOM = 'leave_room'

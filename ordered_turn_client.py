@@ -97,29 +97,31 @@ class InsecureOrderedClient(IdentifyClient):
                           self.players_have_been_insecure_ordered})
         return state
 
-# class SecureOrderedClient(InsecureOrderedClient):
-#     """This class extends the client, when initialised all players will
-#     be ordered into a random 'position' such that we can handle them as
-#     though they were sitting around a physical table"""
-#     SHUFFLED_LIST = 'shuffled_list'
-#
-#     def __init__(self, cli, max_players=3):
-#         super().init(cli, max_players)
-#         self.queue_map.extend([(self.SHUFFLED_LIST, self.recv_shuffled_list)])
-#
-#     def is_round_over(self):
-#         pass
-#
-#     def recv_shuffled_list(self, data):
-#         pass
-#
-#     def alert_players_have_been_ordered(self):
-#         if self.peer_map.get(self.cli.ident).get(self.ROLL) == 0:
-#             # This is player 0, initiate the shuffle
-#             pl = self.gen_playerlist()
-#             shuffle(pl)
-#             self.cli.post_message(data={self.MESSAGE_KEY: self.SHUFFLED_LIST,
-#                                         self.SHUFFLED_LIST: pl})
-#
-#     def gen_playerlist(self):
-#         return list(self.peer_map.keys())
+
+class SecureOrderedClient(InsecureOrderedClient):
+    """This class extends the client, when initialised all players will
+    be ordered into a random 'position' such that we can handle them as
+    though they were sitting around a physical table"""
+    # TODO: implement
+    SHUFFLED_LIST = 'shuffled_list'
+
+    def __init__(self, cli, state=None, max_players=3):
+        super().__init__(cli, state, max_players)
+        self.queue_map.extend([(self.SHUFFLED_LIST, self.recv_shuffled_list)])
+
+    def is_round_over(self):
+        pass
+
+    def recv_shuffled_list(self, data):
+        pass
+
+    def alert_players_have_been_ordered(self):
+        if self.peer_map.get(self.cli.ident).get(self.ROLL) == 0:
+            # This is player 0, initiate the shuffle
+            pl = self.gen_playerlist()
+            shuffle(pl)
+            self.cli.post_message(data={self.MESSAGE_KEY: self.SHUFFLED_LIST,
+                                        self.SHUFFLED_LIST: pl})
+
+    def gen_playerlist(self):
+        return list(self.peer_map.keys())

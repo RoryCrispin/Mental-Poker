@@ -121,8 +121,8 @@ def test_hand_reveal_client():
             playermaps.append(playermap['poker_player'])
     assert all((d.cash_in_pot == playermaps[0].cash_in_pot for d in playermaps))
 
-#
-# def test_lots_of_rounds():
-#     while True:
-#         poker_sequencer = PokerHandGameSequencer()
-#         x = start_async_rounds(poker_sequencer, 3)
+
+def test_lots_of_rounds():
+    for _ in range(0, 20):
+        poker_sequencer = PokerHandGameSequencer()
+        x = start_async_rounds(poker_sequencer, 3)

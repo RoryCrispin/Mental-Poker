@@ -5,6 +5,8 @@ from secure_shuffle_client import SecureShufflingClient
 class PlayerShuffleClient(SecureShufflingClient):
     """Use the SecureShuffleClient to securely shuffle a list of the player indexes."""
 
+    # TODO: forgot to implement this!!
+
     def alert_players_have_been_ordered(self):
         self.shuffle_state = self.get_player_rolls()
         super().alert_players_have_been_ordered()

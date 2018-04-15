@@ -53,6 +53,3 @@ class IdentifyClient(GameClient):
     def init_no_state(self):
         super().init_no_state()
         self.peer_map = {self.cli.ident: {}}
-
-    def get_players(self):
-        pass

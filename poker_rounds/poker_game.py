@@ -42,6 +42,10 @@ class PokerPlayer:
         self.hand = []
         self.winnings = 0
 
+    @property
+    def is_all_in(self):
+        return self.cash_in_hand == 0
+
     def add_to_pot(self, amount: int) -> bool:
         if self.cash_in_hand >= amount:
             self.cash_in_hand -= amount
@@ -81,8 +85,6 @@ class PokerPlayer:
             else:
                 self.add_to_pot(self.game.blind)
 
-    def is_all_in(self):
-        return self.cash_in_hand == 0
 
 
 fresh_deck = list(range(10, 62))

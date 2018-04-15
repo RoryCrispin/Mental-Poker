@@ -52,7 +52,7 @@ class BettingClient(TurnTakingClient):
         for i in range(dealer_position + 1, dealer_position + self.max_players + 1):
             ident, player_map = self.get_peer_at_position(i)
             player = player_map[PokerPlayer.POKER_PLAYER]
-            if not player.is_all_in() and not player.folded:
+            if not player.is_all_in and not player.folded:
                 if not big_blind_played:
                     player.set_blind(self.cli.log, big_blind=True)
                     big_blind_played = True
@@ -69,7 +69,7 @@ class BettingClient(TurnTakingClient):
 
     def get_possible_moves_for_player(self, player: PokerPlayer):
         possible_moves = []
-        if self.player.folded or self.player.is_all_in():
+        if self.player.folded or self.player.is_all_in:
             possible_moves.append(BettingCodes.SKIP)
         else:
             possible_moves.append(BettingCodes.ALLIN)
@@ -237,7 +237,7 @@ class BettingClient(TurnTakingClient):
         all_in_players = []
         player: PokerPlayer
         for player in self.get_every_player():
-            if player.is_all_in():
+            if player.is_all_in:
                 all_in_players.append(player)
         return all_in_players
 
@@ -245,7 +245,7 @@ class BettingClient(TurnTakingClient):
         active_pots = []
         player: PokerPlayer
         for player in self.get_every_player():
-            if not player.folded and not player.is_all_in():
+            if not player.folded and not player.is_all_in:
                 active_pots.append(player.cash_in_pot)
         return active_pots
 
