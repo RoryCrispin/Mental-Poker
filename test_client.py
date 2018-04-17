@@ -18,7 +18,8 @@ logger = logging.getLogger()
 
 
 def start_async_rounds(game_round, process_count):
-    # Each process needs to start with a slight delay to prevent race conditions
+    # Each process needs to start with a slight delay to prevent race
+    # conditions
     sleepmap = [0.1 * x for x in range(0, process_count)]
     start_delay = max(sleepmap) + 0.1
     args = [(game_round, s, start_delay) for s in sleepmap]
@@ -77,7 +78,8 @@ def test_shuffling_client():
 
 
 def test_secure_shuffling_client():
-    rounds = ManualGameSequencer([SecureShufflingClient, SecureShuffleSampleDecryptor])
+    rounds = ManualGameSequencer(
+        [SecureShufflingClient, SecureShuffleSampleDecryptor])
     x = start_async_rounds(rounds, 3)
     deck_states = []
     for client in x:
@@ -90,7 +92,8 @@ def test_secure_shuffling_client():
 
 
 def test_secure_deck_shuffling():
-    rounds = ManualGameSequencer([DeckShuffleClient, SecureShuffleSampleDecryptor])
+    rounds = ManualGameSequencer(
+        [DeckShuffleClient, SecureShuffleSampleDecryptor])
     x = start_async_rounds(rounds, 3)
     deck_states = []
     for client in x:
@@ -120,7 +123,8 @@ def test_hand_reveal_client():
     for client_pm in peer_maps:
         for _, playermap in client_pm.items():
             playermaps.append(playermap['poker_player'])
-    assert all((d.cash_in_pot == playermaps[0].cash_in_pot for d in playermaps))
+    assert all(
+        (d.cash_in_pot == playermaps[0].cash_in_pot for d in playermaps))
 
 
 def test_lots_of_rounds():
