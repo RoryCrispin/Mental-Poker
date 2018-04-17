@@ -15,7 +15,8 @@ class PlayerShuffleClient(SecureShufflingClient):
     def get_player_rolls(self):
         player_rolls = []
         for _, peer in self.peer_map.items():
-            player_rolls.append(peer['roll'] + 10)  # Add 2 because we can't encrypt numbers <= 1
+            # Add 2 because we can't encrypt numbers <= 1
+            player_rolls.append(peer['roll'] + 10)
         return player_rolls
 
 

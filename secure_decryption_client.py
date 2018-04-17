@@ -8,7 +8,8 @@ from turn_taking_client import TurnTakingClient
 class SecureDecryptionClient(TurnTakingClient):
     def __init__(self, cli, state=None, max_players=3):
         super().__init__(cli, state, max_players)
-        self.queue_map.extend([(CryptoWords.SHARE_PRIVATE, self.recv_private_component)])
+        self.queue_map.extend(
+            [(CryptoWords.SHARE_PRIVATE, self.recv_private_component)])
         self.deck_state = None
         self.key = None
         self.have_shared_my_component = False
@@ -57,7 +58,9 @@ class SecureDecryptionClient(TurnTakingClient):
         for ident, vals in self.peer_map.items():
             if ident != self.cli.ident:
                 d = vals.get(CryptoWords.PRIVATE_COMPONENT)
-                self.cli.log(LogLevel.VERBOSE, "Decrypting deck with {}".format(ident))
+                self.cli.log(
+                    LogLevel.VERBOSE,
+                    "Decrypting deck with {}".format(ident))
                 self.key.update_private_component(d)
                 self.decrypt_deck()
         self.key.update_private_component(own_priv)
@@ -69,5 +72,3 @@ class SecureShuffleSampleDecryptor(SecureDecryptionClient):
         state = super().get_final_state()
         state.update({PokerWords.DECK_STATE: self.deck_state})
         return state
-
-

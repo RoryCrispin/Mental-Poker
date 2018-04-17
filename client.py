@@ -59,7 +59,8 @@ class CommsClient(RedisClient):
         print("{} <> {}".format(str(log_level), message))
 
     def advance_to_next_round(self):
-        return self.game_sequencer.advance_to_next_round(self, self.final_state)
+        return self.game_sequencer.advance_to_next_round(
+            self, self.final_state)
 
 
 class GameClient:
@@ -103,7 +104,8 @@ class GameClient:
                     did_run_job = True
                     break
             if not did_run_job:
-                self.cli.log(LogLevel.ERROR, "Did not run a job with key: {}".format(msg_key))
+                self.cli.log(LogLevel.ERROR,
+                             "Did not run a job with key: {}".format(msg_key))
                 new_queue.append(event)
         return (None, None,
                 self.get_final_state()) if self.is_round_over() else \
