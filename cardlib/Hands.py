@@ -95,7 +95,8 @@ class HandRank:
     def get_quads(cards):
         groupings = HandRank.get_groupings(cards)
         if len(HandRank.getPairs(groupings, min_size=4)) >= 1:
-            return Hand(HandEnum.Quads, HandRank.flatten_groups_to_faces(groupings))
+            return Hand(HandEnum.Quads,
+                        HandRank.flatten_groups_to_faces(groupings))
         else:
             return None
 
@@ -116,7 +117,8 @@ class HandRank:
         groupings = HandRank.get_groupings(cards)
         sets = HandRank.getPairs(groupings, min_size=3)
         if len(sets) >= 1:
-            return Hand(HandEnum.Set, HandRank.flatten_groups_to_faces(groupings))
+            return Hand(
+                HandEnum.Set, HandRank.flatten_groups_to_faces(groupings))
         else:
             return None
 
@@ -124,7 +126,8 @@ class HandRank:
     def getTwoPair(cards):
         groupings = HandRank.get_groupings(cards)
         if len(HandRank.getPairs(groupings)) >= 2:
-            return Hand(HandEnum.TwoPair, HandRank.flatten_groups_to_faces(groupings))
+            return Hand(HandEnum.TwoPair,
+                        HandRank.flatten_groups_to_faces(groupings))
         else:
             return None
 
@@ -132,7 +135,8 @@ class HandRank:
     def getPair(cards):
         groupings = HandRank.get_groupings(cards)
         if len(HandRank.getPairs(groupings)) >= 1:
-            return Hand(HandEnum.Pair, HandRank.flatten_groups_to_faces(groupings))
+            return Hand(HandEnum.Pair,
+                        HandRank.flatten_groups_to_faces(groupings))
         else:
             return None
 

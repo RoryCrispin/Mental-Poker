@@ -34,7 +34,8 @@ class ShowdownDeckDecryptor(SecureDecryptionClient):
 
     @staticmethod
     def get_list_of_poker_players(state):
-        return [x[1][PokerPlayer.POKER_PLAYER] for x in state['peer_map'].items()]
+        return [x[1][PokerPlayer.POKER_PLAYER]
+                for x in state['peer_map'].items()]
 
     def update_cryptodeck_with_decrypted_values(self, state):
         i = 0
@@ -49,7 +50,8 @@ class ShowdownDeckDecryptor(SecureDecryptionClient):
     def populate_showdown_reveal_cards(self, state):
         for card in state[PokerWords.CRYPTODECK_STATE]:
             if card.dealt_to is not None and card.dealt_to < 0 and not card.has_been_dealt:
-                state.get('game').state_log.append({self.SHOWDOWN_REVEAL: str(card.get_card())})
+                state.get('game').state_log.append(
+                    {self.SHOWDOWN_REVEAL: str(card.get_card())})
 
     def populate_all_player_hands(self, crypto_deck):
         for card in crypto_deck:
@@ -74,7 +76,8 @@ class ShowdownDeckDecryptor(SecureDecryptionClient):
                 player.cash_in_pot -= minimum_pot
                 current_pot += minimum_pot
             # Get best hand from invested players
-            winner = [self.get_winner([x[0] for x in invested_players], table_cards)][0][0]
+            winner = [self.get_winner(
+                [x[0] for x in invested_players], table_cards)][0][0]
             winner.winnings += current_pot
         if len(self.get_invested_players(poker_players)) == 1:
             player = self.get_invested_players(poker_players)[0][0]
@@ -93,7 +96,8 @@ class ShowdownDeckDecryptor(SecureDecryptionClient):
     # TODO: add support for draws!
     @staticmethod
     def get_winner(list_of_players, table_cards):
-        hands = [(player, player.hand + table_cards) for player in list_of_players if not player.folded]
+        hands = [(player, player.hand + table_cards)
+                 for player in list_of_players if not player.folded]
         decoded_hands = [(x[0], HandRank.getHand(x[1])) for x in hands]
         sorted_hands = sorted(decoded_hands, key=lambda x: x[1], reverse=True)
         return sorted_hands[0]

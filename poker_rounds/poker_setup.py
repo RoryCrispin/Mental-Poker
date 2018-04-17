@@ -16,7 +16,8 @@ class PokerSetup(GameClient):
 
     @staticmethod
     def have_built_poker_player_map(state):
-        return PokerPlayer.POKER_PLAYER in list(state['peer_map'].items())[0][1]
+        return PokerPlayer.POKER_PLAYER in list(
+            state['peer_map'].items())[0][1]
 
     def build_player_map(self, state):
         self.game = PokerGame(self.max_players)
@@ -36,5 +37,3 @@ class PokerSetup(GameClient):
         state.update({'peer_map': self.peer_map,
                       'game': self.game})
         return state
-
-

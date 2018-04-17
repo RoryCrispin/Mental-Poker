@@ -65,7 +65,8 @@ class PokerHandGameSequencer(GameSequencer):
                 next_round = client(cli, state)
                 next_round.init_state()
                 if next_round.is_round_over():
-                    return self.advance_to_next_round(cli, next_round.get_final_state())
+                    return self.advance_to_next_round(
+                        cli, next_round.get_final_state())
                 else:
                     return next_round
         next_round = self.get_betting_reveal_state(state)

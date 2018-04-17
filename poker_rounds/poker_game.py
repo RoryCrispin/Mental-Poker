@@ -66,7 +66,10 @@ class PokerPlayer:
                 PokerGame.FROM: self.ident,
                 PokerGame.ACTION: BettingCodes.BIG_BLIND
             })
-            logging_func(LogLevel.INFO, "Player {} plays BIG blind".format(self.ident))
+            logging_func(
+                LogLevel.INFO,
+                "Player {} plays BIG blind".format(
+                    self.ident))
 
             if self.cash_in_hand < self.game.blind * 2:
                 logging_func(LogLevel.INFO, "Going ALL IN for blind")
@@ -79,7 +82,10 @@ class PokerPlayer:
                 PokerGame.FROM: self.ident,
                 PokerGame.ACTION: BettingCodes.SMALL_BLIND
             })
-            logging_func(LogLevel.INFO, "Player {} plays SMALL blind".format(self.ident))
+            logging_func(
+                LogLevel.INFO,
+                "Player {} plays SMALL blind".format(
+                    self.ident))
             if self.cash_in_hand < self.game.blind:
                 logging_func(LogLevel.INFO, "^^ goes ALL IN for blind")
                 self.add_to_pot(self.cash_in_hand)

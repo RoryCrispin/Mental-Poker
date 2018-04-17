@@ -19,7 +19,9 @@ class HumanBettingPlayer:
         print(yaml.dump(game_round.game.state_log))
         accepted_move = False
         while not accepted_move:
-            move = input("Chose move from set: {}\n".format(set(possible_moves)))
+            move = input(
+                "Chose move from set: {}\n".format(
+                    set(possible_moves)))
             if move in possible_moves:
                 print("Accepted move")
                 accepted_move = True

@@ -119,7 +119,8 @@ def test_straight_flush():
 
 
 def test_select():
-    assert HandRank.select_hand(oversize_sf_hand).getEnum() == HandEnum.StraightFlush
+    assert HandRank.select_hand(
+        oversize_sf_hand).getEnum() == HandEnum.StraightFlush
 
 
 def hand_checker(test_func, hand):

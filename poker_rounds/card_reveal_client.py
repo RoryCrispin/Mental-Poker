@@ -49,11 +49,14 @@ class CardRevealClient(TurnTakingClient):
             self.remove_my_lock_and_share()
             self.end_my_turn()
 
-    def remove_my_lock_and_share(self):  # TODO: join this with remove_my_lock method
+    # TODO: join this with remove_my_lock method
+    def remove_my_lock_and_share(self):
         if self.card.value is None:
             self.card = self.get_card_for_decryption()
         self.remove_my_lock()
-        self.send_round_message(self.REMOVE_LOCK, {self.REMOVE_LOCK: self.card.value})
+        self.send_round_message(
+            self.REMOVE_LOCK, {
+                self.REMOVE_LOCK: self.card.value})
 
     def remove_my_lock(self):
         decrypted_card = self.key.decrypt_message(self.card.value)
@@ -61,12 +64,17 @@ class CardRevealClient(TurnTakingClient):
 
     def recv_lock_removed(self, data):
         if self.is_turn_valid(data):
-            self.card.removed_lock(data[self.SENDER_ID], data['data'][self.REMOVE_LOCK])
-            self.cli.log(LogLevel.VERBOSE, "Recv lock removed by {}".format(data[self.SENDER_ID]))
+            self.card.removed_lock(
+                data[self.SENDER_ID], data['data'][self.REMOVE_LOCK])
+            self.cli.log(LogLevel.VERBOSE,
+                         "Recv lock removed by {}".format(data[self.SENDER_ID]))
 
             if self.received_all_peer_keys() and self.is_my_card():
                 self.remove_my_lock()
-                self.cli.log(LogLevel.INFO, "Received locked card: {}".format(self.card.value))
+                self.cli.log(
+                    LogLevel.INFO,
+                    "Received locked card: {}".format(
+                        self.card.value))
 
     def is_card_valid(self):
         if self.card.value in range(10, 62):
