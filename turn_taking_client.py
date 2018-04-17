@@ -15,7 +15,8 @@ class TurnTakingClient(SecureOrderedClient):
         self.queue_map.extend([(self.END_TURN, self.recv_end_turn),
                                (self.LEAVE_ROOM, self.recv_leave_room)])
         self.current_turn = 0
-        # Pregrnerate a room code; this will be overwritten if we're not player 0
+        # Pregrnerate a room code; this will be overwritten if we're not player
+        # 0
         self.room_code = uuid4()
         self.setup_finished = False
 
@@ -31,7 +32,8 @@ class TurnTakingClient(SecureOrderedClient):
         # TODO: This is common place where the game stops running turns
         if data['data'][self.ROOM_CODE] == self.room_code:
             if not data[self.SENDER_ID] == self.get_current_turn():
-                self.cli.log(LogLevel.ERROR, "An invalid turn was made: {}".format(data))
+                self.cli.log(LogLevel.ERROR,
+                             "An invalid turn was made: {}".format(data))
             else:
                 self.current_turn += 1
         self.take_turn_if_mine()
@@ -88,7 +90,8 @@ class TurnTakingClient(SecureOrderedClient):
     def get_peer_at_position(self, position, peer_map=None):
         if peer_map is None:
             peer_map = self.peer_map
-        return [peer for peer in peer_map.items() if peer[1]['roll'] == position % self.max_players][0]
+        return [peer for peer in peer_map.items() if peer[1]['roll'] ==
+                position % self.max_players][0]
 
     def get_my_position(self):
         return self.peer_map[self.cli.ident]['roll']
@@ -113,7 +116,10 @@ class CountingClient(TurnTakingClient):
     def handle_count(self, data):
         if self.is_turn_valid(data):
             self.counting_state = (data['data'][self.NEW_COUNT])
-            self.cli.log(LogLevel.INFO, "Received move %s" % self.counting_state)
+            self.cli.log(
+                LogLevel.INFO,
+                "Received move %s" %
+                self.counting_state)
 
     def is_round_over(self):
         return self.counting_state >= 10
