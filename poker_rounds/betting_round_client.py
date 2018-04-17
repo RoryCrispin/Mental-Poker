@@ -18,6 +18,10 @@ class BettingCodes:
 
 
 class BettingClient(TurnTakingClient):
+    """
+    The betting client handles all game logic relating to the betting round of a game of
+    poker. It will look for the
+    """
     BET_AMOUNT = 'bet_amount'
 
     def __init__(self, cli, state=None, max_players=3):
@@ -202,7 +206,6 @@ class BettingClient(TurnTakingClient):
             self.cli.log(LogLevel.INFO, "Player {} folds".format(player.ident))
 
     def handle_skip(self, data):
-        player: PokerPlayer = self.get_player_from_turn_message(data)
         if self.is_turn_valid(data):
             self.cli.log(LogLevel.INFO,
                          "Got skip from {}".format(data[self.SENDER_ID]))

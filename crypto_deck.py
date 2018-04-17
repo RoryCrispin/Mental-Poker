@@ -16,7 +16,11 @@ class CryptoCard:
         self.state_log = []
         self.value = None
         self.locks_present = []
-        self.dealt_to = None  # Identifies a the use of this card, ie: dealt to table /player 0
+        # dealt_to identifies the player/position intended for this card
+        # Either a positive number => the players roll
+        # or a negative number => the order in which they'll be revealed
+        # to the table
+        self.dealt_to = None
         self.has_been_dealt = False
         self.deck_index = None
 

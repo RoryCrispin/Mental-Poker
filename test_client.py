@@ -130,4 +130,4 @@ def test_hand_reveal_client():
 def test_lots_of_rounds():
     for _ in range(0, 20):
         poker_sequencer = PokerHandGameSequencer()
-        x = start_async_rounds(poker_sequencer, 3)
+        start_async_rounds(poker_sequencer, 3)

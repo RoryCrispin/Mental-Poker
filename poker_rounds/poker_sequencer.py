@@ -91,7 +91,6 @@ class PokerHandGameSequencer(GameSequencer):
                     finished_dealing = False
                     break
                 if card.dealt_to < 0 and card.has_been_dealt is False:
-                    all_open_cards_dealt = False
                     break
             from poker_rounds.card_reveal_client import CardRevealClient, HandDecoder
             self.round_order[CardRevealClient] = finished_dealing

@@ -6,12 +6,16 @@ import yaml
 
 
 class AIBettingPlayer:
+    """ This simplistic betting player class simulates a human player
+    by making random moves at each opportunity"""
     @staticmethod
     def get_move(game_round, possible_moves):
         return choice(possible_moves)
 
 
 class HumanBettingPlayer:
+    """ This betting player class interrupts play to offer the
+    user a choice of which move to make"""
     @staticmethod
     def get_move(game_round, possible_moves):
         os.system('cls' if os.name == 'nt' else 'clear')
