@@ -1,3 +1,4 @@
+# coding=utf-8
 from Crypto.PublicKey import RSA
 
 from client import GameClient, LogLevel

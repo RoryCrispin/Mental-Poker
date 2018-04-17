@@ -1,16 +1,17 @@
-from makeRsaKeys import SRA_key
+# coding=utf-8
+from makeRsaKeys import SraKey
 
 
 def test_enc_dec_works():
-    ka = SRA_key.from_new_primes(1024)
+    ka = SraKey.from_new_primes(1024)
     ea = ka.encrypt_message(52)
     da = ka.decrypt_message(ea)
     assert da == 52
 
 
 def test_ea_eb_not_equal():
-    ka = SRA_key.from_new_primes(1024)
-    kb = SRA_key.from_existing_primes(1024, ka.get_public_primes())
+    ka = SraKey.from_new_primes(1024)
+    kb = SraKey.from_existing_primes(1024, ka.get_public_primes())
 
     message = 52
     ea = ka.encrypt_message(message)
@@ -19,8 +20,8 @@ def test_ea_eb_not_equal():
 
 
 def test_commutativity():
-    ka = SRA_key.from_new_primes(1024)
-    kb = SRA_key.from_existing_primes(1024, ka.get_public_primes())
+    ka = SraKey.from_new_primes(1024)
+    kb = SraKey.from_existing_primes(1024, ka.get_public_primes())
 
     message = 52
     ea = ka.encrypt_message(message)
@@ -35,9 +36,9 @@ def test_commutativity():
 
 
 def test_commutativity_three_way():
-    ka = SRA_key.from_new_primes(1024)
-    kb = SRA_key.from_existing_primes(1024, ka.get_public_primes())
-    kc = SRA_key.from_existing_primes(1024, ka.get_public_primes())
+    ka = SraKey.from_new_primes(1024)
+    kb = SraKey.from_existing_primes(1024, ka.get_public_primes())
+    kc = SraKey.from_existing_primes(1024, ka.get_public_primes())
 
     message = 52
     ea = ka.encrypt_message(message)
@@ -55,9 +56,9 @@ def test_commutativity_three_way():
 
 
 def test_share_provate_d_commutativity():
-    ka = SRA_key.from_new_primes(1024)
-    kb = SRA_key.from_existing_primes(1024, ka.get_public_primes())
-    kc = SRA_key.from_existing_primes(1024, ka.get_public_primes())
+    ka = SraKey.from_new_primes(1024)
+    kb = SraKey.from_existing_primes(1024, ka.get_public_primes())
+    kc = SraKey.from_existing_primes(1024, ka.get_public_primes())
 
     message = 52
     ea = ka.encrypt_message(message)

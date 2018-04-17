@@ -1,3 +1,4 @@
+# coding=utf-8
 from client_logging import LogLevel
 from poker_rounds.card_reveal_client import CardRevealClient
 from poker_rounds.poker_game import PokerGame
@@ -17,7 +18,7 @@ class OpenCardRevealClient(CardRevealClient):
             try:
                 if card.dealt_to <= 0 and not card.has_been_dealt:
                     return card
-            except(TypeError):
+            except TypeError:
                 return None
             index += 1
         raise ValueError("No card to decrypt")

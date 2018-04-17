@@ -1,4 +1,7 @@
+# coding=utf-8
 from uuid import uuid4
+
+from Crypto.Random.random import shuffle
 
 from client import LogLevel, GameClient
 
@@ -20,7 +23,8 @@ class InsecureOrderedClient(GameClient):
                                 self.recv_join_message),
                                (self.ROOM_FULL_ROLL,
                                 self.recv_roll)])
-
+        self.players_have_been_insecure_ordered = False
+        self.roll = None
         self.max_players = max_players
         self.room_closed = False
 

@@ -1,10 +1,11 @@
+# coding=utf-8
 from uuid import uuid4
-from yaml import load, dump
 
 import redis
+from yaml import load, dump
 
 
-class RedisClient():
+class RedisClient:
     def __init__(self, channel):
         self.ident = str(uuid4())
         self.channel = channel
@@ -22,7 +23,7 @@ class RedisClient():
                                   "data": dump(data)
                               }))
 
-    def decode_message(message):
+    def decode_message(message: dict):
         payload = load(message['data'])
         payload['data'] = load(payload['data'])
         return payload

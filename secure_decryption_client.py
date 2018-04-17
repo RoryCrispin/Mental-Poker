@@ -1,3 +1,4 @@
+# coding=utf-8
 from client_logging import LogLevel
 from crypto_deck import CryptoWords
 from poker_rounds.poker_game import PokerWords
@@ -16,9 +17,6 @@ class SecureDecryptionClient(TurnTakingClient):
         self.deck_state = state[PokerWords.DECK_STATE]
         self.key = state[CryptoWords.SRA_KEY]
         super().init_existing_state(state)
-
-    def init_no_state(self):
-        raise ValueError
 
     def take_turn(self):
         self.share_my_private_component()

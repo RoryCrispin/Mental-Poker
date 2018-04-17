@@ -1,9 +1,10 @@
+# coding=utf-8
 from uuid import uuid4
 
 from client_logging import LogLevel
 
 
-class PokerGame():
+class PokerGame:
     ACTION = 'action'
     DEALT_CARD = 'dealt_card'
     FROM = 'ident'
@@ -86,11 +87,10 @@ class PokerPlayer:
                 self.add_to_pot(self.game.blind)
 
 
-
 fresh_deck = list(range(10, 62))
 
 
-class PokerWords():
+class PokerWords:
     WINNINGS = 'winnings'
     OPEN_CARDS = 'open_cards'
     HAND = 'hand'

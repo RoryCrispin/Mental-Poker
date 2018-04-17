@@ -1,6 +1,8 @@
-from turn_taking_client import TurnTakingClient
-from client import LogLevel
+# coding=utf-8
 from random import shuffle
+
+from client import LogLevel
+from turn_taking_client import TurnTakingClient
 
 
 class ShufflingClient(TurnTakingClient):

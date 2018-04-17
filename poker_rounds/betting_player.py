@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 from random import choice
 
@@ -5,15 +6,17 @@ import yaml
 
 
 class AIBettingPlayer:
-    def get_move(self, round, possible_moves):
+    @staticmethod
+    def get_move(game_round, possible_moves):
         return choice(possible_moves)
 
 
 class HumanBettingPlayer:
-    def get_move(self, round, possible_moves):
+    @staticmethod
+    def get_move(game_round, possible_moves):
         os.system('cls' if os.name == 'nt' else 'clear')
-
-        print(yaml.dump(round.game.state_log))
+        move = None
+        print(yaml.dump(game_round.game.state_log))
         accepted_move = False
         while not accepted_move:
             move = input("Chose move from set: {}\n".format(set(possible_moves)))

@@ -1,3 +1,4 @@
+# coding=utf-8
 from cardlib.Hands import HandRank
 from poker_rounds.poker_game import PokerWords, PokerPlayer, fresh_deck, PokerGame
 from secure_decryption_client import SecureDecryptionClient
@@ -26,7 +27,8 @@ class ShowdownDeckDecryptor(SecureDecryptionClient):
 
         return state
 
-    def get_table_cards(self, state):
+    @staticmethod
+    def get_table_cards(state):
         return [card.get_card() for card in state[PokerWords.CRYPTODECK_STATE]
                 if card.dealt_to is not None and card.dealt_to < 0]
 
@@ -52,11 +54,11 @@ class ShowdownDeckDecryptor(SecureDecryptionClient):
     def populate_all_player_hands(self, crypto_deck):
         for card in crypto_deck:
             if card.dealt_to is not None and card.dealt_to >= 0:
-                peer: PokerPlayer
                 peer = self.get_peer_at_position(card.dealt_to)[1]
                 peer[PokerPlayer.POKER_PLAYER].hand.append(card.get_card())
 
-    def get_pots(self, poker_players):
+    @staticmethod
+    def get_pots(poker_players):
         return [(x, x.cash_in_pot) for x in poker_players if x.cash_in_pot > 0]
 
     def determine_winnings(self, poker_players, table_cards):
@@ -89,13 +91,15 @@ class ShowdownDeckDecryptor(SecureDecryptionClient):
                                                      PokerWords.WINNINGS: player.winnings})
 
     # TODO: add support for draws!
-    def get_winner(self, list_of_players, table_cards):
+    @staticmethod
+    def get_winner(list_of_players, table_cards):
         hands = [(player, player.hand + table_cards) for player in list_of_players if not player.folded]
         decoded_hands = [(x[0], HandRank.getHand(x[1])) for x in hands]
         sorted_hands = sorted(decoded_hands, key=lambda x: x[1], reverse=True)
         return sorted_hands[0]
 
-    def get_invested_players(self, poker_players):
+    @staticmethod
+    def get_invested_players(poker_players):
         return [(x, x.cash_in_pot)
                 for x in poker_players
                 if x.cash_in_pot > 0]

@@ -1,3 +1,4 @@
+# coding=utf-8
 import logging
 
 from client_logging import LogLevel
@@ -6,10 +7,10 @@ from redis_client import RedisClient
 
 
 class CommsClient(RedisClient):
-    def __init__(self, game_sequencer: GameSequencer, round_args={}):
+    def __init__(self, game_sequencer: GameSequencer, round_args=None):
         super().__init__('poker_chan')
         self.log_level = 0
-        self.round_args = round_args
+        self.round_args = {} if round_args is None else round_args
         self.logger = logging.getLogger("pkr")
         self.round_list_index = 0
         self.game_sequencer = game_sequencer
@@ -17,13 +18,14 @@ class CommsClient(RedisClient):
         self.logged_messages = []
         self.log(LogLevel.INFO, "I am client: {}".format(self.ident))
         self.round = game_sequencer.advance_to_next_round(self)
+        self.final_state = None
 
     def begin(self):
         for message in self.p.listen():
             if message['type'] == 'message':
                 if message['data'] == 'pdb_start':
-                    import ipdb;
-                    ipdb.set_trace()
+                    import pdb
+                    pdb.set_trace()
                     break
                 if message['data'] == 'dump_game_log':
                     pass
@@ -60,15 +62,17 @@ class CommsClient(RedisClient):
         return self.game_sequencer.advance_to_next_round(self, self.final_state)
 
 
-class GameClient():
+class GameClient:
     SENDER_ID = 'sender_id'
     MESSAGE_KEY = 'message_key'
     IDENT_REQ_KEY = 'identify_request'
     IDENT_RESP_KEY = 'identify_response'
     PEER_MAP = 'peer_map'
+
     def __init__(self, cli: CommsClient, state=None):
         self.cli = cli
         self.queue_map = []
+        self.peer_map = None
         self.state = state
         self.previous_state = {}
         self.logger = logging.getLogger("pkr")
@@ -120,18 +124,14 @@ class GameClient():
         # Send out your own identity too
         self.recv_identify_request(None)
 
-    def request_idenfity(self):
-        self.cli.log(LogLevel.INFO, "Requesting Identify")
-        self.cli.post_message(data={self.MESSAGE_KEY:
-                                        self.IDENT_REQ_KEY})
-        # Send out your own identity too
-        self.recv_identify_request(None)
-
     def recv_identify_response(self, data):
         if data.get(self.SENDER_ID) not in self.peer_map:
             self.cli.log(LogLevel.INFO, "Identify Response!")
             self.peer_map[data.get(self.SENDER_ID)] = {}
             self.peer_did_join()
+
+    def peer_did_join(self):
+        pass
 
     def recv_identify_request(self, _):
         self.cli.post_message(data={self.MESSAGE_KEY:
@@ -150,8 +150,6 @@ class GameClient():
 
     def get_num_joined_players(self):
         return len(self.peer_map.keys())
-
-
 
 
 class GreetingCli(GameClient):

@@ -1,7 +1,8 @@
+# coding=utf-8
 from random import shuffle
 
 from client import LogLevel
-from crypto.makeRsaKeys import SRA_key
+from crypto.makeRsaKeys import SraKey
 from crypto_deck import CryptoCard, CryptoWords
 from poker_rounds.poker_game import PokerWords
 from turn_taking_client import TurnTakingClient
@@ -42,17 +43,16 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
         self.end_my_turn()
 
     def share_primes(self):
-        self.key = SRA_key.from_new_primes(self.KEYSIZE)
+        self.key = SraKey.from_new_primes(self.KEYSIZE)
         self.send_round_message(self.SHARE_PRIMES,
                                 {self.SHARE_PRIMES:
-                                 self.key.get_public_primes()})
+                                     self.key.get_public_primes()})
 
     def encrypt_deck(self):
         new_deck = []
         for card in self.shuffle_state:
             new_deck.append(self.key.encrypt_message(card))
         self.shuffle_state = new_deck
-
 
     def recv_shuffled_deck(self, data):
         if self.is_turn_valid(data):
@@ -64,7 +64,7 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
     def recv_primes(self, data):
         if self.is_turn_valid(data):
             self.pq = data['data'][self.SHARE_PRIMES]
-            self.key = SRA_key.from_existing_primes(self.KEYSIZE, self.pq)
+            self.key = SraKey.from_existing_primes(self.KEYSIZE, self.pq)
 
     def is_round_over(self):
         return len(self.encryptd_by) >= self.max_players
@@ -90,11 +90,11 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
         # Prepare the cardlib with their assigned player.
         index = 0
         for player_index in range(0, self.max_players):
-            for _ in range(0,2):
+            for _ in range(0, 2):
                 cryptodeck[index].dealt_to = player_index
                 index += 1
         # Prepare the table cards
         for index in range(0, 5):
-            location = (self.max_players*2) + index
-            cryptodeck[location].dealt_to = -1- index
+            location = (self.max_players * 2) + index
+            cryptodeck[location].dealt_to = -1 - index
         return cryptodeck

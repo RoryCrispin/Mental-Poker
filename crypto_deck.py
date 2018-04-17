@@ -1,6 +1,8 @@
+# coding=utf-8
 from cardlib.Card import Card
 
-class CryptoCard():
+
+class CryptoCard:
     ENCRYPTED = 'encrypted'
     DECRYPTED = 'decrypted'
     GENERATED = 'generated'
@@ -45,7 +47,7 @@ class CryptoCard():
             return None
 
 
-class CryptoWords():
+class CryptoWords:
     SHARE_PRIVATE = 'share_private'
     SRA_KEY = 'sra_key'
     PRIVATE_COMPONENT = 'private_component'

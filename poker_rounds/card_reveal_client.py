@@ -1,3 +1,4 @@
+# coding=utf-8
 from client_logging import LogLevel
 from crypto_deck import CryptoCard, CryptoWords
 from poker_rounds.poker_game import PokerWords
@@ -15,6 +16,9 @@ class CardRevealClient(TurnTakingClient):
                                (self.REMOVE_LOCK,
                                 self.recv_lock_removed)])
         self.card = CryptoCard()
+        self.cryptodeck_state = None
+        self.key = None
+        self.hand = None
 
     def init_existing_state(self, state):
         self.cryptodeck_state = state[PokerWords.CRYPTODECK_STATE]
@@ -30,7 +34,7 @@ class CardRevealClient(TurnTakingClient):
             try:
                 if card.dealt_to >= 0 and not card.has_been_dealt:
                     return card
-            except(TypeError):
+            except TypeError:
                 return None
             index += 1
         return None
@@ -44,7 +48,6 @@ class CardRevealClient(TurnTakingClient):
             self.cli.log(LogLevel.VERBOSE, "Removed my lock")
             self.remove_my_lock_and_share()
             self.end_my_turn()
-
 
     def remove_my_lock_and_share(self):  # TODO: join this with remove_my_lock method
         if self.card.value is None:
@@ -105,6 +108,10 @@ class CardRevealClient(TurnTakingClient):
 
 
 class HandDecoder(TurnTakingClient):
+    def __init__(self, cli, state=None, max_players=3):
+        super().__init__(cli, state, max_players)
+        self.hand = None
+
     def init_existing_state(self, state):
         super().init_existing_state(state)
         hand = []

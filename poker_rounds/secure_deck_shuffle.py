@@ -1,3 +1,4 @@
+# coding=utf-8
 from secure_shuffle_client import SecureShufflingClient
 
 

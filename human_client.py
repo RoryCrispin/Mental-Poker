@@ -1,6 +1,7 @@
-import os.path
-import time
+# coding=utf-8
+import os
 
+import time
 from yaml import dump
 
 from client import CommsClient

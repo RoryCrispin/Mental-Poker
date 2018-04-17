@@ -1,3 +1,4 @@
+# coding=utf-8
 from cardlib.Card import Card, Face, Rank
 
 

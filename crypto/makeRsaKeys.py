@@ -1,14 +1,18 @@
+# coding=utf-8
 # RSA Key Generator
 # http://inventwithpython.com/hacking (BSD Licensed)
 
-import crypto.cryptomath as cryptomath
-import crypto.rabinMiller as rabinMiller
 import random
 
+import crypto.cryptomath as cryptomath
+import crypto.rabinMiller as rabinMiller
 
-class SRA_key():
+
+class SraKey:
     def __init__(self, keysize, pq):
         self.keysize = keysize
+        self.n, self.e, self.d, self.pq = None, None, None, None
+
         self.generateKey(self.keysize, pq)
 
     @classmethod
@@ -26,17 +30,17 @@ class SRA_key():
         p = rabinMiller.generateLargePrime(keysize)
         print('Generating q prime...')
         q = rabinMiller.generateLargePrime(keysize)
-        return (p, q)
+        return p, q
 
-    def generateKey(self, keySize, pq=None):
+    def generateKey(self, key_size, pq=None):
         # Creates a public/private key pair with keys that are keySize bits in
         # size. This function may take a while to run.
-        if(pq is None):
+        if pq is None:
             # Step 1: Create two prime numbers, p and q. Calculate n = p * q.
             print('Generating p prime...')
-            p = rabinMiller.generateLargePrime(keySize)
+            p = rabinMiller.generateLargePrime(key_size)
             print('Generating q prime...')
-            q = rabinMiller.generateLargePrime(keySize)
+            q = rabinMiller.generateLargePrime(key_size)
         else:
             print("Using pre-generated primes")
             p, q = pq
@@ -46,13 +50,13 @@ class SRA_key():
         print('Generating e that is relatively prime to (p-1)*(q-1)...')
         while True:
             # Keep trying random numbers for e until one is valid.
-            e = random.randrange(2 ** (keySize - 1), 2 ** (keySize))
+            e = random.randrange(2 ** (key_size - 1), 2 ** key_size)
             if cryptomath.gcd(e, (p - 1) * (q - 1)) == 1:
                 break
 
         # Step 3: Calculate d, the mod inverse of e.
         print('Calculating d that is mod inverse of e...')
-        d = cryptomath.findModInverse(e, (p - 1) * (q - 1))
+        d = cryptomath.find_mod_inverse(e, (p - 1) * (q - 1))
 
         self.n = n
         self.e = e
@@ -60,10 +64,10 @@ class SRA_key():
         self.pq = (p, q)
 
     def encrypt_message(self, message):
-        return(pow(message, self.e, self.n))
+        return pow(message, self.e, self.n)
 
     def decrypt_message(self, message):
-        return(pow(message, self.d, self.n))
+        return pow(message, self.d, self.n)
 
     def get_public_primes(self):
         return self.pq

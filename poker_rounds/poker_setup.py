@@ -1,3 +1,4 @@
+# coding=utf-8
 from cardlib.Card import Card
 from client import GameClient
 from poker_rounds.poker_game import PokerGame, PokerPlayer
@@ -7,6 +8,7 @@ class PokerSetup(GameClient):
     def __init__(self, cli, state=None, max_players=3):
         self.max_players = max_players
         super().__init__(cli, state)
+        self.game = None
 
     def init_existing_state(self, state):
         super().init_existing_state(state)

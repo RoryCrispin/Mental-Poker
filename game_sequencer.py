@@ -1,4 +1,4 @@
-
+# coding=utf-8
 
 class GameSequencer:
     def __init__(self):
@@ -28,5 +28,3 @@ class ManualGameSequencer(GameSequencer):
             next_round.init_state()
             return next_round
         return None
-
-

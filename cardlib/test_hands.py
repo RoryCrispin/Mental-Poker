@@ -1,3 +1,4 @@
+# coding=utf-8
 import pytest
 
 from cardlib.Card import Card, Rank, Face
@@ -18,10 +19,8 @@ c5oS = Card(Rank.Five, Face.Spade)
 c4oS = Card(Rank.Four, Face.Spade)
 c3oS = Card(Rank.Three, Face.Spade)
 cAoS = Card(Rank.Ace, Face.Spade)
-cKoS = Card(Rank.King, Face.Spade)
 c6oC = Card(Rank.Six, Face.Club)
 c4oD = Card(Rank.Four, Face.Diamond)
-c4oS = Card(Rank.Four, Face.Spade)
 c2oS = Card(Rank.Two, Face.Spade)
 
 high_hand = [cAoH, c7oS, c8oD, cKoH, c9oD]
@@ -96,15 +95,15 @@ def test_set():
 
 
 def test_boat():
-    assert hand_checker(HandRank.getBoat, boat_hand)
-    assert not hand_checker(HandRank.getBoat, set_hand)
+    assert hand_checker(HandRank.get_boat, boat_hand)
+    assert not hand_checker(HandRank.get_boat, set_hand)
 
 
 def test_quads():
-    assert hand_checker(HandRank.getQuads, quad_hand)
-    assert hand_checker(HandRank.getQuads, quad_hand).getKickers() == \
+    assert hand_checker(HandRank.get_quads, quad_hand)
+    assert hand_checker(HandRank.get_quads, quad_hand).get_kickers() == \
            [Rank.Ace, Rank.Eight]
-    assert not hand_checker(HandRank.getQuads, high_hand)
+    assert not hand_checker(HandRank.get_quads, high_hand)
 
 
 def test_straight():
@@ -112,7 +111,7 @@ def test_straight():
 
 
 def test_flush():
-    assert (hand_checker(HandRank.getFlush, flush_hand))
+    assert (hand_checker(HandRank.get_flush, flush_hand))
 
 
 def test_straight_flush():

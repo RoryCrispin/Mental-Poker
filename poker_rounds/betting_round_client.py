@@ -1,3 +1,4 @@
+# coding=utf-8
 from random import randint
 
 from client_logging import LogLevel
@@ -6,7 +7,7 @@ from poker_rounds.poker_game import PokerGame, PokerPlayer
 from turn_taking_client import TurnTakingClient
 
 
-class BettingCodes():
+class BettingCodes:
     CALL = 'call'
     BET = 'bet'
     FOLD = 'fold'
@@ -28,7 +29,7 @@ class BettingClient(TurnTakingClient):
                                (BettingCodes.SKIP, self.handle_skip),
                                (BettingCodes.ALLIN, self.handle_all_in)
                                ])
-        self.game: PokerGame
+        self.game: PokerGame = None
 
         if self.cli.round_args.get('betting_player') is None:
             self.betting_player = AIBettingPlayer()

@@ -1,3 +1,4 @@
+# coding=utf-8
 from game_sequencer import GameSequencer
 from poker_rounds.betting_round_client import BettingClient
 from poker_rounds.open_card_reveal_client import OpenCardRevealClient
@@ -101,7 +102,6 @@ class PokerHandGameSequencer(GameSequencer):
             # Have run poker setup
             if PokerSetup.have_built_poker_player_map(state):
                 self.round_order[PokerSetup] = True
-
 
     def get_betting_reveal_state(self, state):
         for round_name, complete in self.betting_round_order.items():
