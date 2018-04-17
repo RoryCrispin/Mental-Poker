@@ -1,8 +1,8 @@
 # coding=utf-8
-from enum import IntEnum
+# from enum import IntEnum
 
 
-class LogLevel(IntEnum):
+class LogLevel():
     VERBOSE = 0
     INFO = 2
     GENERAL = 3
