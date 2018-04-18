@@ -45,14 +45,9 @@ class CommsClient(RedisClient):
     def message_is_for_me(self, payload):
         from_self = payload.get('sender_id') == self.ident
         to_all = payload.get('to') is None
-        to_self = payload.get('to') == self.ident
         if from_self:
             return False
-        if to_all:
-            return True
-        if to_self:
-            return True
-        return False
+        return to_all
 
     def log(self, log_level, message):
         self.logged_messages.append((log_level, message))

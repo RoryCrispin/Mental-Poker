@@ -1,0 +1,5 @@
+[run]
+omit =
+    manual_start_client.py
+    human_client.py
+    rsa_client.py

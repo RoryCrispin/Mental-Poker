@@ -13,6 +13,7 @@ class AIBettingPlayer:
         return choice(possible_moves)
 
 
+# pragma: no cover
 class HumanBettingPlayer:
     """ This betting player class interrupts play to offer the
     user a choice of which move to make"""

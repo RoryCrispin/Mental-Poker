@@ -12,7 +12,6 @@ from poker_rounds.poker_game import PokerWords
 from poker_rounds.poker_sequencer import PokerHandGameSequencer
 from poker_rounds.secure_deck_shuffle import DeckShuffleClient
 from secure_decryption_client import SecureShuffleSampleDecryptor
-from secure_shuffle_client import SecureShufflingClient
 
 logger = logging.getLogger()
 
@@ -25,10 +24,13 @@ def start_async_rounds(game_round, process_count):
     args = [(game_round, s, start_delay) for s in sleepmap]
     p = Pool(processes=process_count)
     pmap = p.map_async(start_game, args)
+    p.close()
+    p.join()
     return pmap.get()
 
 
 def start_game(args):
+    print("start gamne")
     game_round, sleeptime, start_delay = args
     sleep(sleeptime)
     client_final_state = CommsClient(game_round).begin()
@@ -77,18 +79,18 @@ def test_shuffling_client():
     assert (all(d != list(range(10)) for d in decks))
 
 
-def test_secure_shuffling_client():
-    rounds = ManualGameSequencer(
-        [SecureShufflingClient, SecureShuffleSampleDecryptor])
-    x = start_async_rounds(rounds, 3)
-    deck_states = []
-    for client in x:
-        deck_states.append(client.get(PokerWords.DECK_STATE))
-    assert deck_states[0] != list(range(1, 10))
-    # There's a 10! chance that this test will fail because the shuffled order
-    # is actually 1..10
-    assert sorted(deck_states[0]) == list(range(1, 10))
-    assert (all(d == deck_states[0] for d in deck_states))
+# def test_secure_shuffling_client():
+#     rounds = ManualGameSequencer(
+#         [SecureShufflingClient, SecureShuffleSampleDecryptor])
+#     x = start_async_rounds(rounds, 3)
+#     deck_states = []
+#     for client in x:
+#         deck_states.append(client.get(PokerWords.DECK_STATE))
+#     assert deck_states[0] != list(range(1, 10))
+#     # There's a 10! chance that this test will fail because the shuffled order
+#     # is actually 1..10
+#     assert sorted(deck_states[0]) == list(range(1, 10))
+#     assert (all(d == deck_states[0] for d in deck_states))
 
 
 def test_secure_deck_shuffling():
@@ -128,6 +130,6 @@ def test_hand_reveal_client():
 
 
 def test_lots_of_rounds():
-    for _ in range(0, 20):
+    for _ in range(0, 40):
         poker_sequencer = PokerHandGameSequencer()
         start_async_rounds(poker_sequencer, 3)

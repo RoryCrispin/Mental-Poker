@@ -59,9 +59,6 @@ class TurnTakingClient(SecureOrderedClient):
         self.cli.post_message(data={self.MESSAGE_KEY: self.END_TURN,
                                     self.ROOM_CODE: self.room_code})
 
-    def message_for_this_room(self, room_code):
-        return room_code == self.room_code
-
     def take_turn(self):
         raise NotImplementedError
 
@@ -96,30 +93,3 @@ class TurnTakingClient(SecureOrderedClient):
     def get_my_position(self):
         return self.peer_map[self.cli.ident]['roll']
 
-
-class CountingClient(TurnTakingClient):
-    NEW_COUNT = 'new_count'
-
-    def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players)
-        self.queue_map.extend([(self.NEW_COUNT, self.handle_count)])
-        self.counting_state = 0
-
-    def take_turn(self):
-        self.counting_state += 1
-        self.cli.log(LogLevel.INFO, "Sending move %s" % self.counting_state)
-        self.cli.post_message(data={self.MESSAGE_KEY: self.NEW_COUNT,
-                                    self.ROOM_CODE: self.room_code,
-                                    self.NEW_COUNT: self.counting_state})
-        self.end_my_turn()
-
-    def handle_count(self, data):
-        if self.is_turn_valid(data):
-            self.counting_state = (data['data'][self.NEW_COUNT])
-            self.cli.log(
-                LogLevel.INFO,
-                "Received move %s" %
-                self.counting_state)
-
-    def is_round_over(self):
-        return self.counting_state >= 10

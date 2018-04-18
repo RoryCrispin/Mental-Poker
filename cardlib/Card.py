@@ -1,6 +1,5 @@
 # coding=utf-8
 from enum import Enum, IntEnum
-from itertools import product
 
 
 class Face(Enum):
@@ -39,8 +38,8 @@ class Card:
     def __repr__(self):
         return "%s %s" % (self.rank.name, self.face.name)
 
-    def __sortkey__(self):
-        return self.rank
+    # def __sortkey__(self):
+    #     return self.rank
 
     def __lt__(self, other):
         return self.rank < other.rank
@@ -51,8 +50,8 @@ class Card:
     def __int__(self):
         return self.rank
 
-    def __add__(self, x):
-        return Card(Rank(int(self) + int(x)), self.face)
+    # def __add__(self, x):
+    #     return Card(Rank(int(self) + int(x)), self.face)
 
     def __eq__(self, other):
         return self.face == other.face and self.rank == other.rank
@@ -63,5 +62,5 @@ class Card:
 #     ranks = range(0, 13)
 #     return [Card(Rank(x[1]), x[0]) for x in product(faces, ranks)]
 
-def generate_full_deck():
-    return [Card(p[0], p[1]) for p in product(Rank, Face)]
+# def generate_full_deck():
+#     return [Card(p[0], p[1]) for p in product(Rank, Face)]
