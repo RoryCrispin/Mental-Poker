@@ -1,7 +1,6 @@
 # coding=utf-8
-from time import time
-
 import yaml
+from time import time
 
 from game_sequencer import GameSequencer
 from ordered_turn_client import InsecureOrderedClient
@@ -25,6 +24,7 @@ class PokerHandGameSequencer(GameSequencer):
     THIRD_BETTING_ROUND = 'third_betting_round'
     RIVER_REVEAL = 'river_reveal'
     SHOWDOWN = 'showdown'
+    DEBUG_TIMINGS = False
 
     def __init__(self):
         super().__init__()
@@ -68,8 +68,9 @@ class PokerHandGameSequencer(GameSequencer):
         self.update_round_completion_list(state)
         for client, complete in self.round_order.items():
             if not complete:
-                self.timestamps.append([client.__name__, time()])
-                print(yaml.dump(self.timestamps))
+                if self.DEBUG_TIMINGS:
+                    self.timestamps.append([client.__name__, time()])
+                    print(yaml.dump(self.timestamps))
                 next_round = client(cli, state)
                 next_round.init_state()
                 if next_round.is_round_over():
@@ -79,8 +80,9 @@ class PokerHandGameSequencer(GameSequencer):
                     return next_round
         next_round = self.get_betting_reveal_state(state)
         if next_round is not None:
-            self.timestamps.append([next_round.__name__, time()])
-            print(yaml.dump(self.timestamps))
+            if self.DEBUG_TIMINGS:
+                self.timestamps.append([next_round.__name__, time()])
+                print(yaml.dump(self.timestamps))
             next_round = next_round(cli, state)
             next_round.init_state()
             return next_round

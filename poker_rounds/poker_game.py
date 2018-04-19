@@ -43,6 +43,11 @@ class PokerPlayer:
         self.hand = []
         self.winnings = 0
 
+    def __str__(self):
+        return "Player : {}, Cash in hand: {}, Cash in pot {}".format(self.ident,
+                                                                      self.cash_in_hand,
+                                                                      self.cash_in_pot)
+
     @property
     def is_all_in(self):
         return self.cash_in_hand == 0
@@ -58,7 +63,6 @@ class PokerPlayer:
         self.did_play_blind_this_round = False
 
     def set_blind(self, logging_func, big_blind=True):
-        from poker_rounds.betting_round_client import BettingCodes
         self.did_play_blind_this_round = True
         if big_blind:
 
@@ -103,3 +107,13 @@ class PokerWords:
     DECK_STATE = 'deck_state'
     SHUFFLE_PLAYERS = 'shuffle_players'
     CRYPTODECK_STATE = 'crypto_deck_state'
+
+
+class BettingCodes:
+    CALL = 'call'
+    BET = 'bet'
+    FOLD = 'fold'
+    ALLIN = 'all_in'
+    SKIP = 'skip'
+    BIG_BLIND = 'big_blind'
+    SMALL_BLIND = 'small_blind'

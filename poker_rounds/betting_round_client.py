@@ -1,20 +1,9 @@
 # coding=utf-8
-from random import randint
 
 from client_logging import LogLevel
 from poker_rounds.betting_player import AIBettingPlayer
-from poker_rounds.poker_game import PokerGame, PokerPlayer
+from poker_rounds.poker_game import PokerGame, PokerPlayer, BettingCodes
 from turn_taking_client import TurnTakingClient
-
-
-class BettingCodes:
-    CALL = 'call'
-    BET = 'bet'
-    FOLD = 'fold'
-    ALLIN = 'all_in'
-    SKIP = 'skip'
-    BIG_BLIND = 'big_blind'
-    SMALL_BLIND = 'small_blind'
 
 
 class BettingClient(TurnTakingClient):
@@ -101,12 +90,13 @@ class BettingClient(TurnTakingClient):
 
     def take_turn(self):
         possible_moves = self.get_possible_moves_for_player(self.player)
-        next_move = self.betting_player.get_move(self, possible_moves)
+        max_bet = self.get_max_raise(self.player)
+        (next_move, bet_size) = self.betting_player.get_move(self, possible_moves, max_bet)
 
         if next_move == BettingCodes.CALL:
             self.make_call()
         elif next_move == BettingCodes.BET:
-            self.make_bet(randint(1, self.get_max_raise(self.player)))
+            self.make_bet(bet_size)
         elif next_move == BettingCodes.FOLD:
             self.make_fold()
         elif next_move == BettingCodes.ALLIN:
