@@ -1,10 +1,10 @@
 # coding=utf-8
 from cardlib.Hands import HandRank
 from poker_rounds.poker_game import PokerWords, PokerPlayer, fresh_deck, PokerGame
-from secure_decryption_client import SecureDecryptionClient
+from secure_decryption_client import DeckDecryptionClient
 
 
-class ShowdownDeckDecryptor(SecureDecryptionClient):
+class ShowdownDeckDecryptor(DeckDecryptionClient):
     SHOWDOWN_REVEAL = 'showdown_reveal'
 
     def __init__(self, cli, state=None, max_players=3):

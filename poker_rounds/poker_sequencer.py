@@ -1,9 +1,11 @@
 # coding=utf-8
 from game_sequencer import GameSequencer
+from ordered_turn_client import InsecureOrderedClient
 from poker_rounds.betting_round_client import BettingClient
 from poker_rounds.open_card_reveal_client import OpenCardRevealClient
 from poker_rounds.poker_setup import PokerSetup
 from poker_rounds.showdown import ShowdownDeckDecryptor
+from secure_player_ordering import ShuffledPlayerDecryptionClient, PlayerShuffleClient
 
 
 class PokerHandGameSequencer(GameSequencer):
@@ -25,11 +27,15 @@ class PokerHandGameSequencer(GameSequencer):
         from poker_rounds.card_reveal_client import CardRevealClient, HandDecoder
         from poker_rounds.secure_deck_shuffle import DeckShuffleClient
 
-        self.round_order = {DeckShuffleClient: False,
-                            CardRevealClient: False,
-                            HandDecoder: False,  # TODO: Three flop cards, then turn and river
-                            PokerSetup: False,
-                            }
+        self.round_order = {
+            InsecureOrderedClient: False,
+            PlayerShuffleClient: False,
+            ShuffledPlayerDecryptionClient: False,
+            DeckShuffleClient: False,
+            CardRevealClient: False,
+            HandDecoder: False,
+            PokerSetup: False,
+        }
 
         self.betting_round_order = {
             self.FIRST_BETTING_ROUND: False,
@@ -75,33 +81,46 @@ class PokerHandGameSequencer(GameSequencer):
             next_round.init_state()
             return next_round
 
+    def has_deck_been_shuffled(self, state):
+        return state.get('crypto_deck_state') is not None
+
+    def have_finished_dealing(self, state):
+        finished_dealing = True
+        for card in state.get('crypto_deck_state'):
+            if card.dealt_to is None:
+                break
+            if card.dealt_to >= 0 and card.has_been_dealt is False:
+                finished_dealing = False
+                break
+            if card.dealt_to < 0 and card.has_been_dealt is False:
+                break
+        return finished_dealing
+
+    def hand_has_been_decoded(self, state):
+        return state.get('hand') is not None
+
     def update_round_completion_list(self, state):
         from poker_rounds.secure_deck_shuffle import DeckShuffleClient
         if state is None:
             return
-        if state.get('crypto_deck_state') is not None:
+        if not self.round_order[InsecureOrderedClient]:
+            self.round_order[InsecureOrderedClient] = True
+            return InsecureOrderedClient
+
+        if not self.round_order[PlayerShuffleClient]:
+            self.round_order[PlayerShuffleClient] = True
+            return PlayerShuffleClient
+
+        if not self.round_order[ShuffledPlayerDecryptionClient]:
+            self.round_order[ShuffledPlayerDecryptionClient] = True
+            return ShuffledPlayerDecryptionClient
+
+        if self.has_deck_been_shuffled(state):
             self.round_order[DeckShuffleClient] = True
-
-            # Check if all cards have been dealt yet?
-            finished_dealing = True
-            for card in state.get('crypto_deck_state'):
-                if card.dealt_to is None:
-                    break
-                if card.dealt_to >= 0 and card.has_been_dealt is False:
-                    finished_dealing = False
-                    break
-                if card.dealt_to < 0 and card.has_been_dealt is False:
-                    break
             from poker_rounds.card_reveal_client import CardRevealClient, HandDecoder
-            self.round_order[CardRevealClient] = finished_dealing
-
-            # Has hand been decoded
-            if state.get('hand') is not None:
-                self.round_order[HandDecoder] = True
-
-            # Have run poker setup
-            if PokerSetup.have_built_poker_player_map(state):
-                self.round_order[PokerSetup] = True
+            self.round_order[CardRevealClient] = self.have_finished_dealing(state)
+            self.round_order[HandDecoder] = self.hand_has_been_decoded(state)
+            self.round_order[PokerSetup] = PokerSetup.have_built_poker_player_map(state)
 
     def get_betting_reveal_state(self, state):
         for round_name, complete in self.betting_round_order.items():

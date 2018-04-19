@@ -6,8 +6,6 @@ from secure_shuffle_client import SecureShufflingClient
 class PlayerShuffleClient(SecureShufflingClient):
     """Use the SecureShuffleClient to securely shuffle a list of the player indexes."""
 
-    # TODO: forgot to implement this!!
-
     def alert_players_have_been_ordered(self):
         self.shuffle_state = self.get_player_rolls()
         super().alert_players_have_been_ordered()
@@ -15,15 +13,26 @@ class PlayerShuffleClient(SecureShufflingClient):
     def get_player_rolls(self):
         player_rolls = []
         for _, peer in self.peer_map.items():
-            # Add 2 because we can't encrypt numbers <= 1
             player_rolls.append(peer['roll'] + 10)
         return player_rolls
+
+    def get_final_state(self):
+        state = super().get_final_state()
+        state.update({'shuffle_state': self.shuffle_state})
+        return state
 
 
 class ShuffledPlayerDecryptionClient(SecureDecryptionClient):
     """Take the shuffled list of player indexes from PlayerShuffleClient and rearrange
     the players into these positions, such that the players have now been ordered in a
     fair, random permutation, and that no player has any control over where they're sat"""
+
+    def __init__(self, cli, state=None, max_players=3):
+        super().__init__(cli, state, max_players, private_component_key='ordering_private_component')
+
+    def init_existing_state(self, state):
+        self.deck_state = state['shuffle_state']
+        super().init_existing_state(state)
 
     def get_final_state(self):
         state = super().get_final_state()
@@ -32,7 +41,7 @@ class ShuffledPlayerDecryptionClient(SecureDecryptionClient):
         new_positions = []
         i = 0
         for new_position in self.deck_state:
-            new_position -= 2  # Remove the addition added to keep numbers >= 2 for SRA encryption
+            new_position -= 10  # Remove the addition added to keep numbers >= 2 for SRA encryption
             for ident, peer in self.peer_map.items():
                 if peer['roll'] == new_position:
                     new_positions.append((ident, i))

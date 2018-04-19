@@ -12,6 +12,7 @@ from poker_rounds.poker_game import PokerWords
 from poker_rounds.poker_sequencer import PokerHandGameSequencer
 from poker_rounds.secure_deck_shuffle import DeckShuffleClient
 from secure_decryption_client import SecureShuffleSampleDecryptor
+from secure_player_ordering import PlayerShuffleClient
 
 logger = logging.getLogger()
 
@@ -92,6 +93,11 @@ def test_shuffling_client():
 #     assert sorted(deck_states[0]) == list(range(1, 10))
 #     assert (all(d == deck_states[0] for d in deck_states))
 
+def test_secure_player_ordering():
+    rounds = ManualGameSequencer([InsecureOrderedClient, PlayerShuffleClient])
+    x = start_async_rounds(rounds, 3)
+
+
 
 def test_secure_deck_shuffling():
     rounds = ManualGameSequencer(
@@ -128,8 +134,8 @@ def test_hand_reveal_client():
     assert all(
         (d.cash_in_pot == playermaps[0].cash_in_pot for d in playermaps))
 
-
-def test_lots_of_rounds():
-    for _ in range(0, 40):
-        poker_sequencer = PokerHandGameSequencer()
-        start_async_rounds(poker_sequencer, 3)
+#
+# def test_lots_of_rounds():
+#     for _ in range(0, 40):
+#         poker_sequencer = PokerHandGameSequencer()
+#         start_async_rounds(poker_sequencer, 3)

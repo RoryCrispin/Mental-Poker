@@ -3,8 +3,7 @@ from random import shuffle
 
 from client import LogLevel
 from crypto.makeRsaKeys import SraKey
-from crypto_deck import CryptoCard, CryptoWords
-from poker_rounds.poker_game import PokerWords
+from crypto_deck import CryptoWords
 from turn_taking_client import TurnTakingClient
 
 
@@ -71,30 +70,9 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
 
     def get_final_state(self):
         state = super().get_final_state()
-        cryptodeck = self.init_cryptodeck()
         state.update({
-            PokerWords.CRYPTODECK_STATE: cryptodeck,
-            PokerWords.DECK_STATE: self.shuffle_state,
             CryptoWords.SRA_KEY: self.key
         })
         return state
 
-    def init_cryptodeck(self):
-        cryptodeck = []
-        i = 0
-        for card in self.shuffle_state:
-            cryptocard = CryptoCard()
-            cryptocard.generate_card(self.encryptd_by, card, i)
-            cryptodeck.append(cryptocard)
 
-        # Prepare the cardlib with their assigned player.
-        index = 0
-        for player_index in range(0, self.max_players):
-            for _ in range(0, 2):
-                cryptodeck[index].dealt_to = player_index
-                index += 1
-        # Prepare the table cards
-        for index in range(0, 5):
-            location = (self.max_players * 2) + index
-            cryptodeck[location].dealt_to = -1 - index
-        return cryptodeck

@@ -10,6 +10,8 @@ from poker_rounds.poker_sequencer import PokerHandGameSequencer
 
 ai_betting_player = AIBettingPlayer()
 rounds = PokerHandGameSequencer()
+
+# rounds = ManualGameSequencer([InsecureOrderedClient, PlayerShuffleClient, ShuffledPlayerDecryptionClient])
 cli = CommsClient(rounds, {'betting_player': ai_betting_player}).begin()
 
 print("~~~~~~~ Game State Log ~~~~~~~~~~")

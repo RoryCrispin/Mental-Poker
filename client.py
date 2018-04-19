@@ -71,7 +71,7 @@ class GameClient:
         self.peer_map = None
         self.state = state
         self.previous_state = {}
-        self.logger = logging.getLogger("pkr")
+        # self.logger = logging.getLogger("pkr")
         self.queue_map.extend([(self.IDENT_REQ_KEY,
                                 self.recv_identify_request),
                                (self.IDENT_RESP_KEY,
