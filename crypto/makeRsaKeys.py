@@ -3,6 +3,7 @@
 # http://inventwithpython.com/hacking (BSD Licensed)
 
 import random
+from asyncio import sleep
 
 import crypto.cryptomath as cryptomath
 import crypto.rabinMiller as rabinMiller
@@ -62,6 +63,22 @@ class SraKey:
         self.e = e
         self.d = d
         self.pq = (p, q)
+
+        print("Using e = {}".format(e))
+
+    def bruteforce_key(self, key_size, pq, ciphertext, expected):
+        self.p, self.q = pq
+        self.n = self.p * self.q
+
+        for e in range(2 ** (key_size - 1), 2 ** key_size):
+            if cryptomath.gcd(e, (self.p - 1) * (self.q - 1)) == 1:
+                self.d = cryptomath.find_mod_inverse(e, (self.p - 1) * (self.q - 1))
+                self.e = e
+                print("Checking e = {}".format(e))
+                sleep(1)
+                if self.decrypt_message(ciphertext) == expected:
+                    print("DONE")
+                    return e
 
     def encrypt_message(self, message):
         return pow(message, self.e, self.n)
