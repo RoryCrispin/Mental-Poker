@@ -9,7 +9,7 @@ from redis_client import RedisClient
 class CommsClient(RedisClient):
     def __init__(self, game_sequencer: GameSequencer, round_args=None):
         super().__init__('poker_chan')
-        self.log_level = 0
+        self.log_level = 100
         self.round_args = {} if round_args is None else round_args
         self.logger = logging.getLogger("pkr")
         self.round_list_index = 0
@@ -50,8 +50,9 @@ class CommsClient(RedisClient):
         return to_all
 
     def log(self, log_level, message):
-        self.logged_messages.append((log_level, message))
-        print("{} <> {}".format(str(log_level), message))
+        if log_level > self.log_level:
+            self.logged_messages.append((log_level, message))
+            print("{} <> {}".format(str(log_level), message))
 
     def advance_to_next_round(self):
         return self.game_sequencer.advance_to_next_round(

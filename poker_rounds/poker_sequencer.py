@@ -1,4 +1,8 @@
 # coding=utf-8
+from time import time
+
+import yaml
+
 from game_sequencer import GameSequencer
 from ordered_turn_client import InsecureOrderedClient
 from poker_rounds.betting_round_client import BettingClient
@@ -36,7 +40,6 @@ class PokerHandGameSequencer(GameSequencer):
             HandDecoder: False,
             PokerSetup: False,
         }
-
         self.betting_round_order = {
             self.FIRST_BETTING_ROUND: False,
             self.FLOP_REVEAL: False,
@@ -59,15 +62,14 @@ class PokerHandGameSequencer(GameSequencer):
             self.RIVER_REVEAL: OpenCardRevealClient,
             self.SHOWDOWN: ShowdownDeckDecryptor
         }
-
-        self.betting_rounds_played = 0
-        self.open_cards_revealed = 0
-        self.game_over = False
+        self.timestamps = []
 
     def advance_to_next_round(self, cli, state=None):
         self.update_round_completion_list(state)
         for client, complete in self.round_order.items():
             if not complete:
+                self.timestamps.append([client.__name__, time()])
+                print(yaml.dump(self.timestamps))
                 next_round = client(cli, state)
                 next_round.init_state()
                 if next_round.is_round_over():
@@ -77,14 +79,18 @@ class PokerHandGameSequencer(GameSequencer):
                     return next_round
         next_round = self.get_betting_reveal_state(state)
         if next_round is not None:
+            self.timestamps.append([next_round.__name__, time()])
+            print(yaml.dump(self.timestamps))
             next_round = next_round(cli, state)
             next_round.init_state()
             return next_round
 
-    def has_deck_been_shuffled(self, state):
+    @staticmethod
+    def has_deck_been_shuffled(state):
         return state.get('crypto_deck_state') is not None
 
-    def have_finished_dealing(self, state):
+    @staticmethod
+    def have_finished_dealing(state):
         finished_dealing = True
         for card in state.get('crypto_deck_state'):
             if card.dealt_to is None:
@@ -96,7 +102,8 @@ class PokerHandGameSequencer(GameSequencer):
                 break
         return finished_dealing
 
-    def hand_has_been_decoded(self, state):
+    @staticmethod
+    def hand_has_been_decoded(state):
         return state.get('hand') is not None
 
     def update_round_completion_list(self, state):

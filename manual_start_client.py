@@ -1,7 +1,7 @@
 # coding=utf-8
+import time
 from os import path
 
-import time
 from yaml import dump
 
 from client import CommsClient
@@ -13,6 +13,8 @@ rounds = PokerHandGameSequencer()
 
 # rounds = ManualGameSequencer([InsecureOrderedClient, PlayerShuffleClient, ShuffledPlayerDecryptionClient])
 cli = CommsClient(rounds, {'betting_player': ai_betting_player}).begin()
+
+print("- [Game Over, {}]".format(time.time()))
 
 print("~~~~~~~ Game State Log ~~~~~~~~~~")
 print(dump(cli['game'].state_log))
