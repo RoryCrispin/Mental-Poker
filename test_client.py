@@ -4,8 +4,8 @@ from multiprocessing import Pool
 
 from time import sleep
 
-from aes_keyshare_client import AESKeyshareClient
 from client import CommsClient, GreetingCli
+from fernet_keyshare_client import FernetKeyshareClient
 from game_sequencer import ManualGameSequencer
 from ordered_turn_client import InsecureOrderedClient
 from poker_rounds.card_reveal_client import CardRevealClient
@@ -57,11 +57,11 @@ def test_RSA_keys_match_three_way():
             assert pk_entry in actual_pubkeys
 
 
-def test_aes_keyshare():
-    rounds = ManualGameSequencer([InsecureOrderedClient, AESKeyshareClient])
+def test_fernet_keyshare():
+    rounds = ManualGameSequencer([InsecureOrderedClient, FernetKeyshareClient])
     x = start_async_rounds(rounds, 3)
-    assert x[0]['shared_aes_key'] is not None
-    assert all([y['shared_aes_key'] == x[0]['shared_aes_key'] for y in x])
+    assert x[0]['shared_fernet_key_params'] is not None
+    assert all([y['shared_fernet_key_params'] == x[0]['shared_fernet_key_params'] for y in x])
 
 
 def test_greeting_client():
@@ -144,7 +144,7 @@ def test_hand_reveal_client():
         (d.cash_in_pot == playermaps[0].cash_in_pot for d in playermaps))
 
 #
-# def test_lots_of_rounds():
-#     for _ in range(0, 40):
-#         poker_sequencer = PokerHandGameSequencer()
-#         start_async_rounds(poker_sequencer, 3)
+def test_lots_of_rounds():
+    for _ in range(0, 40):
+        poker_sequencer = PokerHandGameSequencer()
+        start_async_rounds(poker_sequencer, 3)

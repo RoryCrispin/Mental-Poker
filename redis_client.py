@@ -2,7 +2,6 @@
 from uuid import uuid4
 
 import redis
-from Crypto.Cipher.AES import AESCipher
 from yaml import load, dump
 
 
@@ -16,7 +15,6 @@ class RedisClient:
         self.p.subscribe(channel)
         self.queue = []
         self.do_encrypt_communication = False
-        self.aes_key: AESCipher = None
 
     def post_message(self, to=None, m_code=None, data=None):
         return self.r.publish(self.channel,
@@ -31,7 +29,7 @@ class RedisClient:
     def marshall_data(self, data):
         dumped_data = dump(data)
         if self.do_encrypt_communication:
-            encrypted_data = self.aes_key.encrypt(dumped_data.encode())
+            encrypted_data = self.fernet_key.encrypt(dumped_data.encode())
             return encrypted_data
         else:
             return dumped_data
@@ -39,24 +37,16 @@ class RedisClient:
     def unmarshall_data(self, data):
         pass
 
-    def start_encrypting_communication_with_key(self, aes_key):
+    def start_encrypting_communication_with_key(self, fernet_key):
         self.do_encrypt_communication = True
-        self.aes_key = aes_key
+        self.fernet_key = fernet_key
 
     def decode_message(self, message: dict):
         payload = load(message['data'])
         if payload['encrypted']:
-            decrypted_message = self.aes_key.decrypt(payload['data'])
+            decrypted_message = self.fernet_key.decrypt(payload['data'])
             payload['data'] = load(decrypted_message)
         else:
             payload['data'] = load(payload['data'])
         return payload
 
-
-class AESRedisClient(RedisClient):
-    def set_key(self, aes_key):
-        self.aes_key = aes_key
-
-    def post_message(self, to=None, m_code=None, data=None, encrypt=True):
-        encrypted_data = None
-        pass

@@ -2,7 +2,7 @@
 import yaml
 from time import time
 
-from aes_keyshare_client import AESKeyshareClient
+from fernet_keyshare_client import FernetKeyshareClient
 from game_sequencer import GameSequencer
 from ordered_turn_client import InsecureOrderedClient
 from poker_rounds.betting_round_client import BettingClient
@@ -34,7 +34,7 @@ class PokerHandGameSequencer(GameSequencer):
 
         self.round_order = {
             InsecureOrderedClient: False,
-            AESKeyshareClient: False,
+            FernetKeyshareClient: False,
             PlayerShuffleClient: False,
             ShuffledPlayerDecryptionClient: False,
             DeckShuffleClient: False,
@@ -118,9 +118,9 @@ class PokerHandGameSequencer(GameSequencer):
             self.round_order[InsecureOrderedClient] = True
             return InsecureOrderedClient
 
-        if not self.round_order[AESKeyshareClient]:
-            self.round_order[AESKeyshareClient] = True
-            return AESKeyshareClient
+        if not self.round_order[FernetKeyshareClient]:
+            self.round_order[FernetKeyshareClient] = True
+            return FernetKeyshareClient
 
         if not self.round_order[PlayerShuffleClient]:
             self.round_order[PlayerShuffleClient] = True
