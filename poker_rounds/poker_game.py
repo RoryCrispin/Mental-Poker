@@ -44,9 +44,9 @@ class PokerPlayer:
         self.winnings = 0
 
     def __str__(self):
-        return "Player : {}, Cash in hand: {}, Cash in pot {}".format(self.ident,
-                                                                      self.cash_in_hand,
-                                                                      self.cash_in_pot)
+        return "Player: {},\tCash in hand: {},\tCash in pot {}".format(self.ident,
+                                                                       self.cash_in_hand,
+                                                                       self.cash_in_pot)
 
     @property
     def is_all_in(self):

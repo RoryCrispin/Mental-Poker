@@ -2,7 +2,6 @@
 from Crypto.PublicKey import RSA
 
 from client import GameClient, LogLevel
-from client_logging import readable_ident
 
 
 class RSAKeyShareClient(GameClient):
@@ -25,7 +24,7 @@ class RSAKeyShareClient(GameClient):
             })
 
     def is_round_over(self):
-        return len(self.player_map) >= self.max_players
+        return len(self.peer_map) >= self.max_players
 
     def recv_pubkey(self, e):
         p_ident = e.get('sender_id')
@@ -33,7 +32,8 @@ class RSAKeyShareClient(GameClient):
         if self.get_player(p_ident) is None:  # If key not stored
             self.player_map.append((p_ident, p_key))
             self.cli.log(LogLevel.INFO, "Got pubkey from {}".format(
-                readable_ident(p_ident)))
+                (p_ident)))
+
             self.share_my_pubkey()
             self.send_handshake(p_ident)
 
@@ -51,16 +51,16 @@ class RSAKeyShareClient(GameClient):
                 'handshake': message,
             })
         self.cli.log(LogLevel.INFO, "Sent handshake to {}".format(
-            readable_ident(ident)))
+            (ident)))
 
     def recv_handshake(self, e):
         hand = (self.key.decrypt(e.get('data').get('handshake')))
         if hand == self.handshake_message:
             self.cli.log(LogLevel.INFO, "Handshake with {} OK".format(
-                readable_ident(e['sender_id'])))
+                (e['sender_id'])))
         else:
             self.cli.log(LogLevel.ERROR, "Bad handshake with client {}".format(
-                readable_ident(e['sender_id'])))
+                (e['sender_id'])))
 
     def get_player(self, ident):
         for p in self.player_map:

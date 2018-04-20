@@ -1,7 +1,6 @@
 # coding=utf-8
 import logging
 from multiprocessing import Pool
-
 from time import sleep
 
 from client import CommsClient, GreetingCli
@@ -11,6 +10,7 @@ from poker_rounds.card_reveal_client import CardRevealClient
 from poker_rounds.poker_game import PokerWords
 from poker_rounds.poker_sequencer import PokerHandGameSequencer
 from poker_rounds.secure_deck_shuffle import DeckShuffleClient
+from rsa_client import RSAKeyShareClient
 from secure_decryption_client import SecureShuffleSampleDecryptor
 from secure_player_ordering import PlayerShuffleClient
 
@@ -38,21 +38,21 @@ def start_game(args):
     return client_final_state
 
 
-# def test_RSA_keys_match_three_way():
-#     rounds = ManualGameSequencer([RSAKeyShareClient])
-#     x = start_async_rounds(rounds, 3)
-#     # For each client's state, extract it's own pubkey and ident as [(pk, id)]
-#     actual_pubkeys = [(y['ident'], y['pubkey']) for y in x]
-#     # Extract each player's list of external public keys
-#     playerlists = [y['playerlist'] for y in x]
-#
-#     assert playerlists is not None
-#     assert actual_pubkeys is not None
-#
-#     # Assert that all players lists of public keys match the actual values
-#     for player in playerlists:
-#         for pk_entry in player:
-#             assert pk_entry in actual_pubkeys
+def test_RSA_keys_match_three_way():
+    rounds = ManualGameSequencer([RSAKeyShareClient])
+    x = start_async_rounds(rounds, 3)
+    # For each client's state, extract it's own pubkey and ident as [(pk, id)]
+    actual_pubkeys = [(y['ident'], y['pubkey']) for y in x]
+    # Extract each player's list of external public keys
+    playerlists = [y['playerlist'] for y in x]
+
+    assert playerlists is not None
+    assert actual_pubkeys is not None
+
+    # Assert that all players lists of public keys match the actual values
+    for player in playerlists:
+        for pk_entry in player:
+            assert pk_entry in actual_pubkeys
 
 
 def test_greeting_client():

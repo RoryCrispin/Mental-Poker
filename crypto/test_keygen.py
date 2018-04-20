@@ -1,5 +1,5 @@
 # coding=utf-8
-from makeRsaKeys import SraKey
+from crypto.makeRsaKeys import SraKey
 
 
 def test_enc_dec_works():
@@ -8,6 +8,12 @@ def test_enc_dec_works():
     da = ka.decrypt_message(ea)
     assert da == 52
 
+
+# def test_break_encryption():
+#     ka = SraKey.from_new_primes(64)
+#     kb = SraKey.from_existing_primes(64, ka.get_public_primes())
+#     ea = ka.encrypt_message(52)
+#     kb.bruteforce_key(64, ka.get_public_primes(), ea, 52)
 
 def test_ea_eb_not_equal():
     ka = SraKey.from_new_primes(1024)
