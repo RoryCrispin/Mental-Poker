@@ -11,6 +11,7 @@ class RSAKeyShareClient(GameClient):
         self.max_players = max_players
         self.handshake_message = b'RSA_HANDSHAKE_MESSAGE'
         self.key = RSA.generate(2048)
+        self.cli.own_rsa_key = self.key
         self.queue_map.extend([('rsa_pubkey', self.recv_pubkey),
                                ('rsa_handshake', self.recv_handshake)])
         self.share_my_pubkey()
@@ -21,6 +22,8 @@ class RSAKeyShareClient(GameClient):
             data={
                 'message_key': 'rsa_pubkey',
                 'rsa_pubkey': self.key.publickey().exportKey('PEM').decode()
+                # TODO: We should be exporting the PUBLIC ONLY
+                # https://www.dlitz.net/software/pycrypto/api/2.6/
             })
 
     def is_round_over(self):
@@ -88,6 +91,7 @@ class RSAKeyShareClient(GameClient):
             'playerlist':
                 self.player_map
         })
+        self.cli.peer_rsa_keys = self.player_map
         return state
 
     def send_rsa_broadcast(self, message_key, message: bytes):
