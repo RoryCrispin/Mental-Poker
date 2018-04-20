@@ -5,14 +5,14 @@ from client import GameClient, LogLevel
 
 
 class RSAKeyShareClient(GameClient):
-    def __init__(self, cli, max_players=2):
-        super().__init__(cli)
+    def __init__(self, cli, state=None, max_players=3):
+        super().__init__(cli, state)
         self.player_map = []
         self.max_players = max_players
         self.handshake_message = b'RSA_HANDSHAKE_MESSAGE'
         self.key = RSA.generate(2048)
-        self.queue_map = [('rsa_pubkey', self.recv_pubkey),
-                          ('rsa_handshake', self.recv_handshake)]
+        self.queue_map.extend([('rsa_pubkey', self.recv_pubkey),
+                               ('rsa_handshake', self.recv_handshake)])
         self.share_my_pubkey()
 
     def share_my_pubkey(self):
@@ -24,7 +24,10 @@ class RSAKeyShareClient(GameClient):
             })
 
     def is_round_over(self):
-        return len(self.peer_map) >= self.max_players
+        return self.all_keys_recvd()
+
+    def all_keys_recvd(self):
+        return len(self.player_map) >= self.max_players - 1
 
     def recv_pubkey(self, e):
         p_ident = e.get('sender_id')
@@ -46,6 +49,7 @@ class RSAKeyShareClient(GameClient):
         message = peer_key_parse.encrypt(self.handshake_message, 0)
         self.cli.post_message(
             to=ident,
+            m_code=None,
             data={
                 'message_key': 'rsa_handshake',
                 'handshake': message,
@@ -53,11 +57,17 @@ class RSAKeyShareClient(GameClient):
         self.cli.log(LogLevel.INFO, "Sent handshake to {}".format(
             (ident)))
 
+    def alert_all_keys_recvd(self):
+        print("bobob")
+        pass
+
     def recv_handshake(self, e):
         hand = (self.key.decrypt(e.get('data').get('handshake')))
         if hand == self.handshake_message:
             self.cli.log(LogLevel.INFO, "Handshake with {} OK".format(
                 (e['sender_id'])))
+            if self.all_keys_recvd():
+                self.alert_all_keys_recvd()
         else:
             self.cli.log(LogLevel.ERROR, "Bad handshake with client {}".format(
                 (e['sender_id'])))
@@ -72,10 +82,24 @@ class RSAKeyShareClient(GameClient):
         state = (super(RSAKeyShareClient, self).get_final_state())
         state.update({
             'ident':
-            self.cli.ident,
+                self.cli.ident,
             'pubkey':
-            self.key.publickey().exportKey('PEM').decode(),
+                self.key.publickey().exportKey('PEM').decode(),
             'playerlist':
-            self.player_map
+                self.player_map
         })
         return state
+
+    def send_rsa_broadcast(self, message_key, message: bytes):
+        """Send a message to all players, encrypted individually with each of
+        their public keys"""
+        for ident, key in self.player_map:
+            if ident != self.cli.ident:
+                peer_key = RSA.importKey(key)
+                encrypted_message = peer_key.encrypt(message, 0)[0]
+                self.cli.post_message(to=ident,
+                                      data={
+                                          self.MESSAGE_KEY: message_key,
+                                          'message': encrypted_message,
+                                          'for': ident
+                                      })

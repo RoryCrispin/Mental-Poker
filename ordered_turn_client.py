@@ -105,7 +105,6 @@ class SecureOrderedClient(InsecureOrderedClient):
     """This class extends the client, when initialised all players will
     be ordered into a random 'position' such that we can handle them as
     though they were sitting around a physical table"""
-    # TODO: implement
     SHUFFLED_LIST = 'shuffled_list'
 
     def __init__(self, cli, state=None, max_players=3):

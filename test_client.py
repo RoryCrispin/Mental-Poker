@@ -1,8 +1,10 @@
 # coding=utf-8
 import logging
 from multiprocessing import Pool
+
 from time import sleep
 
+from aes_keyshare_client import AESKeyshareClient
 from client import CommsClient, GreetingCli
 from game_sequencer import ManualGameSequencer
 from ordered_turn_client import InsecureOrderedClient
@@ -53,6 +55,13 @@ def test_RSA_keys_match_three_way():
     for player in playerlists:
         for pk_entry in player:
             assert pk_entry in actual_pubkeys
+
+
+def test_aes_keyshare():
+    rounds = ManualGameSequencer([InsecureOrderedClient, AESKeyshareClient])
+    x = start_async_rounds(rounds, 3)
+    assert x[0]['shared_aes_key'] is not None
+    assert all([y['shared_aes_key'] == x[0]['shared_aes_key'] for y in x])
 
 
 def test_greeting_client():
