@@ -32,10 +32,8 @@ class RedisClient:
         dumped_data = dump(data)
         if self.do_encrypt_communication:
             encrypted_data = self.aes_key.encrypt(dumped_data.encode())
-            print("Encrypting ")
             return encrypted_data
         else:
-            print("Not Encrypting ")
             return dumped_data
 
     def unmarshall_data(self, data):
