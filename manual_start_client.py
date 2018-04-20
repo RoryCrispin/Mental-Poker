@@ -3,6 +3,7 @@ import time
 
 from aes_keyshare_client import AESKeyshareClient
 from client import CommsClient
+from client import GreetingCli
 from game_sequencer import ManualGameSequencer
 from ordered_turn_client import InsecureOrderedClient
 from poker_rounds.betting_player import AIBettingPlayer
@@ -10,7 +11,7 @@ from poker_rounds.poker_sequencer import PokerHandGameSequencer
 
 ai_betting_player = AIBettingPlayer()
 rounds = PokerHandGameSequencer()
-rounds = ManualGameSequencer([InsecureOrderedClient, AESKeyshareClient])
+rounds = ManualGameSequencer([InsecureOrderedClient, AESKeyshareClient, GreetingCli])
 
 # rounds = ManualGameSequencer([InsecureOrderedClient, PlayerShuffleClient, ShuffledPlayerDecryptionClient])
 cli = CommsClient(rounds, {'betting_player': ai_betting_player}).begin()

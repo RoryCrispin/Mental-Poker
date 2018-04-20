@@ -2,3 +2,5 @@ PyYAML
 pytest
 redis
 # Pycrypto has dependencies 'python3-devel' and 'redhat-rpm-config' on the Fedora RHEL build machine
+pycrypto
+cryptography

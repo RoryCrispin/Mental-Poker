@@ -29,7 +29,7 @@ class CommsClient(RedisClient):
                     break
                 if message['data'] == 'dump_game_log':
                     pass
-                payload = RedisClient.decode_message(message)
+                payload = self.decode_message(message)
                 # print(yaml.dump(payload['data']))
                 if self.message_is_for_me(payload):
                     self.queue.append(payload)
