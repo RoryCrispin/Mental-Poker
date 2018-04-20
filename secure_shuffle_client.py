@@ -2,7 +2,7 @@
 from random import shuffle
 
 from client import LogLevel
-from crypto.makeRsaKeys import SraKey
+from crypto.sra_keygen import SraKey
 from crypto_deck import CryptoWords
 from turn_taking_client import TurnTakingClient
 
@@ -13,7 +13,7 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
     SHARE_KEY = 'share_key'
     SHARE_PRIVATE = 'share_private'
     ENCRYPTED_BY = 'encrypted_by'
-    KEYSIZE = 128
+    KEYSIZE = 2048
     def __init__(self, cli, state=None, max_players=3):
         super().__init__(cli, state, max_players)
         self.queue_map.extend([(self.SHUFFLE_DECK, self.recv_shuffled_deck),
