@@ -36,7 +36,7 @@ class RedisClient:
         dumped_data = dump(data)
         if self.do_encrypt_communication:
             encrypted_data = self.fernet_key.encrypt(dumped_data.encode())
-            hashed_data = hashlib.sha224(encrypted_data).hexdigest()
+            hashed_data = hashlib.sha3_512(encrypted_data).hexdigest()
             signed_hash = self.own_rsa_key.sign(hashed_data.encode(), 0)
             return encrypted_data, signed_hash
         else:
@@ -59,8 +59,8 @@ class RedisClient:
     def verify_message_signiture(self, payload) -> bool:
         if payload['sender_id'] != self.ident:
             recv_hash = payload['hash']
-            gen_hash = hashlib.sha224(payload['data']).hexdigest()
-            peer_rsa_key_param = [x for x in self.peer_rsa_keys if x[0] == payload['sender_id']][0][1]
+            gen_hash = hashlib.sha3_512(payload['data']).hexdigest()
+            peer_rsa_key_param = [param for param in self.peer_rsa_keys if param[0] == payload['sender_id']][0][1]
             peer_rsa_key = RSA.importKey(peer_rsa_key_param)
             return peer_rsa_key.verify(gen_hash.encode(), recv_hash)
         else:

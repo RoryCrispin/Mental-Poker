@@ -5,7 +5,7 @@ import time
 from yaml import dump
 
 from client import CommsClient
-from poker_rounds.betting_player import HumanBettingPlayer
+from poker_rounds.human_betting_player import HumanBettingPlayer
 from poker_rounds.poker_sequencer import PokerHandGameSequencer
 
 ai_betting_player = HumanBettingPlayer()
