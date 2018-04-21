@@ -1,7 +1,8 @@
 # coding=utf-8
-# This class uses the structure of the textbook RSA key generation class provided by
-# http://inventwithpython.com/hacking (BSD Licensed) - it has been mofidied to use the stronger
-# PyCrypto library functions for prime generation and also rearranged to generate SRA keys rather than RSA keys.
+# This class uses the structure of the textbook RSA key generation class
+# provided by http://inventwithpython.com/hacking (BSD Licensed) - it has been
+# mofidied to use the stronger PyCrypto library functions for prime generation
+# and also rearranged to generate SRA keys rather than RSA keys.
 
 
 import random

@@ -1,6 +1,7 @@
 # coding=utf-8
 from cardlib.Hands import HandRank
-from poker_rounds.poker_game import PokerWords, PokerPlayer, fresh_deck, PokerGame
+from poker_rounds.poker_game import PokerWords, PokerPlayer, fresh_deck, \
+    PokerGame
 from secure_decryption_client import DeckDecryptionClient
 
 
@@ -49,7 +50,8 @@ class ShowdownDeckDecryptor(DeckDecryptionClient):
 
     def populate_showdown_reveal_cards(self, state):
         for card in state[PokerWords.CRYPTODECK_STATE]:
-            if card.dealt_to is not None and card.dealt_to < 0 and not card.has_been_dealt:
+            if card.dealt_to is not None and card.dealt_to < \
+                    0 and not card.has_been_dealt:
                 state.get('game').state_log.append(
                     {self.SHOWDOWN_REVEAL: str(card.get_card())})
 
@@ -64,9 +66,6 @@ class ShowdownDeckDecryptor(DeckDecryptionClient):
         return [(x, x.cash_in_pot) for x in poker_players if x.cash_in_pot > 0]
 
     def determine_winnings(self, poker_players, table_cards):
-        # hands = [(player, player.hand + table_cards) for player in poker_players if not player.folded]
-        # decoded_hands = [(x[0], HandRank.getHand(x[1])) for x in hands]
-        # sorted_hands = sorted(decoded_hands, key=lambda x: x[1], reverse=True)
 
         while len(self.get_invested_players(poker_players)) > 1:
             current_pot = 0
@@ -89,9 +88,10 @@ class ShowdownDeckDecryptor(DeckDecryptionClient):
     def update_game_state_log_with_winnings(self, poker_players):
         for player in poker_players:
             if player.winnings > 0:
-                self.state['game'].state_log.append({PokerGame.ACTION: PokerWords.WINNINGS,
-                                                     'ident': player.ident,
-                                                     PokerWords.WINNINGS: player.winnings})
+                self.state['game'].state_log.append(
+                    {PokerGame.ACTION: PokerWords.WINNINGS,
+                     'ident': player.ident,
+                     PokerWords.WINNINGS: player.winnings})
 
     # TODO: add support for draws!
     @staticmethod

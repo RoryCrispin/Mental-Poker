@@ -25,11 +25,6 @@ class TurnTakingClient(SecureOrderedClient):
             pass
 
     def recv_end_turn(self, data):
-        # TODO: Assert from correct player
-        # The issue causing incorr ect turn synchronisation -> Not clearing the queue buffer between rounds, left over
-        # messages need to be deleted
-
-        # TODO: This is common place where the game stops running turns
         if data['data'][self.ROOM_CODE] == self.room_code:
             if not data[self.SENDER_ID] == self.get_current_turn():
                 self.cli.log(LogLevel.ERROR,
@@ -92,4 +87,3 @@ class TurnTakingClient(SecureOrderedClient):
 
     def get_my_position(self):
         return self.peer_map[self.cli.ident]['roll']
-

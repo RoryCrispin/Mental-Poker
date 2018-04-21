@@ -9,7 +9,8 @@ from poker_rounds.betting_round_client import BettingClient
 from poker_rounds.open_card_reveal_client import OpenCardRevealClient
 from poker_rounds.poker_setup import PokerSetup
 from poker_rounds.showdown import ShowdownDeckDecryptor
-from secure_player_ordering import ShuffledPlayerDecryptionClient, PlayerShuffleClient
+from secure_player_ordering import ShuffledPlayerDecryptionClient, \
+    PlayerShuffleClient
 
 
 class PokerHandGameSequencer(GameSequencer):
@@ -29,7 +30,8 @@ class PokerHandGameSequencer(GameSequencer):
 
     def __init__(self):
         super().__init__()
-        from poker_rounds.card_reveal_client import CardRevealClient, HandDecoder
+        from poker_rounds.card_reveal_client import CardRevealClient, \
+            HandDecoder
         from poker_rounds.secure_deck_shuffle import DeckShuffleClient
 
         self.round_order = {
@@ -132,19 +134,26 @@ class PokerHandGameSequencer(GameSequencer):
 
         if self.has_deck_been_shuffled(state):
             self.round_order[DeckShuffleClient] = True
-            from poker_rounds.card_reveal_client import CardRevealClient, HandDecoder
-            self.round_order[CardRevealClient] = self.have_finished_dealing(state)
+            from poker_rounds.card_reveal_client import CardRevealClient, \
+                HandDecoder
+            self.round_order[CardRevealClient] = self.have_finished_dealing(
+                state)
             self.round_order[HandDecoder] = self.hand_has_been_decoded(state)
-            self.round_order[PokerSetup] = PokerSetup.have_built_poker_player_map(state)
+            self.round_order[PokerSetup] = \
+                PokerSetup.have_built_poker_player_map(
+                    state)
 
     def get_betting_reveal_state(self, state):
         for round_name, complete in self.betting_round_order.items():
             if not complete:
-                only_one_player_left = state.get('num_folded_players') is not None \
-                                       and state.get('num_folded_players') == (state.get('max_players') - 1)
+                only_one_player_left = state.get('num_folded_players') \
+                                       is not None \
+                                       and state.get('num_folded_players') \
+                                       == (state.get('max_players') - 1)
 
-                no_active_players = state.get('num_active_players') is not None \
-                                    and state.get('num_active_players') == 0
+                no_active_players = state.get('num_active_players') \
+                                    is not None and \
+                                    state.get('num_active_players') == 0
 
                 if only_one_player_left or no_active_players:
                     if not self.betting_round_order.get(self.SHOWDOWN):

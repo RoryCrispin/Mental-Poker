@@ -15,6 +15,7 @@ from poker_rounds.secure_deck_shuffle import DeckShuffleClient
 from rsa_client import RSAKeyShareClient
 from secure_decryption_client import SecureShuffleSampleDecryptor
 from secure_player_ordering import PlayerShuffleClient
+from shuffling_client import ShufflingClient
 
 logger = logging.getLogger()
 
@@ -61,7 +62,8 @@ def test_fernet_keyshare():
     rounds = ManualGameSequencer([InsecureOrderedClient, FernetKeyshareClient])
     x = start_async_rounds(rounds, 3)
     assert x[0]['shared_fernet_key_params'] is not None
-    assert all([y['shared_fernet_key_params'] == x[0]['shared_fernet_key_params'] for y in x])
+    assert all([y['shared_fernet_key_params'] == x[0]
+    ['shared_fernet_key_params'] for y in x])
 
 
 def test_greeting_client():
@@ -76,9 +78,6 @@ def test_insecure_ordering():
     x = start_async_rounds(rounds, 3)
     peermaps = [y['peer_map'] for y in x]
     assert all(x == peermaps[0] for x in peermaps)
-
-
-from shuffling_client import ShufflingClient
 
 
 def test_shuffling_client():
@@ -97,15 +96,14 @@ def test_shuffling_client():
 #     for client in x:
 #         deck_states.append(client.get(PokerWords.DECK_STATE))
 #     assert deck_states[0] != list(range(1, 10))
-#     # There's a 10! chance that this test will fail because the shuffled order
-#     # is actually 1..10
+#     # There's a 10! chance that this test will fail because the
+#     # shuffled order is actually 1..10
 #     assert sorted(deck_states[0]) == list(range(1, 10))
 #     assert (all(d == deck_states[0] for d in deck_states))
 
 def test_secure_player_ordering():
     rounds = ManualGameSequencer([InsecureOrderedClient, PlayerShuffleClient])
-    x = start_async_rounds(rounds, 3)
-
+    start_async_rounds(rounds, 3)
 
 
 def test_secure_deck_shuffling():
@@ -144,6 +142,8 @@ def test_hand_reveal_client():
         (d.cash_in_pot == playermaps[0].cash_in_pot for d in playermaps))
 
 #
+
+
 def test_lots_of_rounds():
     for _ in range(0, 40):
         poker_sequencer = PokerHandGameSequencer()

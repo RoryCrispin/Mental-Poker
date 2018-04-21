@@ -24,6 +24,8 @@ timing_2048 = """- [InsecureOrderedClient, 1524229849.785036]
 - [Game Over, 1524229864.594204]"""
 
 # Provided by: https://docs.python.org/3/library/itertools.html#recipes
+
+
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
     a, b = tee(iterable)
@@ -45,8 +47,11 @@ for pairs in pairwise(timings):
     print("{}, {}, {}, {}".format(round_name, time_started, time_ended, i))
     i += 1
 
-"""R command 1024:
-ggplot(dat, aes(color=name)) + geom_segment(aes(x=started, xend=ended, y=index, yend=index, size=3)) 
-+ geom_text(aes(label=name, x=ended, y=index, size=3), check_overlap = TRUE, hjust=FALSE, nudge_x =0.3) 
-+ theme(legend.position = "none") + scale_x_continuous(name="Time Elapsed (s)", limits = c(0,19), breaks = seq(0,19, 2))
-+ scale_y_continuous(breaks= NULL, name = "") + ggtitle("Timing diagram for SRA keysize : 1024")"""
+"""R command 1024: ggplot(dat, aes(color=name)) + geom_segment(aes(x=started,
+xend=ended, y=index, yend=index, size=3)) + geom_text(aes(label=name, x=ended,
+y=index, size=3), check_overlap = TRUE, hjust=FALSE, nudge_x =0.3) +
+theme(legend.position = "none") + scale_x_continuous(name="Time Elapsed (s)",
+limits = c(0,19), breaks = seq(0,19, 2)) + scale_y_continuous(breaks= NULL,
+name = "") + ggtitle("Timing diagram for SRA keysize : 1024")
+
+"""

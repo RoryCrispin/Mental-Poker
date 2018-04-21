@@ -28,7 +28,8 @@ class FernetKeyshareClient(RSAKeyShareClient):
             keyparams = self.generate_fernet_key()
             self.fernet_key_passphrase = keyparams
             print("I am master, sharing secret...")
-            self.send_rsa_broadcast(self.SHARE_SECRET, dump(keyparams).encode())
+            self.send_rsa_broadcast(
+                self.SHARE_SECRET, dump(keyparams).encode())
 
     def generate_fernet_key(self):
         key = Fernet.generate_key()
@@ -40,8 +41,10 @@ class FernetKeyshareClient(RSAKeyShareClient):
 
     def get_final_state(self):
         state = super().get_final_state()
-        state.update({self.SHARED_FERNET_KEY_PARAMS: self.fernet_key_passphrase})
-        self.cli.start_encrypting_communication_with_key(fernet_key=self.fernet_key)
+        state.update(
+            {self.SHARED_FERNET_KEY_PARAMS: self.fernet_key_passphrase})
+        self.cli.start_encrypting_communication_with_key(
+            fernet_key=self.fernet_key)
         return state
 
     def recv_secret(self, data):

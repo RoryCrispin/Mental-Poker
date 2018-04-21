@@ -67,7 +67,7 @@ class CardRevealClient(TurnTakingClient):
             self.card.removed_lock(
                 data[self.SENDER_ID], data['data'][self.REMOVE_LOCK])
             self.cli.log(LogLevel.VERBOSE,
-                         "Recv lock removed by {}".format(data[self.SENDER_ID]))
+                         "Rcv decryption from {}".format(data[self.SENDER_ID]))
 
             if self.received_all_peer_keys() and self.is_my_card():
                 self.remove_my_lock()

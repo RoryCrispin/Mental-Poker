@@ -8,6 +8,7 @@ def test_enc_dec_works():
     da = ka.decrypt_message(ea)
     assert da == 52
 
+
 def test_ea_eb_not_equal():
     ka = SraKey.from_new_primes(1024)
     kb = SraKey.from_existing_primes(1024, ka.get_public_primes())

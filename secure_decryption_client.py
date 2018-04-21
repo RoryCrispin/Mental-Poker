@@ -6,9 +6,11 @@ from turn_taking_client import TurnTakingClient
 
 
 class SecureDecryptionClient(TurnTakingClient):
-    def __init__(self, cli, state=None, max_players=3, private_component_key=None):
+    def __init__(self, cli, state=None, max_players=3,
+                 private_component_key=None):
         super().__init__(cli, state, max_players)
-        self.private_component_key = CryptoWords.PRIVATE_COMPONENT if private_component_key is None \
+        self.private_component_key = CryptoWords.PRIVATE_COMPONENT \
+            if private_component_key is None \
             else private_component_key
 
         self.queue_map.extend(

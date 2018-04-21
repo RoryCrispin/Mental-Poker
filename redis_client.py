@@ -9,6 +9,7 @@ from yaml import load, dump
 
 class RedisClient:
     BLOCK_SIZE = 16
+
     def __init__(self, channel):
         self.ident = str(uuid4())
         self.channel = channel
@@ -60,7 +61,9 @@ class RedisClient:
         if payload['sender_id'] != self.ident:
             recv_hash = payload['hash']
             gen_hash = hashlib.sha3_512(payload['data']).hexdigest()
-            peer_rsa_key_param = [param for param in self.peer_rsa_keys if param[0] == payload['sender_id']][0][1]
+            peer_rsa_key_param = [
+                param for param in self.peer_rsa_keys
+                if param[0] == payload['sender_id']][0][1]
             peer_rsa_key = RSA.importKey(peer_rsa_key_param)
             return peer_rsa_key.verify(gen_hash.encode(), recv_hash)
         else:

@@ -36,9 +36,6 @@ class OpenCardRevealClient(CardRevealClient):
                 self.card.value))
         self.card.has_been_dealt = True
         state = super().get_final_state()
-        # if state.get(PokerWords.OPEN_CARDS) is None:
-        #     state[PokerWords.OPEN_CARDS] = []
-        # state[PokerWords.OPEN_CARDS].append((self.card.dealt_to, self.card.value))
         state['game'].state_log.append(
             {PokerGame.CARD_REVEAL: str(self.card.get_card())})
         return state

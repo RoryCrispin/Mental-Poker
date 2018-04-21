@@ -7,9 +7,9 @@ from turn_taking_client import TurnTakingClient
 
 
 class BettingClient(TurnTakingClient):
-    """
-    The betting client handles all game logic relating to the betting round of a game of
-    poker. It will look for the
+    """The betting client handles all game logic relating to the betting
+    round of a game of poker. It will look for the
+
     """
     BET_AMOUNT = 'bet_amount'
 
@@ -91,7 +91,8 @@ class BettingClient(TurnTakingClient):
     def take_turn(self):
         possible_moves = self.get_possible_moves_for_player(self.player)
         max_bet = self.get_max_raise(self.player)
-        (next_move, bet_size) = self.betting_player.get_move(self, possible_moves, max_bet)
+        (next_move, bet_size) = self.betting_player.get_move(
+            self, possible_moves, max_bet)
 
         if next_move == BettingCodes.CALL:
             self.make_call()
@@ -215,11 +216,10 @@ class BettingClient(TurnTakingClient):
 
     def is_round_over(self):
         # TODO: Get rid of all_players_moved
-        all_players_called_last_raise = self.all_active_players_have_called_last_raise()
         one_unfolded_player = len(
             self.get_folded_players()) == (
                                       self.max_players - 1)
-        if all_players_called_last_raise or one_unfolded_player:
+        if self.all_players_called_last_raise() or one_unfolded_player:
             self.cli.log(LogLevel.INFO, "End of betting round")
             if self.get_peer_at_position(0)[0] == self.cli.ident:
                 self.send_round_message(self.LEAVE_ROOM, {})

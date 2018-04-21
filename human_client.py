@@ -15,9 +15,9 @@ cli = CommsClient(rounds, {'betting_player': ai_betting_player}).begin()
 print("~~~~~~~ Game State Log ~~~~~~~~~~")
 print(dump(cli['game'].state_log))
 scriptpath = os.path.dirname(__file__)
-filename = os.path.join(scriptpath,
-                        'states/{}_{}.txt'.format(time.time(),
-                                                  cli['peer_map'][cli['ident']]['roll']))
+filename = cli['peer_map'][cli['ident']]['roll']
+fila_path = os.path.join(
+    scriptpath, 'states/{}_{}.txt'.format(time.time(), filename))
 
 with open(filename, 'w') as f:
     f.write(dump(cli))

@@ -14,4 +14,3 @@ class AIBettingPlayer:
         if move == BettingCodes.BET:
             bet_size = randint(1, max_bet)
         return (move, bet_size)
-
