@@ -2,6 +2,7 @@ import os
 
 import yaml
 
+from cardlib.Card import Card
 from poker_rounds.poker_game import BettingCodes, PokerPlayer
 
 
@@ -24,6 +25,10 @@ class HumanBettingPlayer:
         print("~~~~~~~~~[ Poker Game ]~~~~~~~~~~")
         print(yaml.dump(game_round.game.state_log))
         HumanBettingPlayer.print_player_states(game_round)
+        print("Your cards: ", end='')
+        for cardval in game_round.state['hand']:
+            print(" %s " % (Card(cardval)), end='')
+        print("")
 
     # pragma: no cover
     @staticmethod

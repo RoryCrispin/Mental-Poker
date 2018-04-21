@@ -252,17 +252,6 @@ class BettingClient(TurnTakingClient):
                 all_in_players.append(player)
         return all_in_players
 
-    def get_active_pots(self):
-        active_pots = []
-        player: PokerPlayer
-        for player in self.get_every_player():
-            if not player.folded and not player.is_all_in:
-                active_pots.append(player.cash_in_pot)
-        return active_pots
-
-    def get_all_pots(self):
-        return [player.cash_in_hand for player in self.get_every_player()]
-
     def get_every_player(self):
         players = []
         for _, peer in self.peer_map.items():
@@ -278,10 +267,6 @@ class BettingClient(TurnTakingClient):
     def all_active_players_have_called_last_raise(self):
         return all([player.last_raise_i_have_called == self.game.last_raise
                     for player in self.get_active_players()])
-
-    def players_have_called_last_raise(self):
-        return [player.last_raise_i_have_called == self.game.last_raise
-                for player in self.get_active_players()]
 
     def get_player_from_turn_message(self, data) -> PokerPlayer:
         return self.peer_map[data[self.SENDER_ID]][PokerPlayer.POKER_PLAYER]

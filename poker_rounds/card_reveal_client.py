@@ -18,7 +18,7 @@ class CardRevealClient(TurnTakingClient):
         self.card = CryptoCard()
         self.cryptodeck_state = None
         self.key = None
-        self.hand = None
+        self.hand = []
 
     def init_existing_state(self, state):
         self.cryptodeck_state = state[PokerWords.CRYPTODECK_STATE]
@@ -75,6 +75,7 @@ class CardRevealClient(TurnTakingClient):
                     LogLevel.INFO,
                     "Received locked card: {}".format(
                         self.card.value))
+                self.hand.append(self.card)
 
     def is_card_valid(self):
         if self.card.value in range(10, 62):

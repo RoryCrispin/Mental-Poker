@@ -9,12 +9,12 @@ ai_betting_player = AIBettingPlayer()
 rounds = PokerHandGameSequencer()
 
 # rounds = ManualGameSequencer([InsecureOrderedClient, PlayerShuffleClient, ShuffledPlayerDecryptionClient])
-cli = CommsClient(rounds, {'betting_player': ai_betting_player}).begin()
+cli, am = CommsClient(rounds, {'betting_player': ai_betting_player}).begin()
 
 print("- [Game Over, {}]".format(time.time()))
 
 # print(dump(cli))
-# print("~~~~~~~ Game State Log ~~~~~~~~~~")
+print("~~~~~~~ Game State Log ~~~~~~~~~~")
 # print(dump(cli['game'].state_log))
 # scriptpath = path.dirname(__file__)
 # filename = path.join(scriptpath,
@@ -25,3 +25,4 @@ print("- [Game Over, {}]".format(time.time()))
 #     f.write(dump(cli))
 #     f.close()
 # pass
+print(am)
