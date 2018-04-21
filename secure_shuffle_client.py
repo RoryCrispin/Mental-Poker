@@ -73,5 +73,3 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
             CryptoWords.SRA_KEY: self.key
         })
         return state
-
-

@@ -17,13 +17,10 @@ class RSAKeyShareClient(GameClient):
         self.share_my_pubkey()
 
     def share_my_pubkey(self):
-        print("Sharing my pubkey")
         self.cli.post_message(
             data={
                 'message_key': 'rsa_pubkey',
                 'rsa_pubkey': self.key.publickey().exportKey('PEM').decode()
-                # TODO: We should be exporting the PUBLIC ONLY
-                # https://www.dlitz.net/software/pycrypto/api/2.6/
             })
 
     def is_round_over(self):
