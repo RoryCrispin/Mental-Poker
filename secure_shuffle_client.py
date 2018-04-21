@@ -13,7 +13,8 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
     SHARE_KEY = 'share_key'
     SHARE_PRIVATE = 'share_private'
     ENCRYPTED_BY = 'encrypted_by'
-    KEYSIZE = 128
+    KEYSIZE = 512
+
     def __init__(self, cli, state=None, max_players=3):
         super().__init__(cli, state, max_players)
         self.queue_map.extend([(self.SHUFFLE_DECK, self.recv_shuffled_deck),
@@ -73,5 +74,3 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
             CryptoWords.SRA_KEY: self.key
         })
         return state
-
-
