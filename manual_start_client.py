@@ -1,5 +1,6 @@
 # coding=utf-8
 import time
+from yaml import dump
 
 from client import CommsClient
 from poker_rounds.betting_player import AIBettingPlayer
@@ -8,13 +9,13 @@ from poker_rounds.poker_sequencer import PokerHandGameSequencer
 ai_betting_player = AIBettingPlayer()
 rounds = PokerHandGameSequencer()
 
-# rounds = ManualGameSequencer([InsecureOrderedClient, PlayerShuffleClient, ShuffledPlayerDecryptionClient])
-cli = CommsClient(rounds, {'betting_player': ai_betting_player}).begin()
+cli = CommsClient(rounds, {'betting_player': ai_betting_player, 'log_level': 100}).begin()
 
 print("- [Game Over, {}]".format(time.time()))
 
-# print(dump(cli))
 print("~~~~~~~ Game State Log ~~~~~~~~~~")
+print(dump(cli['game'].state_log))
+print("My Ident: %s" % cli['ident'])
 # print(dump(cli['game'].state_log))
 # scriptpath = path.dirname(__file__)
 # filename = path.join(scriptpath,

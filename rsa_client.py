@@ -58,7 +58,6 @@ class RSAKeyShareClient(GameClient):
             (ident)))
 
     def alert_all_keys_recvd(self):
-        print("bobob")
         pass
 
     def recv_handshake(self, e):

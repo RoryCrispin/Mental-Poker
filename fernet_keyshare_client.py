@@ -27,7 +27,6 @@ class FernetKeyshareClient(RSAKeyShareClient):
         if self.if_am_master_player():
             keyparams = self.generate_fernet_key()
             self.fernet_key_passphrase = keyparams
-            print("I am master, sharing secret...")
             self.send_rsa_broadcast(
                 self.SHARE_SECRET, dump(keyparams).encode())
 

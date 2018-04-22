@@ -34,7 +34,6 @@ def start_async_rounds(game_round, process_count):
 
 
 def start_game(args):
-    print("start gamne")
     game_round, sleeptime, start_delay = args
     sleep(sleeptime)
     client_final_state = CommsClient(game_round).begin()

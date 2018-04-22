@@ -9,8 +9,9 @@ from redis_client import RedisClient
 class CommsClient(RedisClient):
     def __init__(self, game_sequencer: GameSequencer, round_args=None):
         super().__init__('poker_chan')
-        self.log_level = 0
         self.round_args = {} if round_args is None else round_args
+        args_log_level = self.round_args.get('log_level')
+        self.log_level = 0 if args_log_level is None else args_log_level
         self.logger = logging.getLogger("pkr")
         self.round_list_index = 0
         self.game_sequencer = game_sequencer

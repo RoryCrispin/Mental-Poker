@@ -29,9 +29,7 @@ class SraKey:
 
     def generate_primes(keysize):
         # Step 1: Create two prime numbers, p and q. Calculate n = p * q.
-        print('Generating p prime...')
         p = getStrongPrime(keysize)
-        print('Generating q prime...')
         q = getStrongPrime(keysize)
         return p, q
 
@@ -40,7 +38,6 @@ class SraKey:
             p = getStrongPrime(key_size)
             q = getStrongPrime(key_size)
         else:
-            print("Using pre-generated primes")
             p, q = pq
         n = p * q
 
@@ -57,7 +54,6 @@ class SraKey:
         self.d = d
         self.pq = (p, q)
 
-        print("Using e = {}".format(e))
 
     def encrypt_message(self, message):
         return pow(message, self.e, self.n)

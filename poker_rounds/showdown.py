@@ -1,4 +1,5 @@
 # coding=utf-8
+
 from cardlib.Hands import HandRank
 from poker_rounds.poker_game import PokerWords, PokerPlayer, fresh_deck, \
     PokerGame
@@ -21,6 +22,7 @@ class ShowdownDeckDecryptor(DeckDecryptionClient):
         self.check_original_deck_was_valid(self.deck_state)
         poker_players = self.get_list_of_poker_players(state)
         table_cards = self.get_table_cards(state)
+        self.update_game_state_log_with_player_hands(poker_players, table_cards)
         self.determine_winnings(poker_players, table_cards)
         state.update({PokerWords.DECK_STATE: self.deck_state,
                       'poker_players': poker_players,
@@ -61,6 +63,11 @@ class ShowdownDeckDecryptor(DeckDecryptionClient):
                 peer = self.get_peer_at_position(card.dealt_to)[1]
                 peer[PokerPlayer.POKER_PLAYER].hand.append(card.get_card())
 
+        for ident, peer in self.peer_map.items():
+            self.state['game'].state_log.append({PokerGame.ACTION: 'private_cards',
+                                                 'player': peer[PokerPlayer.POKER_PLAYER].ident,
+                                                 'hand': str(peer[PokerPlayer.POKER_PLAYER].hand)})
+
     @staticmethod
     def get_pots(poker_players):
         return [(x, x.cash_in_pot) for x in poker_players if x.cash_in_pot > 0]
@@ -85,6 +92,13 @@ class ShowdownDeckDecryptor(DeckDecryptionClient):
 
         self.update_game_state_log_with_winnings(poker_players)
 
+    def update_game_state_log_with_player_hands(self, list_of_players, table_cards):
+        hands = [(x[0].ident, str(x[1])) for x in self.get_sorted_hands(list_of_players, table_cards)]
+        self.state['game'].state_log.append({
+            PokerGame.ACTION: 'unfolded_player_hands',
+            'unfolded_player_hands': hands
+        })
+
     def update_game_state_log_with_winnings(self, poker_players):
         for player in poker_players:
             if player.winnings > 0:
@@ -95,12 +109,15 @@ class ShowdownDeckDecryptor(DeckDecryptionClient):
 
     # TODO: add support for draws!
     @staticmethod
-    def get_winner(list_of_players, table_cards):
+    def get_sorted_hands(list_of_players, table_cards):
         hands = [(player, player.hand + table_cards)
                  for player in list_of_players if not player.folded]
         decoded_hands = [(x[0], HandRank.getHand(x[1])) for x in hands]
         sorted_hands = sorted(decoded_hands, key=lambda x: x[1], reverse=True)
-        return sorted_hands[0]
+        return sorted_hands
+
+    def get_winner(self, list_of_players, table_cards):
+        return self.get_sorted_hands(list_of_players, table_cards)[0]
 
     @staticmethod
     def get_invested_players(poker_players):

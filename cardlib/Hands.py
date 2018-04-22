@@ -37,6 +37,15 @@ class Hand:
         return (self.getEnum(), self.get_kickers()) > \
                (other.getEnum(), other.get_kickers())
 
+    def __str__(self):
+        val = ""
+        val += self.enum.__str__()
+        val += ", Kickers: "
+        for kicker in self.kickers:
+            val += str(kicker)
+            val += ", "
+        return val
+
 
 class HandRank:
     @staticmethod
