@@ -219,7 +219,7 @@ class BettingClient(TurnTakingClient):
         one_unfolded_player = len(
             self.get_folded_players()) == (
                                       self.max_players - 1)
-        if self.all_players_called_last_raise() or one_unfolded_player:
+        if self.all_active_players_have_called_last_raise() or one_unfolded_player:
             self.cli.log(LogLevel.INFO, "End of betting round")
             if self.get_peer_at_position(0)[0] == self.cli.ident:
                 self.send_round_message(self.LEAVE_ROOM, {})
