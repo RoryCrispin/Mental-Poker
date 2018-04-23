@@ -16,7 +16,6 @@ from secure_player_ordering import ShuffledPlayerDecryptionClient, \
 class PokerHandGameSequencer(GameSequencer):
     SHUFFLE_DECK_PHASE = 'shuffle_deck_phase'
     DEAL_CARD_PHASE = 'deal_card_phase'
-
     FIRST_BETTING_ROUND = 'first_betting_round'
     FLOP_REVEAL = 'flop_reveal'
     FLOP_REVEAL_TWO = 'flop_reveal_two'
@@ -25,8 +24,11 @@ class PokerHandGameSequencer(GameSequencer):
     TURN_REVEAL = 'turn_reveal'
     THIRD_BETTING_ROUND = 'third_betting_round'
     RIVER_REVEAL = 'river_reveal'
+    FOURTH_BETTING_ROUND = 'fourth_betting_round'
     SHOWDOWN = 'showdown'
-    DEBUG_TIMINGS = False
+    # Print the timestamps between rounds - this is useful for generating
+    # the timing diagram as shown in report
+    DEBUG_TIMINGS = True
 
     def __init__(self):
         super().__init__()
@@ -53,6 +55,7 @@ class PokerHandGameSequencer(GameSequencer):
             self.TURN_REVEAL: False,
             self.THIRD_BETTING_ROUND: False,
             self.RIVER_REVEAL: False,
+            self.FOURTH_BETTING_ROUND: False,
             self.SHOWDOWN: False
         }
         self.betting_round_map = {
@@ -64,6 +67,7 @@ class PokerHandGameSequencer(GameSequencer):
             self.TURN_REVEAL: OpenCardRevealClient,
             self.THIRD_BETTING_ROUND: BettingClient,
             self.RIVER_REVEAL: OpenCardRevealClient,
+            self.FOURTH_BETTING_ROUND: BettingClient,
             self.SHOWDOWN: ShowdownDeckDecryptor
         }
         self.timestamps = []

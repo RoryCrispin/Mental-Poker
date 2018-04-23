@@ -1,4 +1,5 @@
 # coding=utf-8
+import uuid
 
 from client_logging import LogLevel
 from poker_rounds.betting_player import AIBettingPlayer
@@ -61,7 +62,7 @@ class BettingClient(TurnTakingClient):
         if not self.state.get('betting_run'):
             self.init_blind_bets()
         else:
-            self.game.last_raise = None
+            self.game.last_raise = uuid.uuid4()
 
         self.player = self.peer_map[self.cli.ident][PokerPlayer.POKER_PLAYER]
         if self.is_my_turn() and not self.is_round_over():
@@ -78,9 +79,6 @@ class BettingClient(TurnTakingClient):
                 possible_moves.append(BettingCodes.ALLIN)
                 possible_moves.append(BettingCodes.FOLD)
             if player.cash_in_hand > self.cash_needed_for_call(player):
-                # We make calling more likely TODO: remove
-                possible_moves.append(BettingCodes.CALL)
-                possible_moves.append(BettingCodes.CALL)
                 possible_moves.append(BettingCodes.CALL)
                 if self.get_max_raise(player) > 0:
                     possible_moves.append(BettingCodes.BET)
@@ -222,8 +220,8 @@ class BettingClient(TurnTakingClient):
                                       self.max_players - 1)
         if self.all_active_players_have_called_last_raise() or one_unfolded_player:
             self.cli.log(LogLevel.INFO, "End of betting round")
-            if self.get_peer_at_position(0)[0] == self.cli.ident:
-                self.send_round_message(self.LEAVE_ROOM, {})
+            # if self.get_peer_at_position(0)[1] == self.cli.ident:
+            #     self.send_round_message(self.LEAVE_ROOM, {})
             return True
         return False
 
@@ -267,7 +265,7 @@ class BettingClient(TurnTakingClient):
 
     def all_active_players_have_called_last_raise(self):
         return all([player.last_raise_i_have_called == self.game.last_raise
-                    for player in self.get_active_players()])
+                    for player in self.get_active_players()]) and self.game.last_raise is not None
 
     def get_player_from_turn_message(self, data) -> PokerPlayer:
         return self.peer_map[data[self.SENDER_ID]][PokerPlayer.POKER_PLAYER]
