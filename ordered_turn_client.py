@@ -25,7 +25,7 @@ class InsecureOrderedClient(GameClient):
                                 self.recv_roll)])
         self.players_have_been_insecure_ordered = False
         self.roll = None
-        self.max_players = max_players
+        self.max_players = self.cli.max_players
         self.room_closed = False
 
     def init_existing_state(self, state):

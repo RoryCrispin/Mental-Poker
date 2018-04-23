@@ -15,7 +15,7 @@ class FernetKeyshareClient(RSAKeyShareClient):
     SHARED_FERNET_KEY_PARAMS = 'shared_fernet_key_params'
 
     def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players)
+        super().__init__(cli, state)
         self.queue_map.extend([(self.SHARE_SECRET, self.recv_secret)])
         self.fernet_key = None
         self.fernet_key_passphrase = None

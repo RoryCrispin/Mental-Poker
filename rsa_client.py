@@ -5,10 +5,10 @@ from client import GameClient, LogLevel
 
 
 class RSAKeyShareClient(GameClient):
-    def __init__(self, cli, state=None, max_players=3):
+    def __init__(self, cli, state=None):
         super().__init__(cli, state)
         self.player_map = []
-        self.max_players = max_players
+        self.max_players = self.cli.max_players
         self.handshake_message = b'RSA_HANDSHAKE_MESSAGE'
         self.key = RSA.generate(2048)
         self.cli.own_rsa_key = self.key

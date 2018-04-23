@@ -13,6 +13,7 @@ class RedisClient:
     def __init__(self, channel, host='localhost', port=6379):
         self.ident = str(uuid4())
         self.channel = channel
+        print(host)
         # self.r = redis.StrictRedis(decode_responses=True)
         self.r = redis.StrictRedis(decode_responses=True, host=host, port=port)
         self.p = self.r.pubsub(ignore_subscribe_messages=True)
