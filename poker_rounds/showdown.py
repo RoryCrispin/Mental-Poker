@@ -93,7 +93,7 @@ class ShowdownDeckDecryptor(DeckDecryptionClient):
         self.update_game_state_log_with_winnings(poker_players)
 
     def update_game_state_log_with_player_hands(self, list_of_players, table_cards):
-        hands = [(x[0].ident, str(x[1])) for x in self.get_sorted_hands(list_of_players, table_cards)]
+        hands = [[x[0].ident, str(x[1])] for x in self.get_sorted_hands(list_of_players, table_cards)]
         self.state['game'].state_log.append({
             PokerGame.ACTION: 'unfolded_player_hands',
             'unfolded_player_hands': hands

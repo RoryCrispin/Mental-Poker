@@ -16,6 +16,7 @@ print("- [Game Over, {}]".format(time.time()))
 print("~~~~~~~ Game State Log ~~~~~~~~~~")
 print(dump(cli['game'].state_log))
 print("My Ident: %s" % cli['ident'])
+
 # print(dump(cli['game'].state_log))
 # scriptpath = path.dirname(__file__)
 # filename = path.join(scriptpath,
