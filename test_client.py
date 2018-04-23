@@ -144,6 +144,8 @@ def test_hand_reveal_client():
 
 
 def test_lots_of_rounds():
-    for _ in range(0, 40):
+    # Check that the game terminates many times. This helps to test
+    # for any edge cases that may happen infrequently.
+    while True:
         poker_sequencer = PokerHandGameSequencer()
         start_async_rounds(poker_sequencer, 3)

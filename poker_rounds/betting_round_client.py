@@ -44,24 +44,25 @@ class BettingClient(TurnTakingClient):
         small_blind_played = False
 
         for i in range(
-                dealer_position +
-                1,
-                dealer_position +
-                self.max_players +
-                1):
+                dealer_position + 1,
+                dealer_position + self.max_players + 1):
             ident, player_map = self.get_peer_at_position(i)
             player = player_map[PokerPlayer.POKER_PLAYER]
             if not player.is_all_in and not player.folded:
-                if not big_blind_played:
-                    player.set_blind(self.cli.log, big_blind=True)
-                    big_blind_played = True
-                elif not small_blind_played:
+                if not small_blind_played:
                     player.set_blind(self.cli.log, big_blind=False)
                     small_blind_played = True
+                elif not big_blind_played:
+                    player.set_blind(self.cli.log, big_blind=True)
+                    big_blind_played = True
 
     def alert_players_have_been_ordered(self):
         self.game: PokerGame = self.state['game']
-        self.init_blind_bets()
+        if not self.state.get('betting_run'):
+            self.init_blind_bets()
+        else:
+            self.game.last_raise = None
+
         self.player = self.peer_map[self.cli.ident][PokerPlayer.POKER_PLAYER]
         if self.is_my_turn() and not self.is_round_over():
             self.take_turn()

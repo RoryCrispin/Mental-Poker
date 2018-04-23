@@ -19,6 +19,8 @@ class PokerGame:
         self.last_raise = None
 
     def advance_to_next_dealer(self):
+        # This code can be used in games where the
+        # dealer moves *during* play.
         if self.dealer == self.max_players:
             self.dealer = 0
         else:

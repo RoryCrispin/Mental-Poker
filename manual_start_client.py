@@ -9,7 +9,7 @@ from poker_rounds.poker_sequencer import PokerHandGameSequencer
 ai_betting_player = AIBettingPlayer()
 rounds = PokerHandGameSequencer()
 
-cli = CommsClient(rounds, {'betting_player': ai_betting_player, 'log_level': 100}).begin()
+cli = CommsClient(rounds, {'betting_player': ai_betting_player, 'log_level': 0}).begin()
 
 print("- [Game Over, {}]".format(time.time()))
 

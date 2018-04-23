@@ -49,7 +49,7 @@ class HumanBettingPlayer:
     @staticmethod
     def get_bet(max_bet):
         while True:
-            input_bet = input("How much to bet? Max={}".format(max_bet))
+            input_bet = input("How much to bet? Max={} ".format(max_bet))
             try:
                 input_bet = int(input_bet)
             except ValueError:
