@@ -28,7 +28,7 @@ class PokerHandGameSequencer(GameSequencer):
     SHOWDOWN = 'showdown'
     # Print the timestamps between rounds - this is useful for generating
     # the timing diagram as shown in report
-    DEBUG_TIMINGS = True
+    DEBUG_TIMINGS = False
 
     def __init__(self):
         super().__init__()
@@ -46,18 +46,7 @@ class PokerHandGameSequencer(GameSequencer):
             HandDecoder: False,
             PokerSetup: False,
         }
-        self.betting_round_order = {
-            self.FIRST_BETTING_ROUND: False,
-            self.FLOP_REVEAL: False,
-            self.FLOP_REVEAL_TWO: False,
-            self.FLOP_REVEAL_THREE: False,
-            self.SECOND_BETTING_ROUND: False,
-            self.TURN_REVEAL: False,
-            self.THIRD_BETTING_ROUND: False,
-            self.RIVER_REVEAL: False,
-            self.FOURTH_BETTING_ROUND: False,
-            self.SHOWDOWN: False
-        }
+
         self.betting_round_map = {
             self.FIRST_BETTING_ROUND: BettingClient,
             self.FLOP_REVEAL: OpenCardRevealClient,
@@ -70,6 +59,11 @@ class PokerHandGameSequencer(GameSequencer):
             self.FOURTH_BETTING_ROUND: BettingClient,
             self.SHOWDOWN: ShowdownDeckDecryptor
         }
+
+        self.betting_round_order = {}
+        for name, _ in self.betting_round_map.items():
+            self.betting_round_order.update({name: False})
+
         self.timestamps = []
 
     def advance_to_next_round(self, cli, state=None):

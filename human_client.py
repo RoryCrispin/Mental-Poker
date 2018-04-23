@@ -6,6 +6,7 @@ from client import CommsClient
 from poker_rounds.human_betting_player import HumanBettingPlayer
 from poker_rounds.poker_sequencer import PokerHandGameSequencer
 
+print("Starting game")
 ai_betting_player = HumanBettingPlayer()
 rounds = PokerHandGameSequencer()
 cli = CommsClient(rounds, {'betting_player': ai_betting_player, 'log_level': 100}).begin()

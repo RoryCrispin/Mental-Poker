@@ -27,7 +27,7 @@ class HumanBettingPlayer:
         HumanBettingPlayer.print_player_states(game_round)
         print("Your cards: ", end='')
         for cardval in game_round.state['hand']:
-            print(" %s " % (Card(cardval)), end='')
+            print(" %s" % (Card(cardval)), end=', ')
         print("")
 
     # pragma: no cover
@@ -63,6 +63,8 @@ class HumanBettingPlayer:
     def print_player_states(game_round):
         print(" ==[  Players ]==")
         for ident, player in game_round.peer_map.items():
+            print(player[PokerPlayer.POKER_PLAYER], end='')
             if ident == game_round.player.ident:
-                print('You >> ', end='')
-            print(player[PokerPlayer.POKER_PLAYER])
+                print(' << You')
+            else:
+                print("")
