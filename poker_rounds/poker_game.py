@@ -5,6 +5,7 @@ from client_logging import LogLevel
 
 
 class PokerGame:
+    """This helper class encapsulates the state of a poker game."""
     ACTION = 'action'
     DEALT_CARD = 'dealt_card'
     FROM = 'ident'
@@ -32,6 +33,7 @@ class PokerGame:
 
 
 class PokerPlayer:
+    """This class encapsulates the state of a player in the poker game """
     POKER_PLAYER = 'poker_player'
 
     def __init__(self, ident, game: PokerGame):

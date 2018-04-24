@@ -8,6 +8,9 @@ from yaml import load, dump
 
 
 class RedisClient:
+    """This client handles the low level communication over the shared message board,
+    Redis. It can be replaced to enable the client to run over different message brokers -
+    as explained in the report"""
     BLOCK_SIZE = 16
 
     def __init__(self, channel, host='localhost', port=6379):

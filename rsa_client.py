@@ -5,6 +5,8 @@ from client import GameClient, LogLevel
 
 
 class RSAKeyShareClient(GameClient):
+    """This client handles the protocol for sharing all client's
+    RSA public keys with eachother. It's used for the End to End encryption"""
     def __init__(self, cli, state=None):
         super().__init__(cli, state)
         self.player_map = []

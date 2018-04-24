@@ -6,6 +6,9 @@ from ordered_turn_client import SecureOrderedClient
 
 
 class TurnTakingClient(SecureOrderedClient):
+    """This client handles the high level sequencing of players in
+    turn based games. it relies on the players having been ordered previously
+    and have a 'roll' field in their peer_map entry."""
     END_TURN = 'end_turn'
     ROOM_CODE = 'room_code'
     LEAVE_ROOM = 'leave_room'
@@ -15,8 +18,7 @@ class TurnTakingClient(SecureOrderedClient):
         self.queue_map.extend([(self.END_TURN, self.recv_end_turn),
                                (self.LEAVE_ROOM, self.recv_leave_room)])
         self.current_turn = 0
-        # Pregrnerate a room code; this will be overwritten if we're not player
-        # 0
+        # Pregrnerate a room code; this will be overwritten if we're not player 0
         self.room_code = uuid4()
         self.setup_finished = False
 

@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 
 import yaml
@@ -8,7 +9,7 @@ from poker_rounds.poker_game import BettingCodes, PokerPlayer
 
 class HumanBettingPlayer:
     """ This betting player class interrupts play to offer the
-    user a choice of which move to make"""
+    user a choice of which move to make."""
 
     @staticmethod
     def get_move(game_round, possible_moves, max_bet):

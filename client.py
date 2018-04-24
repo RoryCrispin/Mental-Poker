@@ -7,6 +7,10 @@ from redis_client import RedisClient
 
 
 class CommsClient(RedisClient):
+    """This client handles sequencing of messages from the low level
+    transport layer client. It will also manage running the game rounds
+    and requesting new rounds when the previous round finished."""
+
     def __init__(self, game_sequencer: GameSequencer, round_args=None):
         if round_args is None:
             round_args = {}
@@ -64,6 +68,7 @@ class CommsClient(RedisClient):
 
 
 class GameClient:
+    """This is the base Game class which all rounds extend."""
     SENDER_ID = 'sender_id'
     MESSAGE_KEY = 'message_key'
     IDENT_REQ_KEY = 'identify_request'
@@ -82,10 +87,6 @@ class GameClient:
                                (self.IDENT_RESP_KEY,
                                 self.recv_identify_response)])
 
-    # Takes a Queue of messages and returns a new game class along with
-    # a new queue state (With the applied element removed)
-    # These games are still impure in that they can freely send messages to
-    # other clients through execution
     def init_state(self):
         if self.state is not None:
             self.previous_state = self.state
@@ -93,6 +94,10 @@ class GameClient:
         else:
             self.init_no_state()
 
+    # Takes a Queue of messages and returns a new game class along with
+    # a new queue state (With the applied element removed)
+    # These games are still impure in that they can freely send messages to
+    # other clients through execution
     def apply_queue(self, queue):  # -> GameClient, Queue, FinalState
         new_queue = []
         for event in queue:
@@ -155,6 +160,9 @@ class GameClient:
 
 
 class GreetingCli(GameClient):
+    """ This is a basic game client that exists as a demonstration of the
+    class and in testing."""
+
     def __init__(self, cli, state=None, greetings_sent=0):
         super().__init__(cli)
         self.greetings_sent = greetings_sent

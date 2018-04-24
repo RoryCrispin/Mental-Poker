@@ -5,6 +5,8 @@ from poker_rounds.poker_game import PokerGame, PokerPlayer
 
 
 class PokerSetup(GameClient):
+    """This class runs once after the player hands have been dealt to initialise
+    the poker game state."""
     def __init__(self, cli, state=None, max_players=3):
         self.max_players = max_players
         super().__init__(cli, state)

@@ -3,6 +3,9 @@ from cardlib.Card import Card
 
 
 class CryptoCard:
+    """This class encapsulates the details of a card encrypted with the Secure
+    Shuffle protocol. We keep a log of the cards state for debugging and a list
+    of all players whose locks are currently applied to the card."""
     ENCRYPTED = 'encrypted'
     DECRYPTED = 'decrypted'
     GENERATED = 'generated'

@@ -6,6 +6,9 @@ from turn_taking_client import TurnTakingClient
 
 
 class SecureDecryptionClient(TurnTakingClient):
+    """This client handles sharing players full private keys and decrypting the deck
+    It's used at the end of the game in the showdown round to check players hands
+    and for anti-cheat code."""
     def __init__(self, cli, state=None,
                  private_component_key=None):
         super().__init__(cli, state)

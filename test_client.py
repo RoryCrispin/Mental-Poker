@@ -10,7 +10,7 @@ from game_sequencer import ManualGameSequencer
 from ordered_turn_client import InsecureOrderedClient
 from poker_rounds.card_reveal_client import CardRevealClient
 from poker_rounds.poker_game import PokerWords
-from poker_rounds.poker_sequencer import PokerHandGameSequencer
+from poker_rounds.poker_sequencer import PokerGameSequencer
 from poker_rounds.secure_deck_shuffle import DeckShuffleClient
 from rsa_client import RSAKeyShareClient
 from secure_decryption_client import SecureShuffleSampleDecryptor
@@ -113,7 +113,7 @@ def test_card_reveal_client():
 
 
 def test_hand_reveal_client():
-    poker_sequencer = PokerHandGameSequencer()
+    poker_sequencer = PokerGameSequencer()
     x = start_async_rounds(poker_sequencer, 3)
     for state in x:
         assert len(state.get(PokerWords.HAND)) == 2
@@ -132,5 +132,5 @@ def test_lots_of_rounds():
     # Check that the game terminates many times. This helps to test
     # for any edge cases that may happen infrequently.
     for _ in range(0, 10):
-        poker_sequencer = PokerHandGameSequencer()
+        poker_sequencer = PokerGameSequencer()
         start_async_rounds(poker_sequencer, 3)

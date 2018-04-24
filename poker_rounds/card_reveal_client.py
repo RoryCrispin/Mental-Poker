@@ -6,6 +6,8 @@ from turn_taking_client import TurnTakingClient
 
 
 class CardRevealClient(TurnTakingClient):
+    """This client operates the card reveal protocol. It is extended
+    to either reveal table cards or private player hands."""
     NOT_SHARING_PRIVATE = 'not_sharing_private'
     REMOVE_LOCK = 'remove_lock'
 
@@ -116,6 +118,7 @@ class CardRevealClient(TurnTakingClient):
 
 
 class HandDecoder(TurnTakingClient):
+    """ Extracts the player's hand from the cryptodeck """
     def __init__(self, cli, state=None):
         super().__init__(cli, state)
         self.hand = None

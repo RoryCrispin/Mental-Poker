@@ -9,7 +9,7 @@ from turn_taking_client import TurnTakingClient
 
 class BettingClient(TurnTakingClient):
     """The betting client handles all game logic relating to the betting
-    round of a game of poker. It will look for the
+    round of a game of poker.
 
     """
     BET_AMOUNT = 'bet_amount'

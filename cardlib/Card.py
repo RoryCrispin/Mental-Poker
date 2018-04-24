@@ -55,12 +55,3 @@ class Card:
 
     def __eq__(self, other):
         return self.face == other.face and self.rank == other.rank
-
-
-# def generate_full_deck():
-#     faces = [Face.Club, Face.Diamond, Face.Spade, Face.Heart]
-#     ranks = range(0, 13)
-#     return [Card(Rank(x[1]), x[0]) for x in product(faces, ranks)]
-
-# def generate_full_deck():
-#     return [Card(p[0], p[1]) for p in product(Rank, Face)]

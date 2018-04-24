@@ -6,6 +6,8 @@ from turn_taking_client import TurnTakingClient
 
 
 class ShufflingClient(TurnTakingClient):
+    """This client operates an insecure shuffle. It's not used in the poker game
+    - only in unit tests. """
     SHUFFLE_DECK = 'shuffle_deck'
 
     def __init__(self, cli, state=None):

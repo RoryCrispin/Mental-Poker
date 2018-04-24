@@ -6,8 +6,18 @@ from yaml import dump
 from client import CommsClient
 from poker_rounds.betting_player import AIBettingPlayer
 from poker_rounds.human_betting_player import HumanBettingPlayer
-from poker_rounds.poker_sequencer import PokerHandGameSequencer
+from poker_rounds.poker_sequencer import PokerGameSequencer
 
+"""This is the main runnable code, send the argument --help:
+Usage: run.py [OPTIONS]
+
+Options:
+  --log-level INTEGER    Log level for the client, lower is more logs
+  --player TEXT          Player, (c)omputer or (h)uman
+  --host TEXT            Hostname of the redis message broker
+  --num-players INTEGER  The number of players to wait for in the game
+  --help                 Show this message and exit.
+"""
 
 @click.command()
 @click.option('--log-level', default=100, help='Log level for the client, lower is more logs')
@@ -23,7 +33,7 @@ def run(log_level, player, host, num_players):
     else:
         print("Invalid arguments, please specify a player")
         return
-    rounds = PokerHandGameSequencer()
+    rounds = PokerGameSequencer()
     cli = CommsClient(rounds, {'betting_player': betting_player, 'log_level': log_level,
                                'host': host, 'num_players': num_players}).begin()
 

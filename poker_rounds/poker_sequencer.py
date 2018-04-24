@@ -13,7 +13,9 @@ from secure_player_ordering import ShuffledPlayerDecryptionClient, \
     PlayerShuffleClient
 
 
-class PokerHandGameSequencer(GameSequencer):
+class PokerGameSequencer(GameSequencer):
+    """This class sequences the rounds needed to play a full game of Texas Hold Em poker
+    A full flowchart of it's logic is included in the report pdf."""
     SHUFFLE_DECK_PHASE = 'shuffle_deck_phase'
     DEAL_CARD_PHASE = 'deal_card_phase'
     FIRST_BETTING_ROUND = 'first_betting_round'

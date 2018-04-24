@@ -8,5 +8,3 @@ class LogLevel():
     GENERAL = 3
     ERROR = 4
 
-# def readable_ident(ident):
-#     return ident[:4]

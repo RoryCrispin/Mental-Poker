@@ -5,6 +5,8 @@ from poker_rounds.poker_game import PokerGame
 
 
 class OpenCardRevealClient(CardRevealClient):
+    """Extends the CardRevealClient to reveal open cards on the table
+    (Ie, flop turn, and river cards)"""
     def take_turn(self):
         self.cli.log(LogLevel.INFO, "Removed my lock of communal card")
         self.remove_my_lock_and_share()

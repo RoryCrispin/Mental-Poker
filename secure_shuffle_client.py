@@ -1,5 +1,5 @@
 # coding=utf-8
-from random import shuffle
+from Crypto.Random.random import shuffle
 
 from client import LogLevel
 from crypto.sra_keygen import SraKey
@@ -8,6 +8,7 @@ from turn_taking_client import TurnTakingClient
 
 
 class SecureShufflingClient(TurnTakingClient, CryptoWords):
+    """This client generates a list and operates the secure shuffle round"""
     SHUFFLE_DECK = 'shuffle_deck'
     SHARE_PRIMES = 'share_primes'
     SHARE_KEY = 'share_key'

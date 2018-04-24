@@ -5,6 +5,8 @@ from secure_shuffle_client import SecureShufflingClient
 
 
 class DeckShuffleClient(SecureShufflingClient):
+    """This class extends the shuffling client to add code specific to shuffling
+    and generating a deck of cards."""
     def __init__(self, cli, state=None):
         super().__init__(cli, state)
         self.shuffle_state = list(range(10, 62))
