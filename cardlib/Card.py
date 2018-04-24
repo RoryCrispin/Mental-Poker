@@ -38,9 +38,6 @@ class Card:
     def __repr__(self):
         return "%s %s" % (self.rank.name, self.face.name)
 
-    # def __sortkey__(self):
-    #     return self.rank
-
     def __lt__(self, other):
         return self.rank < other.rank
 
@@ -49,9 +46,6 @@ class Card:
 
     def __int__(self):
         return self.rank
-
-    # def __add__(self, x):
-    #     return Card(Rank(int(self) + int(x)), self.face)
 
     def __eq__(self, other):
         return self.face == other.face and self.rank == other.rank

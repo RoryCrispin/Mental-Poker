@@ -93,7 +93,6 @@ class CardRevealClient(TurnTakingClient):
         return self.generating_card_for() == self.cli.ident
 
     def generating_card_for(self):
-        # return self.get_ident_at_position(0)
         return self.get_ident_at_position(self.card.dealt_to)
 
     def received_all_peer_keys(self):

@@ -27,7 +27,6 @@ class BettingClient(TurnTakingClient):
 
         if self.cli.round_args.get('betting_player') is None:
             self.betting_player = AIBettingPlayer()
-            # raise ValueError
         else:
             self.betting_player = self.cli.round_args.get('betting_player')
 
@@ -204,7 +203,6 @@ class BettingClient(TurnTakingClient):
         try:
             max_pot_size = max(self.get_unfolded_pots())
             cash_needed = max_pot_size - player.cash_in_pot
-            # print("need to call :: {}".format(cash_needed))
             if cash_needed < 0:
                 raise ValueError
             return cash_needed
@@ -219,8 +217,6 @@ class BettingClient(TurnTakingClient):
                                       self.max_players - 1)
         if self.all_active_players_have_called_last_raise() or one_unfolded_player:
             self.cli.log(LogLevel.INFO, "End of betting round")
-            # if self.get_peer_at_position(0)[1] == self.cli.ident:
-            #     self.send_round_message(self.LEAVE_ROOM, {})
             return True
         return False
 
