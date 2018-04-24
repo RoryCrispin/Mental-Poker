@@ -7,10 +7,13 @@ from secure_decryption_client import DeckDecryptionClient
 
 
 class ShowdownDeckDecryptor(DeckDecryptionClient):
+    """ This client runs at the end of the game, it's responsible for fully decryptijng
+    the deck, checking that the initial deck generated was valid and finally, checking
+    the winnings of the game."""
     SHOWDOWN_REVEAL = 'showdown_reveal'
 
-    def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players)
+    def __init__(self, cli, state=None):
+        super().__init__(cli, state)
 
     def get_final_state(self):
         self.fully_decrypt_deck()
@@ -107,7 +110,6 @@ class ShowdownDeckDecryptor(DeckDecryptionClient):
                      'ident': player.ident,
                      PokerWords.WINNINGS: player.winnings})
 
-    # TODO: add support for draws!
     @staticmethod
     def get_sorted_hands(list_of_players, table_cards):
         hands = [(player, player.hand + table_cards)

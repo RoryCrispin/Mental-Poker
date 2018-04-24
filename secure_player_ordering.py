@@ -31,8 +31,8 @@ class ShuffledPlayerDecryptionClient(SecureDecryptionClient):
 
     """
 
-    def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players,
+    def __init__(self, cli, state=None):
+        super().__init__(cli, state,
                          private_component_key='ordering_private_component')
 
     def init_existing_state(self, state):

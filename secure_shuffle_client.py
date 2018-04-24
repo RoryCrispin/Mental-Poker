@@ -15,8 +15,8 @@ class SecureShufflingClient(TurnTakingClient, CryptoWords):
     ENCRYPTED_BY = 'encrypted_by'
     KEYSIZE = 512
 
-    def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players)
+    def __init__(self, cli, state=None):
+        super().__init__(cli, state)
         self.queue_map.extend([(self.SHUFFLE_DECK, self.recv_shuffled_deck),
                                (self.SHARE_PRIMES, self.recv_primes)
                                ])

@@ -5,8 +5,8 @@ from secure_shuffle_client import SecureShufflingClient
 
 
 class DeckShuffleClient(SecureShufflingClient):
-    def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players)
+    def __init__(self, cli, state=None):
+        super().__init__(cli, state)
         self.shuffle_state = list(range(10, 62))
 
     def get_final_state(self):

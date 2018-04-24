@@ -9,8 +9,8 @@ class CardRevealClient(TurnTakingClient):
     NOT_SHARING_PRIVATE = 'not_sharing_private'
     REMOVE_LOCK = 'remove_lock'
 
-    def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players)
+    def __init__(self, cli, state=None):
+        super().__init__(cli, state)
         self.queue_map.extend([(self.NOT_SHARING_PRIVATE,
                                 self.recv_not_sharing_private),
                                (self.REMOVE_LOCK,
@@ -49,7 +49,6 @@ class CardRevealClient(TurnTakingClient):
             self.remove_my_lock_and_share()
             self.end_my_turn()
 
-    # TODO: join this with remove_my_lock method
     def remove_my_lock_and_share(self):
         if self.card.value is None:
             self.card = self.get_card_for_decryption()
@@ -117,8 +116,8 @@ class CardRevealClient(TurnTakingClient):
 
 
 class HandDecoder(TurnTakingClient):
-    def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players)
+    def __init__(self, cli, state=None):
+        super().__init__(cli, state)
         self.hand = None
 
     def init_existing_state(self, state):

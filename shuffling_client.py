@@ -8,8 +8,8 @@ from turn_taking_client import TurnTakingClient
 class ShufflingClient(TurnTakingClient):
     SHUFFLE_DECK = 'shuffle_deck'
 
-    def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players)
+    def __init__(self, cli, state=None):
+        super().__init__(cli, state)
         self.queue_map.extend([(self.SHUFFLE_DECK, self.recv_shuffle)])
         self.shuffle_state = list(range(1, 10))
         self.shuffled_times = 0

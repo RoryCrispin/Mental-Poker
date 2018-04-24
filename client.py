@@ -8,6 +8,8 @@ from redis_client import RedisClient
 
 class CommsClient(RedisClient):
     def __init__(self, game_sequencer: GameSequencer, round_args=None):
+        if round_args is None:
+            round_args = {}
         super().__init__('poker_chan', round_args.get('host'))
         self.max_players = round_args.get('num_players', 3)
         self.round_args = {} if round_args is None else round_args

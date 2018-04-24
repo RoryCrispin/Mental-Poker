@@ -14,9 +14,9 @@ class BettingClient(TurnTakingClient):
     """
     BET_AMOUNT = 'bet_amount'
 
-    def __init__(self, cli, state=None, max_players=3):
+    def __init__(self, cli, state=None):
         self.player: PokerPlayer = None
-        super().__init__(cli, state, max_players)
+        super().__init__(cli, state)
         self.queue_map.extend([(BettingCodes.FOLD, self.handle_fold),
                                (BettingCodes.CALL, self.handle_call),
                                (BettingCodes.BET, self.handle_bet),
@@ -214,7 +214,6 @@ class BettingClient(TurnTakingClient):
             return None
 
     def is_round_over(self):
-        # TODO: Get rid of all_players_moved
         one_unfolded_player = len(
             self.get_folded_players()) == (
                                       self.max_players - 1)
@@ -261,7 +260,6 @@ class BettingClient(TurnTakingClient):
     def is_turn_valid(self, data):
         if super().is_turn_valid(data):
             return True
-            # TODO: Check for all in/folded players making illegal moves
 
     def all_active_players_have_called_last_raise(self):
         return all([player.last_raise_i_have_called == self.game.last_raise

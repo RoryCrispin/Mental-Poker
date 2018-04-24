@@ -87,19 +87,6 @@ def test_shuffling_client():
     assert (all(d != list(range(10)) for d in decks))
 
 
-# def test_secure_shuffling_client():
-#     rounds = ManualGameSequencer(
-#         [SecureShufflingClient, SecureShuffleSampleDecryptor])
-#     x = start_async_rounds(rounds, 3)
-#     deck_states = []
-#     for client in x:
-#         deck_states.append(client.get(PokerWords.DECK_STATE))
-#     assert deck_states[0] != list(range(1, 10))
-#     # There's a 10! chance that this test will fail because the
-#     # shuffled order is actually 1..10
-#     assert sorted(deck_states[0]) == list(range(1, 10))
-#     assert (all(d == deck_states[0] for d in deck_states))
-
 def test_secure_player_ordering():
     rounds = ManualGameSequencer([InsecureOrderedClient, PlayerShuffleClient])
     start_async_rounds(rounds, 3)
@@ -140,12 +127,10 @@ def test_hand_reveal_client():
     assert all(
         (d.cash_in_pot == playermaps[0].cash_in_pot for d in playermaps))
 
-#
-
 
 def test_lots_of_rounds():
     # Check that the game terminates many times. This helps to test
     # for any edge cases that may happen infrequently.
-    while True:
+    for _ in range(0, 10):
         poker_sequencer = PokerHandGameSequencer()
         start_async_rounds(poker_sequencer, 3)

@@ -10,8 +10,8 @@ class TurnTakingClient(SecureOrderedClient):
     ROOM_CODE = 'room_code'
     LEAVE_ROOM = 'leave_room'
 
-    def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players)
+    def __init__(self, cli, state=None):
+        super().__init__(cli, state)
         self.queue_map.extend([(self.END_TURN, self.recv_end_turn),
                                (self.LEAVE_ROOM, self.recv_leave_room)])
         self.current_turn = 0

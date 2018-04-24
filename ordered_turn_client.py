@@ -17,7 +17,7 @@ class InsecureOrderedClient(GameClient):
     ROLL = 'roll'
     PLAYERS_HAVE_BEEN_INSECURE_ORDERED = 'players_have_been_insecure_ordered'
 
-    def __init__(self, cli, state=None, max_players=3):
+    def __init__(self, cli, state=None):
         super().__init__(cli, state)
         self.queue_map.extend([(self.JOIN_MESSAGE,
                                 self.recv_join_message),
@@ -107,8 +107,8 @@ class SecureOrderedClient(InsecureOrderedClient):
     though they were sitting around a physical table"""
     SHUFFLED_LIST = 'shuffled_list'
 
-    def __init__(self, cli, state=None, max_players=3):
-        super().__init__(cli, state, max_players)
+    def __init__(self, cli, state=None):
+        super().__init__(cli, state)
         self.queue_map.extend([(self.SHUFFLED_LIST, self.recv_shuffled_list)])
 
     def is_round_over(self):
